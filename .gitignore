@@ -1,0 +1,31 @@
+# Build artifacts
+*.o
+*.a
+*.so
+*.exe
+pcc_vm
+build/
+bin/
+
+# Development files
+.vscode/
+.clangd/
+*.tmp
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Agent logs and experiments
+agents/logs/
+agents/experiments/
+agents/temp/
+
+# Test outputs
+tests/output/
+tests/temp/
+
+# Dependencies (if any)
+deps/
+third_party/
