@@ -1,0 +1,33 @@
+{
+  "type": "GAME",
+  "nodes": [
+    {
+      "type": "WORLD",
+      "size": [
+        10,
+        10,
+        1
+      ],
+      "entities": []
+    },
+    {
+      "type": "PLAYER",
+      "pos": [
+        0,
+        0,
+        0
+      ],
+      "controls": [
+        "WASD"
+      ]
+    },
+    {
+      "type": "OBJECTIVE",
+      "goal": {
+        "type": "DEFEAT_ALL",
+        "target": "enemy"
+      }
+    }
+  ],
+  "compression_id": "C5610"
+}
