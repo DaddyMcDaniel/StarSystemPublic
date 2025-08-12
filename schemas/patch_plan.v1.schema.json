@@ -1,0 +1,139 @@
+/*
+SUMMARY: Patch Plan Schema v1
+==============================
+Defines structured patch operations for modifying Godot scenes in StarSystem.
+Enables deterministic scene modifications with validation and rollback capabilities.
+
+KEY COMPONENTS:
+- operations: Array of atomic scene modification operations
+- operation_types: add_node, modify_property, delete_node, add_script
+- safety_options: dry_run and backup flags for safe execution
+- validation: Target path and data validation
+
+USAGE:
+- Used by tools.godot.apply_patch for scene modifications
+- Supports both dry-run validation and actual application
+- Enables atomic batch operations with rollback capability
+- Essential for AI-generated scene modifications
+
+RELATED FILES:
+- tools: godot.apply_patch
+- mcp_server/server.py - Godot integration
+- Enables safe automated scene generation and modification
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:patch_plan:v1",
+  "version": 1,
+  "title": "Patch Plan Schema v1",
+  "description": "Structured patch operations for deterministic Godot scene modifications",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Patch context and identification",
+      "additionalProperties": false,
+      "properties": {
+        "patch_id": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "author": {"type": "string"},
+        "description": {"type": "string"},
+        "target_scene": {"type": "string"},
+        "godot_version": {"type": "string"}
+      }
+    },
+    "operations": {
+      "type": "array",
+      "description": "Ordered list of atomic scene modification operations",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this operation"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["add_node", "modify_property", "delete_node", "add_script", "set_transform", "add_resource"],
+            "description": "Type of scene modification operation"
+          },
+          "target_path": {
+            "type": "string",
+            "description": "Node path in Godot scene tree (e.g., '/root/Main/Player')",
+            "pattern": "^/.*"
+          },
+          "data": {
+            "type": "object",
+            "description": "Operation-specific data payload"
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Pre-conditions that must be met for this operation",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string", "enum": ["node_exists", "property_equals", "script_attached"]},
+                "target": {"type": "string"},
+                "expected_value": {}
+              }
+            }
+          },
+          "rollback_data": {
+            "type": "object",
+            "description": "Data needed to reverse this operation"
+          }
+        },
+        "required": ["type", "target_path"]
+      }
+    },
+    "execution_options": {
+      "type": "object",
+      "description": "Control flags for patch execution",
+      "additionalProperties": false,
+      "properties": {
+        "dry_run": {
+          "type": "boolean",
+          "default": false,
+          "description": "Validate operations without applying changes"
+        },
+        "backup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Create backup before applying changes"
+        },
+        "atomic": {
+          "type": "boolean",
+          "default": true,
+          "description": "All operations succeed or all are rolled back"
+        },
+        "continue_on_warning": {
+          "type": "boolean",
+          "default": false,
+          "description": "Continue execution despite non-critical warnings"
+        },
+        "validation_level": {
+          "type": "string",
+          "enum": ["none", "basic", "strict"],
+          "default": "basic",
+          "description": "Level of pre-execution validation"
+        }
+      }
+    },
+    "expected_outcomes": {
+      "type": "object",
+      "description": "Expected results for validation",
+      "additionalProperties": false,
+      "properties": {
+        "nodes_added": {"type": "integer", "minimum": 0},
+        "nodes_modified": {"type": "integer", "minimum": 0},
+        "nodes_deleted": {"type": "integer", "minimum": 0},
+        "scene_valid": {"type": "boolean", "default": true}
+      }
+    }
+  },
+  "required": ["operations"]
+}

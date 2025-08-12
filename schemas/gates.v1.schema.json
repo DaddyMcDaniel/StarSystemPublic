@@ -1,0 +1,86 @@
+/*
+SUMMARY: Gates Configuration Schema v1
+===========================================
+Defines acceptance gates, hard caps, tolerances, and validation rules for StarSystem builds.
+Used by validators.gates_check tool to enforce quality standards and prevent regressions.
+
+KEY COMPONENTS:
+- hard_caps: Absolute limits (tri_count, materials, etc.)
+- tolerances: Acceptable degradation thresholds 
+- priorities: Evaluation order for tie-breaking
+- nan_policy: How to handle undefined/NaN values
+
+USAGE:
+- Loaded by validators.gates_check during build validation
+- Separate profiles for web vs native builds (gates.web.yaml vs gates.native.yaml)
+- Enforced deterministically with machine-readable rationale
+
+RELATED FILES:
+- config/gates.web.yaml - Web platform configuration
+- config/gates.native.yaml - Native platform configuration 
+- tools: validators.gates_check
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:gates:v1",
+  "version": 1,
+  "title": "Gates Configuration Schema",
+  "description": "Acceptance gates, caps, and validation rules for build quality control",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "hard_caps": {
+      "type": "object",
+      "description": "Absolute limits that cannot be exceeded",
+      "additionalProperties": false,
+      "properties": {
+        "tri_count": {"type": "integer", "minimum": 0},
+        "materials": {"type": "integer", "minimum": 0},
+        "texture_memory_mb": {"type": "number", "minimum": 0},
+        "draw_calls": {"type": "integer", "minimum": 0}
+      }
+    },
+    "tolerances": {
+      "type": "object",
+      "description": "Acceptable degradation thresholds",
+      "additionalProperties": false,
+      "properties": {
+        "tri_count": {
+          "type": "object",
+          "properties": {
+            "worsen_max_pct": {"type": "number", "minimum": 0}
+          }
+        },
+        "materials": {
+          "type": "object", 
+          "properties": {
+            "worsen_max": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "priorities": {
+      "type": "array",
+      "description": "Evaluation order for metrics",
+      "items": {
+        "type": "string",
+        "enum": ["readability", "perf_proxy", "tri_count", "materials"]
+      }
+    },
+    "tie_breakers": {
+      "type": "array",
+      "description": "Tie-breaking order when priorities are equal",
+      "items": {
+        "type": "string",
+        "enum": ["perf_proxy", "tri_count", "materials", "readability"]
+      }
+    },
+    "nan_policy": {
+      "type": "string",
+      "enum": ["treat_as_worst", "treat_as_best", "fail"],
+      "default": "treat_as_worst"
+    }
+  },
+  "required": ["hard_caps", "tolerances", "priorities"]
+}

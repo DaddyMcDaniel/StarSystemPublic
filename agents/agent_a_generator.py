@@ -1,7 +1,37 @@
 #!/usr/bin/env python3
 """
-Agent A: PCC Game Generator
-Generates pure PCC AST structures for games based on English prompts
+SUMMARY: Agent A - Primary Code Generator v1
+============================================
+Fast, prolific code generator specializing in PCC language features and runtime improvements.
+Primary agent in the A→D→B→C evolution cycle for StarSystem development.
+
+ROLE & RESPONSIBILITIES:
+- Rapid prototyping of PCC language features and Godot integration enhancements
+- Generating deterministic code changes with proper seed management
+- Creating testable implementations following established patterns
+- Proposing surgical edits rather than broad architectural rewrites
+- Building grid-based placement logic inspired by Terraria/Eco hammer tools
+
+KEY CAPABILITIES:
+- Blueprint Chips: Generate deterministic node graphs from natural language prompts
+- Replay Systems: Create reproducible test scenarios with exact seed reproduction
+- Building Systems: Design grid-based placement and validation logic
+- Planet Generation: Generate layered, navigatable, alien-like mini-planets
+- Performance-aware: Ensures generated code meets efficiency requirements
+
+INTEGRATION:
+- Loads HOD from agents/memory/agent_a_prompt.txt
+- Outputs validated by Agent B (tester/validator)
+- Supervised by Agent C (governance/coordination)
+- Focus on unlimited creative building time (Halo Forge mode philosophy)
+
+USAGE:
+  python agents/agent_a_generator.py
+  make agents  # Run full A→B→C handshake
+
+RELATED FILES:
+- agents/memory/agent_a_prompt.txt - High-Order Directive with contracts
+- Week 2+ focus on idea → playable mini-planet workflow
 """
 import random
 import json

@@ -1,0 +1,156 @@
+/*
+SUMMARY: Ledger Schema v1
+==========================
+Defines undo/redo time-travel entries for cross-session persistence in StarSystem.
+Enables unlimited undo across sessions and provides comprehensive change history.
+
+KEY COMPONENTS:
+- ledger_entries: Chronological list of all changes with reversibility data
+- session_boundaries: Markers for session starts/ends
+- branching_points: Alternative timeline creation and merging
+- state_snapshots: Periodic full state captures for performance
+
+USAGE:
+- Written by tools.builders.ledger_write for all world modifications
+- Enables undo/redo across multiple building sessions
+- Supports branching timelines for experimental changes
+- Saved to runs/{run_id}/ledger.json
+
+RELATED FILES:
+- tools: builders.ledger_write
+- artifacts: runs/{run_id}/ledger.json
+- supports: unlimited undo, session continuity, change history
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:ledger:v1",
+  "version": 1,
+  "title": "Ledger Schema",
+  "description": "Undo/redo time-travel entries for cross-session change persistence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ledger_metadata": {
+      "type": "object",
+      "description": "Ledger identification and versioning",
+      "additionalProperties": false,
+      "properties": {
+        "ledger_id": {"type": "string"},
+        "world_id": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "current_entry_index": {"type": "integer", "minimum": -1},
+        "total_entries": {"type": "integer", "minimum": 0},
+        "active_branch": {"type": "string", "default": "main"}
+      },
+      "required": ["ledger_id", "world_id", "created_at"]
+    },
+    "ledger_entries": {
+      "type": "array",
+      "description": "Chronological list of all changes with undo data",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry_id": {"type": "string"},
+          "sequence_number": {"type": "integer", "minimum": 0},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "author": {"type": "string"},
+          "operation_type": {
+            "type": "string",
+            "enum": ["create", "modify", "delete", "move", "batch", "import", "generate"]
+          },
+          "description": {"type": "string"},
+          "forward_changes": {
+            "type": "object",
+            "description": "Data needed to apply this change",
+            "properties": {
+              "objects_added": {"type": "array", "items": {"type": "object"}},
+              "objects_modified": {"type": "array", "items": {"type": "object"}},
+              "objects_removed": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "reverse_changes": {
+            "type": "object",
+            "description": "Data needed to undo this change",
+            "properties": {
+              "objects_to_remove": {"type": "array", "items": {"type": "string"}},
+              "objects_to_restore": {"type": "array", "items": {"type": "object"}},
+              "property_reverts": {"type": "array", "items": {"type": "object"}}
+            }
+          },
+          "affects_objects": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of object IDs affected by this change"
+          },
+          "session_id": {"type": "string"},
+          "branch_name": {"type": "string", "default": "main"},
+          "can_undo": {"type": "boolean", "default": true},
+          "undo_complexity": {
+            "type": "string",
+            "enum": ["simple", "moderate", "complex", "requires_confirmation"]
+          }
+        },
+        "required": ["entry_id", "sequence_number", "timestamp", "operation_type", "forward_changes", "reverse_changes"]
+      }
+    },
+    "session_boundaries": {
+      "type": "array",
+      "description": "Markers for session starts and ends",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {"type": "string"},
+          "start_timestamp": {"type": "string", "format": "date-time"},
+          "end_timestamp": {"type": "string", "format": "date-time"},
+          "start_entry_index": {"type": "integer", "minimum": 0},
+          "end_entry_index": {"type": "integer", "minimum": 0},
+          "session_type": {"type": "string", "enum": ["building", "testing", "collaboration", "import"]},
+          "author": {"type": "string"}
+        },
+        "required": ["session_id", "start_timestamp", "start_entry_index"]
+      }
+    },
+    "branching_points": {
+      "type": "array",
+      "description": "Alternative timeline creation and merging",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "branch_name": {"type": "string"},
+          "parent_branch": {"type": "string"},
+          "branch_point_entry": {"type": "integer", "minimum": 0},
+          "created_at": {"type": "string", "format": "date-time"},
+          "created_by": {"type": "string"},
+          "description": {"type": "string"},
+          "is_merged": {"type": "boolean", "default": false},
+          "merged_at": {"type": "string", "format": "date-time"},
+          "merge_strategy": {"type": "string", "enum": ["fast_forward", "three_way", "manual_resolution"]}
+        },
+        "required": ["branch_name", "parent_branch", "branch_point_entry", "created_at"]
+      }
+    },
+    "state_snapshots": {
+      "type": "array",
+      "description": "Periodic full state captures for performance optimization",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "snapshot_id": {"type": "string"},
+          "entry_index": {"type": "integer", "minimum": 0},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "full_world_state": {"type": "object"},
+          "compression_type": {"type": "string", "enum": ["none", "gzip", "lz4", "zstd"]},
+          "state_hash": {"type": "string"},
+          "size_bytes": {"type": "integer", "minimum": 0}
+        },
+        "required": ["snapshot_id", "entry_index", "timestamp", "state_hash"]
+      }
+    }
+  },
+  "required": ["ledger_metadata", "ledger_entries"]
+}

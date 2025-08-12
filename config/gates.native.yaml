@@ -1,0 +1,51 @@
+# SUMMARY: Native Platform Gates Configuration
+# ============================================
+# Performance gates and validation rules for native (desktop) StarSystem builds.
+# Higher performance targets compared to web builds due to better hardware capabilities.
+#
+# KEY COMPONENTS:
+# - hard_caps: Absolute limits for native platform performance
+# - tolerances: Acceptable degradation thresholds for regression testing
+# - priorities/tie_breakers: Evaluation order for quality metrics
+#
+# USAGE:
+# - Loaded by validators.gates_check when building for native platforms
+# - More aggressive limits than web builds (gates.web.yaml)
+# - Used for desktop and standalone application validation
+#
+# RELATED FILES:
+# - config/gates.web.yaml - Web platform configuration (lower limits)
+# - schemas/gates.v1.schema.json - Validation schema
+# - tools: validators.gates_check
+
+gates:
+  hard_caps:
+    tri_count: 500000      # Higher than web (120k) for native performance
+    materials: 128         # More materials supported natively
+    texture_memory_mb: 512 # Higher memory budget for native
+    draw_calls: 2000       # More draw calls acceptable
+  priorities:
+    - readability
+    - perf_proxy
+    - tri_count
+    - materials
+  tolerances:
+    tri_count:
+      worsen_max_pct: 5.0  # More lenient for native builds
+    materials:
+      worsen_max: 4        # More materials tolerance
+    texture_memory_mb:
+      worsen_max_pct: 10.0
+  tie_breakers:
+    - perf_proxy
+    - tri_count
+    - materials
+    - readability
+  nan_policy: treat_as_worst
+
+budgets:
+  calls_max: 200           # More tool calls for native validation
+  wall_seconds: 1800       # 30 minutes for complex native builds
+  per_call_timeout: 300    # Longer per-call timeout
+  fixer_max_iters: 5       # More fix iterations
+  cancel_on_gate_violation: true

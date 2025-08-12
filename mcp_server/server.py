@@ -1,7 +1,35 @@
 #!/usr/bin/env python3
 """
-StarSystem MCP Server
-Headless Godot utilities, generators, and validators for Week-1 pre-alpha core
+SUMMARY: StarSystem MCP Server v1
+==================================
+Headless Godot utilities, generators, and validators for StarSystem pre-alpha core.
+Implements MCP protocol with deterministic seeding and comprehensive tool registry.
+
+KEY FEATURES:
+- Complete MCP tool registry: godot.*, generators.*, validators.*, builders.*
+- Deterministic seeding with seed cascade (global → world → tool → chip)
+- Schema validation for all tool inputs/outputs
+- Godot headless integration with fallback stubs
+- Artifact management under runs/{run_id}/ with atomic latest updates
+
+TOOLS IMPLEMENTED:
+- godot.test_headless: Headless scene testing and validation
+- godot.capture_views: Deterministic camera orbit captures
+- godot.dump_scene: Scene structure analysis and statistics
+- godot.apply_patch: Safe scene modification with rollback
+- generators.maze_generate: Procedural maze generation
+- validators.*: gates_check, non_regression, replay validation
+- builders.*: load_system, validate_placement, apply_placement, ledger_write
+
+USAGE:
+  python mcp_server/server.py                    # Run stdio mode
+  python mcp_server/server.py --ws --port 5174   # Run WebSocket mode
+  make mcp-server                                 # Run via Makefile
+
+RELATED FILES:
+- schemas/: All tool input/output validation schemas
+- config/gates.*.yaml: Performance gates configuration
+- Week 2+ requirement for schema freeze and validation
 """
 
 import asyncio

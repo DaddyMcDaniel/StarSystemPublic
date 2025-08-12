@@ -1,0 +1,169 @@
+/*
+SUMMARY: Provenance Schema v1
+==============================
+Defines ancestry graph, authorship tracking, and remix credits for StarSystem creations.
+Enables fair attribution and credit sharing in the community creation ecosystem.
+
+KEY COMPONENTS:
+- ancestry: Parent-child relationships and derivation chains
+- authorship: Creator information and contribution levels
+- remix_splits: Revenue/credit sharing calculations
+- licensing: Usage permissions and restrictions
+
+USAGE:
+- Embedded in all created content (blueprint chips, schematic cards, worlds)
+- Used by remix systems for proper attribution
+- Required in run_manifest.json for all artifacts
+- Supports community economy and fair sharing
+
+RELATED FILES:
+- All creation tools include provenance data
+- run_manifest.json: provenance.parent_ids, provenance.author, provenance.remix_splits
+- Supports: community sharing, attribution, economic systems
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:provenance:v1",
+  "version": 1,
+  "title": "Provenance Schema",
+  "description": "Ancestry graph, authorship tracking, and remix credits for community creations",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ancestry": {
+      "type": "object",
+      "description": "Parent-child relationships and derivation chains",
+      "additionalProperties": false,
+      "properties": {
+        "parent_ids": {
+          "type": "array",
+          "description": "Direct parent creation IDs",
+          "items": {"type": "string"}
+        },
+        "root_id": {
+          "type": "string",
+          "description": "Original creation at root of ancestry chain"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Distance from original creation (0 = original)"
+        },
+        "derivation_method": {
+          "type": "string",
+          "enum": ["direct_copy", "modification", "remix", "inspiration", "mashup"],
+          "description": "How this creation relates to its parents"
+        },
+        "similarity_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Calculated similarity to closest parent (1.0 = identical)"
+        }
+      }
+    },
+    "authorship": {
+      "type": "object",
+      "description": "Creator information and contribution levels",
+      "additionalProperties": false,
+      "properties": {
+        "primary_author": {
+          "type": "string",
+          "description": "Main creator of this version"
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "author_id": {"type": "string"},
+              "contribution_type": {"type": "string", "enum": ["creation", "modification", "testing", "feedback", "curation"]},
+              "contribution_percentage": {"type": "number", "minimum": 0, "maximum": 100},
+              "timestamp": {"type": "string", "format": "date-time"}
+            },
+            "required": ["author_id", "contribution_type"]
+          }
+        },
+        "original_authors": {
+          "type": "array",
+          "description": "All authors in the ancestry chain",
+          "items": {
+            "type": "object",
+            "properties": {
+              "author_id": {"type": "string"},
+              "generation": {"type": "integer", "minimum": 0},
+              "legacy_weight": {"type": "number", "minimum": 0, "maximum": 1}
+            }
+          }
+        }
+      },
+      "required": ["primary_author"]
+    },
+    "remix_splits": {
+      "type": "object",
+      "description": "Revenue and credit sharing calculations",
+      "additionalProperties": false,
+      "properties": {
+        "splits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "recipient_id": {"type": "string"},
+              "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+              "split_type": {"type": "string", "enum": ["revenue", "attribution", "usage_rights"]},
+              "rationale": {"type": "string"}
+            },
+            "required": ["recipient_id", "percentage", "split_type"]
+          }
+        },
+        "total_percentage": {
+          "type": "number",
+          "minimum": 100,
+          "maximum": 100,
+          "description": "Must always equal 100%"
+        },
+        "calculation_method": {
+          "type": "string",
+          "enum": ["equal", "contribution_based", "similarity_weighted", "custom"],
+          "default": "contribution_based"
+        }
+      },
+      "required": ["splits", "total_percentage"]
+    },
+    "licensing": {
+      "type": "object",
+      "description": "Usage permissions and restrictions",
+      "additionalProperties": false,
+      "properties": {
+        "license_type": {
+          "type": "string",
+          "enum": ["CC0", "CC-BY", "CC-BY-SA", "CC-BY-NC", "CC-BY-NC-SA", "custom"],
+          "default": "CC-BY-SA"
+        },
+        "commercial_allowed": {"type": "boolean", "default": true},
+        "modification_allowed": {"type": "boolean", "default": true},
+        "attribution_required": {"type": "boolean", "default": true},
+        "share_alike_required": {"type": "boolean", "default": false},
+        "custom_terms": {"type": "string"}
+      },
+      "required": ["license_type"]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Provenance tracking metadata",
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "provenance_version": {"type": "string", "default": "v1"},
+        "verification_hash": {"type": "string"}
+      },
+      "required": ["created_at"]
+    }
+  },
+  "required": ["authorship", "metadata"]
+}

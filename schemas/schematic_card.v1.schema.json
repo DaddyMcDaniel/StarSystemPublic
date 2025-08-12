@@ -1,0 +1,149 @@
+/*
+SUMMARY: Schematic Card Schema v1
+==================================
+Defines self-contained, shareable build components with I/O pins for StarSystem construction.
+Enables modular building system where players can create, share, and remix building components.
+
+KEY COMPONENTS:
+- build_data: Complete construction information
+- io_pins: Input/output connection points for modularity
+- metadata: Sharing, provenance, and compatibility info
+- dependencies: Required resources and compatibility checks
+
+USAGE:
+- Created by tools.generators.export_schematic from player builds
+- Imported by tools.generators.import_schematic for placement
+- Enables community sharing of building patterns and structures
+- Supports remix culture with proper attribution
+
+RELATED FILES:
+- tools: export_schematic, import_schematic
+- artifacts: runs/{run_id}/schematics/
+- Supports player creativity and community sharing
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:schematic_card:v1",
+  "version": 1,
+  "title": "Schematic Card Schema",
+  "description": "Self-contained build component with I/O pins for modular construction and sharing",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Card identification and sharing information",
+      "additionalProperties": false,
+      "properties": {
+        "card_id": {"type": "string"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "author": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "version": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "category": {"type": "string", "enum": ["structure", "decoration", "functional", "system", "terrain"]},
+        "difficulty": {"type": "string", "enum": ["beginner", "intermediate", "advanced", "expert"]},
+        "license": {"type": "string", "default": "CC-BY-SA"}
+      },
+      "required": ["card_id", "name", "author", "created_at"]
+    },
+    "build_data": {
+      "type": "object",
+      "description": "Complete construction information",
+      "additionalProperties": false,
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "position": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+              "material": {"type": "string"},
+              "rotation": {"type": "integer", "minimum": 0, "maximum": 3},
+              "properties": {"type": "object"}
+            },
+            "required": ["position", "material"]
+          }
+        },
+        "bounding_box": {
+          "type": "object",
+          "properties": {
+            "min": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+            "max": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}}
+          },
+          "required": ["min", "max"]
+        },
+        "anchor_point": {
+          "type": "object",
+          "description": "Reference point for placement",
+          "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}},
+          "required": ["x", "y", "z"]
+        }
+      },
+      "required": ["blocks", "bounding_box", "anchor_point"]
+    },
+    "io_pins": {
+      "type": "object",
+      "description": "Input/output connection points for modularity",
+      "additionalProperties": false,
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string", "enum": ["power", "data", "resource", "structural"]},
+              "position": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+              "required": {"type": "boolean", "default": false}
+            },
+            "required": ["name", "type", "position"]
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string", "enum": ["power", "data", "resource", "structural"]},
+              "position": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+              "capacity": {"type": "number", "minimum": 0}
+            },
+            "required": ["name", "type", "position"]
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "Resource requirements and compatibility",
+      "additionalProperties": false,
+      "properties": {
+        "materials": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        },
+        "min_planet_size": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+        "required_tools": {"type": "array", "items": {"type": "string"}},
+        "incompatible_with": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "preview": {
+      "type": "object",
+      "description": "Visual preview information",
+      "additionalProperties": false,
+      "properties": {
+        "thumbnail_path": {"type": "string"},
+        "render_views": {"type": "array", "items": {"type": "string"}},
+        "color_palette": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "required": ["metadata", "build_data"]
+}

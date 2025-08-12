@@ -1,0 +1,283 @@
+/*
+SUMMARY: Building System Schema v1
+===================================
+Defines comprehensive grid-based building system for StarSystem mini-planets.
+Supports Terraria/Eco-style hammer configuration, networks, catalogs, and prefabs.
+
+KEY COMPONENTS:
+- grid_system: 3D grid rules, coordinate systems, and placement validation
+- building_networks: Power, resource, data, and structural connection systems
+- material_catalog: Available materials, tools, and building components
+- placement_rules: Physics, constraints, and validation logic
+
+USAGE:
+- Loaded by tools.builders.load_system for initialization
+- Used by tools.builders.validate_placement for placement checks
+- Applied by tools.builders.apply_placement for construction
+- Enables unlimited creative building time (Halo Forge mode)
+
+RELATED FILES:
+- tools: builders.load_system, builders.validate_placement, builders.apply_placement
+- artifacts: runs/{run_id}/building_system.json
+- Core system for creative planet building
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:building_system:v1",
+  "version": 1,
+  "title": "Building System Schema",
+  "description": "Comprehensive grid-based building system with networks, catalogs, and placement rules",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "grid_system": {
+      "type": "object",
+      "description": "3D grid rules and coordinate system",
+      "additionalProperties": false,
+      "properties": {
+        "grid_size": {"type": "number", "minimum": 0.1, "default": 1.0},
+        "coordinate_system": {
+          "type": "string",
+          "enum": ["cartesian", "cylindrical", "spherical"],
+          "default": "cartesian"
+        },
+        "subgrid_levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": {"type": "integer", "minimum": 0},
+              "subdivision_factor": {"type": "integer", "minimum": 2},
+              "precision_threshold": {"type": "number", "minimum": 0}
+            }
+          }
+        },
+        "snap_settings": {
+          "type": "object",
+          "properties": {
+            "position_snap": {"type": "boolean", "default": true},
+            "rotation_snap": {"type": "boolean", "default": true},
+            "scale_snap": {"type": "boolean", "default": false},
+            "snap_angle_degrees": {"type": "number", "default": 15}
+          }
+        },
+        "bounds": {
+          "type": "object",
+          "properties": {
+            "min": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+            "max": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}}
+          }
+        }
+      },
+      "required": ["grid_size"]
+    },
+    "building_networks": {
+      "type": "object",
+      "description": "Connection systems for power, resources, and data",
+      "additionalProperties": false,
+      "properties": {
+        "power_network": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "max_connection_distance": {"type": "number", "default": 10.0},
+            "power_types": {
+              "type": "array",
+              "items": {"type": "string"},
+              "default": ["electric", "mechanical", "hydraulic"]
+            },
+            "loss_per_distance": {"type": "number", "minimum": 0, "default": 0.01}
+          }
+        },
+        "resource_network": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "transport_types": {
+              "type": "array",
+              "items": {"type": "string"},
+              "default": ["conveyor", "pipe", "pneumatic"]
+            },
+            "flow_rules": {
+              "type": "object",
+              "properties": {
+                "max_flow_rate": {"type": "number", "default": 100},
+                "pressure_system": {"type": "boolean", "default": false}
+              }
+            }
+          }
+        },
+        "data_network": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": false},
+            "protocol_types": {
+              "type": "array",
+              "items": {"type": "string"},
+              "default": ["simple", "packet", "broadcast"]
+            },
+            "bandwidth_limit": {"type": "number", "default": 1000}
+          }
+        },
+        "structural_network": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "load_bearing_rules": {"type": "boolean", "default": true},
+            "stress_calculations": {"type": "boolean", "default": false},
+            "foundation_requirements": {"type": "boolean", "default": true}
+          }
+        }
+      }
+    },
+    "material_catalog": {
+      "type": "object",
+      "description": "Available materials, tools, and components",
+      "additionalProperties": false,
+      "properties": {
+        "basic_materials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "category": {"type": "string", "enum": ["structure", "decoration", "functional", "terrain", "special"]},
+              "properties": {
+                "type": "object",
+                "properties": {
+                  "durability": {"type": "number", "minimum": 0},
+                  "weight": {"type": "number", "minimum": 0},
+                  "conductivity": {"type": "number"},
+                  "transparency": {"type": "number", "minimum": 0, "maximum": 1}
+                }
+              },
+              "crafting_requirements": {
+                "type": "object",
+                "additionalProperties": {"type": "integer", "minimum": 0}
+              },
+              "unlock_requirements": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            },
+            "required": ["id", "name", "category"]
+          }
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "tool_type": {"type": "string", "enum": ["hammer", "wrench", "cutter", "painter", "analyzer", "copier"]},
+              "capabilities": {
+                "type": "array",
+                "items": {"type": "string"},
+                "default": ["place", "remove", "rotate", "configure"]
+              },
+              "hammer_modes": {
+                "type": "array",
+                "description": "Terraria/Eco-style hammer configuration modes",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "mode_name": {"type": "string"},
+                    "description": {"type": "string"},
+                    "affects": {"type": "array", "items": {"type": "string"}},
+                    "quick_config": {"type": "boolean"}
+                  }
+                }
+              }
+            },
+            "required": ["id", "name", "tool_type"]
+          }
+        },
+        "prefabs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "category": {"type": "string"},
+              "size": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+              "blueprint_reference": {"type": "string"},
+              "material_cost": {"type": "object"},
+              "placement_restrictions": {"type": "array", "items": {"type": "string"}}
+            },
+            "required": ["id", "name", "size"]
+          }
+        }
+      }
+    },
+    "placement_rules": {
+      "type": "object",
+      "description": "Physics, constraints, and validation logic",
+      "additionalProperties": false,
+      "properties": {
+        "physics_simulation": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": false},
+            "gravity": {"type": "number", "default": 9.8},
+            "collision_detection": {"type": "boolean", "default": true},
+            "realistic_physics": {"type": "boolean", "default": false}
+          }
+        },
+        "placement_constraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "constraint_type": {"type": "string", "enum": ["support", "clearance", "proximity", "orientation", "material_compatibility"]},
+              "description": {"type": "string"},
+              "parameters": {"type": "object"},
+              "applies_to": {"type": "array", "items": {"type": "string"}},
+              "severity": {"type": "string", "enum": ["error", "warning", "suggestion"]}
+            },
+            "required": ["constraint_type"]
+          }
+        },
+        "validation_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule_name": {"type": "string"},
+              "rule_type": {"type": "string", "enum": ["geometry", "network", "structural", "aesthetic", "performance"]},
+              "check_frequency": {"type": "string", "enum": ["immediate", "on_complete", "periodic"]},
+              "auto_fix": {"type": "boolean", "default": false}
+            }
+          }
+        }
+      }
+    },
+    "creative_mode_settings": {
+      "type": "object",
+      "description": "Halo Forge-style unlimited creative building",
+      "additionalProperties": false,
+      "properties": {
+        "unlimited_resources": {"type": "boolean", "default": true},
+        "ignore_physics": {"type": "boolean", "default": true},
+        "instant_placement": {"type": "boolean", "default": true},
+        "undo_history_size": {"type": "integer", "minimum": 0, "default": 1000},
+        "collaborative_building": {"type": "boolean", "default": false},
+        "time_limits": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": false},
+            "session_limit_minutes": {"type": "integer", "default": 0}
+          }
+        }
+      }
+    }
+  },
+  "required": ["grid_system", "material_catalog", "placement_rules"]
+}

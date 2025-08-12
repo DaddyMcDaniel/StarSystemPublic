@@ -1,0 +1,92 @@
+/*
+SUMMARY: Non-Regression Validation Schema v1
+============================================
+Defines non-regression testing rules, tolerances, and validation criteria for StarSystem builds.
+Ensures new changes don't break existing functionality or degrade performance metrics.
+
+KEY COMPONENTS:
+- baseline_metrics: Reference values from previous builds
+- regression_tolerances: Acceptable degradation thresholds
+- validation_rules: Logic for detecting regressions
+- rationale_template: Machine-readable failure explanations
+
+USAGE:
+- Used by validators.non_regression tool during CI/CD validation
+- Compares current build metrics against established baselines
+- Provides deterministic pass/fail decisions with detailed rationale
+
+RELATED FILES:
+- tools: validators.non_regression
+- artifacts: runs/{run_id}/non_regression.json
+- schemas: gates.v1.schema.json (complementary validation)
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:non_regression:v1",
+  "version": 1,
+  "title": "Non-Regression Validation Schema",
+  "description": "Schema for non-regression testing rules and tolerance definitions",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "baseline_metrics": {
+      "type": "object",
+      "description": "Reference metrics from previous validated builds",
+      "additionalProperties": false,
+      "properties": {
+        "tri_count": {"type": "integer", "minimum": 0},
+        "materials": {"type": "integer", "minimum": 0},
+        "build_time_ms": {"type": "number", "minimum": 0},
+        "memory_peak_mb": {"type": "number", "minimum": 0},
+        "readability_score": {"type": "number", "minimum": 0, "maximum": 100},
+        "perf_proxy": {"type": "number", "minimum": 0}
+      }
+    },
+    "tolerances": {
+      "type": "object",
+      "description": "Acceptable regression thresholds",
+      "additionalProperties": false,
+      "properties": {
+        "tri_count": {
+          "type": "object",
+          "properties": {
+            "max_increase_pct": {"type": "number", "minimum": 0},
+            "max_decrease_pct": {"type": "number", "minimum": 0}
+          }
+        },
+        "build_time_ms": {
+          "type": "object",
+          "properties": {
+            "max_increase_pct": {"type": "number", "minimum": 0}
+          }
+        },
+        "memory_peak_mb": {
+          "type": "object",
+          "properties": {
+            "max_increase_pct": {"type": "number", "minimum": 0}
+          }
+        }
+      }
+    },
+    "validation_rules": {
+      "type": "object",
+      "description": "Logic for regression detection",
+      "additionalProperties": false,
+      "properties": {
+        "require_baseline": {"type": "boolean", "default": true},
+        "fail_on_missing_metrics": {"type": "boolean", "default": false},
+        "priority_metrics": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "rationale_template": {
+      "type": "string",
+      "description": "Template for machine-readable failure explanations",
+      "default": "Metric {metric} regressed from {baseline} to {current} ({change_pct}%), exceeding tolerance {tolerance}"
+    }
+  },
+  "required": ["tolerances"]
+}

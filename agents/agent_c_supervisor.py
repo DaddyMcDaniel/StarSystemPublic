@@ -1,7 +1,38 @@
 #!/usr/bin/env python3
 """
-Agent C: PCC Quality Supervisor
-Analyzes test results, enforces compression improvements, and coordinates evolution loop
+SUMMARY: Agent C - Supervisory & Governance Agent v1
+===================================================
+Strategic overseer and governance agent in the PCC-LanguageV2 evolution system.
+Coordinates between Agent A (generator) and Agent B (validator) workflows.
+
+ROLE & RESPONSIBILITIES:
+- Setting clear iteration objectives that align with project goals
+- Enforcing architectural constraints and design principles  
+- Approving or rejecting work based on established acceptance criteria
+- Maintaining system coherence and preventing scope creep
+- Providing strategic direction for the evolution process
+- Ensuring compliance with High-Order Benchmark requirements
+
+KEY OVERSIGHT AREAS:
+- Blueprint Chips: Approve node graph designs and prompt-to-code transformations
+- Performance Pass: Set budget thresholds and approve performance criteria
+- Schematic Cards: Validate export/import design and approve player sharing standards
+- Building System: Approve grid architectures, hammer-style tools, and placement rules
+- Planet Generation: Set standards for layered terrain, navigation, and alien aesthetics
+
+INTEGRATION:
+- Loads HOD from agents/memory/agent_c_prompt.txt
+- Receives outputs from Agent A and validation reports from Agent B
+- Provides final approval/rejection decisions with redirect plans
+- Prioritizes creative freedom and unlimited building time (Halo Forge philosophy)
+
+USAGE:
+  python agents/agent_c_supervisor.py
+  make agents  # Run full A→B→C handshake
+
+RELATED FILES:
+- agents/memory/agent_c_prompt.txt - High-Order Directive with oversight contracts
+- Focus on robust planet generation foundation before advanced features
 """
 import json
 from pathlib import Path

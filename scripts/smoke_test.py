@@ -1,7 +1,37 @@
 #!/usr/bin/env python3
 """
-StarSystem Smoke Test Pipeline
-Validates: generate → apply_patch → test_headless → capture_views → dump_scene
+SUMMARY: StarSystem Smoke Test Pipeline v1
+===========================================
+End-to-end validation pipeline testing all core MCP tools and workflows.
+Simulates complete development cycle from generation to visual validation.
+
+PIPELINE STAGES:
+1. generators.maze_generate: Create procedural content with deterministic seed
+2. godot.apply_patch: Apply generated content to Godot scene (dry-run → apply)  
+3. godot.test_headless: Validate scene integrity and basic functionality
+4. godot.capture_views: Generate deterministic camera orbit captures
+5. godot.dump_scene: Analyze scene structure and export statistics
+
+KEY FEATURES:
+- MockMCPClient: Simulates MCP tool calls with deterministic responses
+- Artifact generation: Creates run_manifest.json with provenance tracking
+- Performance measurement: Execution timing and tool call sequencing
+- Error handling: Graceful degradation with structured error reporting
+
+USAGE:
+  python scripts/smoke_test.py                    # Run with default seed
+  python scripts/smoke_test.py --seed 42          # Run with specific seed
+  make smoke GLOBAL_SEED=123                      # Run via Makefile
+
+OUTPUT:
+- runs/{timestamp}-seed{N}/ with complete artifacts
+- runs/latest symlink for easy access
+- Success/failure status with detailed tool call log
+
+RELATED FILES:
+- Makefile: smoke target integration
+- mcp_server/server.py: Actual tool implementations
+- Essential for Week 2+ validation workflows
 """
 
 import asyncio

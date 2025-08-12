@@ -1,0 +1,170 @@
+/*
+SUMMARY: Safety Tag Schema v1
+==============================
+Defines age/comfort ratings and content moderation tags for StarSystem creations.
+Implements default-private policy with explicit approval for public visibility.
+
+KEY COMPONENTS:
+- content_rating: Age appropriateness and content warnings
+- safety_checks: Automated and manual moderation results
+- visibility_policy: Public/private access controls
+- approval_status: Explicit safety approval for sharing
+
+USAGE:
+- Applied by tools.validators.safety_tag during content validation
+- Required for any content shared publicly
+- Default visibility is private unless safety_tag.ok === true
+- Protects community from inappropriate content
+
+RELATED FILES:
+- tools: validators.safety_tag
+- Policy: default visibility private unless safety approved
+- Supports: community safety, content moderation, age-appropriate sharing
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:safety_tag:v1",
+  "version": 1,
+  "title": "Safety Tag Schema",
+  "description": "Content safety rating and visibility policy for community creations",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "content_rating": {
+      "type": "object",
+      "description": "Age appropriateness and content classification",
+      "additionalProperties": false,
+      "properties": {
+        "age_rating": {
+          "type": "string",
+          "enum": ["everyone", "everyone_10+", "teen", "mature", "adults_only"],
+          "default": "everyone"
+        },
+        "content_descriptors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "violence", "mild_violence", "fantasy_violence",
+              "language", "mild_language", "strong_language",
+              "suggestive_themes", "partial_nudity", "sexual_content",
+              "drug_reference", "alcohol_reference", "tobacco_reference",
+              "gambling", "simulated_gambling",
+              "horror_themes", "scary_imagery",
+              "educational", "informational"
+            ]
+          }
+        },
+        "intensity_level": {
+          "type": "string",
+          "enum": ["minimal", "mild", "moderate", "intense"],
+          "default": "minimal"
+        }
+      },
+      "required": ["age_rating"]
+    },
+    "safety_checks": {
+      "type": "object",
+      "description": "Automated and manual moderation results",
+      "additionalProperties": false,
+      "properties": {
+        "automated_scan": {
+          "type": "object",
+          "properties": {
+            "completed_at": {"type": "string", "format": "date-time"},
+            "scan_version": {"type": "string"},
+            "flags_detected": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "flag_type": {"type": "string"},
+                  "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+                  "description": {"type": "string"}
+                }
+              }
+            },
+            "clean_score": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "manual_review": {
+          "type": "object",
+          "properties": {
+            "reviewed_at": {"type": "string", "format": "date-time"},
+            "reviewer_id": {"type": "string"},
+            "decision": {"type": "string", "enum": ["approved", "rejected", "requires_changes", "pending"]},
+            "notes": {"type": "string"},
+            "appeal_count": {"type": "integer", "minimum": 0, "default": 0}
+          }
+        },
+        "community_reports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reported_at": {"type": "string", "format": "date-time"},
+              "reason": {"type": "string"},
+              "description": {"type": "string"},
+              "status": {"type": "string", "enum": ["pending", "reviewed", "dismissed", "upheld"]}
+            }
+          }
+        }
+      }
+    },
+    "visibility_policy": {
+      "type": "object",
+      "description": "Access control and sharing permissions",
+      "additionalProperties": false,
+      "properties": {
+        "is_public": {"type": "boolean", "default": false},
+        "can_be_shared": {"type": "boolean", "default": false},
+        "can_be_remixed": {"type": "boolean", "default": false},
+        "requires_approval": {"type": "boolean", "default": true},
+        "visibility_reason": {"type": "string"},
+        "restricted_regions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Geographic regions where content is restricted"
+        }
+      }
+    },
+    "approval_status": {
+      "type": "object",
+      "description": "Explicit safety approval for public sharing",
+      "additionalProperties": false,
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "default": false,
+          "description": "Explicit approval for public visibility"
+        },
+        "approved_by": {"type": "string"},
+        "approved_at": {"type": "string", "format": "date-time"},
+        "approval_level": {
+          "type": "string",
+          "enum": ["automated", "community", "moderator", "admin"]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Special conditions or restrictions for approval"
+        }
+      },
+      "required": ["ok"]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Safety tag processing metadata",
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "tag_version": {"type": "string", "default": "v1"},
+        "content_hash": {"type": "string"}
+      },
+      "required": ["created_at"]
+    }
+  },
+  "required": ["content_rating", "approval_status", "metadata"]
+}

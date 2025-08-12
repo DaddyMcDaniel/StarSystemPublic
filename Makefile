@@ -1,5 +1,23 @@
-# StarSystem + The Forge Makefile
-# Week-1 Pre-alpha Core (MCP + headless hooks + planet/nav stubs)
+# SUMMARY: StarSystem + The Forge Makefile v2
+# ============================================= 
+# Main build and workflow automation for StarSystem development.
+# Supports MCP server management, agent workflows, testing, and artifact generation.
+#
+# KEY TARGETS:
+# - smoke: Full pipeline test (generate → apply_patch → test_headless → capture → dump)
+# - mcp-server: Start MCP server in stdio mode for tool integration
+# - agents: Run 3-agent handshake (A→B→C) with deterministic stubs
+# - test: Execute all validation tests and schema checks
+# - clean: Remove runs/ artifacts and build cache
+#
+# USAGE:
+#   make smoke GLOBAL_SEED=123        # Run smoke test with specific seed
+#   make mcp-server                   # Start MCP server for development  
+#   make agents                       # Test agent communication loop
+#   make install                      # Install Python dependencies
+#
+# Week 2+ Core (Schema Freeze + Planet Generation + Human Feedback)
+# Supports idea → playable mini-planet workflow with unlimited creative building
 
 GLOBAL_SEED ?= 0
 GODOT_PATH ?= $(shell cat .cache/godot_path 2>/dev/null || echo "godot4-headless")

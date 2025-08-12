@@ -1,0 +1,146 @@
+/*
+SUMMARY: MCP Tool Input/Output Schema v1
+=========================================
+Base schema for all MCP tool inputs and outputs with deterministic seeding and error handling.
+Defines the standard envelope format for tool communication in the StarSystem MCP server.
+
+KEY COMPONENTS:
+- tool_input: Standard input format with tool_name, seed, and parameters
+- tool_output: Standard output format with success/error, seed_used, and timing
+- error_codes: Comprehensive error classification including NOT_IMPLEMENTED
+
+USAGE:
+- Referenced by all MCP tool schemas for consistent I/O structure
+- Ensures deterministic behavior through required seed parameters
+- Enables proper error handling and debugging across all tools
+- Used by MCP server for request/response validation
+
+RELATED FILES:
+- mcp_server/server.py - MCP server implementation
+- All tool schemas reference this base schema
+- Essential for Week 2 schema freeze and validation requirements
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:mcp_tool_io:v1",
+  "version": 1,
+  "title": "MCP Tool Input/Output Schema v1",
+  "description": "Base schema for MCP tool inputs and outputs with deterministic seeding and comprehensive error handling",
+  "additionalProperties": false,
+  "definitions": {
+    "tool_input": {
+      "type": "object",
+      "description": "Standard input format for all MCP tools",
+      "additionalProperties": false,
+      "properties": {
+        "tool_name": {
+          "type": "string",
+          "description": "Name of the tool being invoked"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Deterministic seed for reproducible results"
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Tool-specific input parameters"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional metadata for request context",
+          "properties": {
+            "run_id": {"type": "string"},
+            "session_id": {"type": "string"},
+            "caller_id": {"type": "string"}
+          }
+        }
+      },
+      "required": ["tool_name", "seed", "inputs"]
+    },
+    "tool_output": {
+      "type": "object",
+      "description": "Standard output format for all MCP tools",
+      "additionalProperties": false,
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the tool execution succeeded"
+        },
+        "data": {
+          "type": "object",
+          "description": "Tool-specific output data (present when success=true)"
+        },
+        "error": {
+          "type": "object",
+          "description": "Error information (present when success=false)",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "godot_missing",
+                "gate_violation", 
+                "lock_timeout",
+                "timeout",
+                "budget_exceeded",
+                "invalid_schema",
+                "NOT_IMPLEMENTED"
+              ],
+              "description": "Standardized error code for programmatic handling"
+            },
+            "message": {
+              "type": "string",
+              "description": "Human-readable error message"
+            },
+            "details": {
+              "type": "object",
+              "description": "Additional error context and debugging information"
+            }
+          },
+          "required": ["code", "message"]
+        },
+        "seed_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual seed used for execution (for determinism verification)"
+        },
+        "execution_time_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Tool execution time in milliseconds"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Response metadata",
+          "properties": {
+            "tool_version": {"type": "string"},
+            "timestamp": {"type": "string", "format": "date-time"},
+            "run_id": {"type": "string"}
+          }
+        }
+      },
+      "required": ["success"],
+      "anyOf": [
+        {
+          "properties": {
+            "success": {"const": true}
+          },
+          "required": ["data", "seed_used"]
+        },
+        {
+          "properties": {
+            "success": {"const": false}
+          },
+          "required": ["error"]
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "input": {"$ref": "#/definitions/tool_input"},
+    "output": {"$ref": "#/definitions/tool_output"}
+  }
+}

@@ -1,0 +1,105 @@
+/*
+SUMMARY: Human Feedback Collection Schema v1
+=============================================
+Defines structure for collecting human feedback on StarSystem builds, games, and experiences.
+Supports rubric-based scoring (1-5 scale) with evidence collection and issue tracking.
+
+KEY COMPONENTS:
+- rubric_scores: 1-5 rating system for different aspects
+- issues: Structured problem reports with evidence
+- session_metadata: Context about the feedback session
+- recommendations: Actionable improvement suggestions
+
+USAGE:
+- Used by human_feedback/feedback_cli.py for structured input collection
+- Validates feedback quality and completeness
+- Saves results to runs/{run_id}/human_feedback.json
+
+RELATED FILES:
+- human_feedback/feedback_cli.py - CLI tool for collection
+- artifacts: runs/{run_id}/human_feedback.json
+- Week 2 requirement for human-in-the-loop validation
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:human_feedback:v1",
+  "version": 1,
+  "title": "Human Feedback Collection Schema",
+  "description": "Schema for structured human feedback collection with rubric scoring and evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "session_metadata": {
+      "type": "object",
+      "description": "Context about the feedback session",
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {"type": "string", "format": "date-time"},
+        "reviewer_id": {"type": "string"},
+        "build_version": {"type": "string"},
+        "session_duration_minutes": {"type": "number", "minimum": 0},
+        "platform": {"type": "string", "enum": ["web", "native", "mobile"]}
+      },
+      "required": ["timestamp", "reviewer_id"]
+    },
+    "rubric_scores": {
+      "type": "object",
+      "description": "1-5 scale ratings for different aspects",
+      "additionalProperties": false,
+      "properties": {
+        "visual_quality": {"type": "integer", "minimum": 1, "maximum": 5},
+        "performance": {"type": "integer", "minimum": 1, "maximum": 5},
+        "usability": {"type": "integer", "minimum": 1, "maximum": 5},
+        "creativity_tools": {"type": "integer", "minimum": 1, "maximum": 5},
+        "planet_generation": {"type": "integer", "minimum": 1, "maximum": 5},
+        "building_system": {"type": "integer", "minimum": 1, "maximum": 5},
+        "overall_experience": {"type": "integer", "minimum": 1, "maximum": 5}
+      }
+    },
+    "issues": {
+      "type": "array",
+      "description": "Structured problem reports with evidence",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "severity": {"type": "string", "enum": ["critical", "major", "minor", "cosmetic"]},
+          "category": {"type": "string", "enum": ["performance", "visual", "usability", "functionality", "content"]},
+          "description": {"type": "string"},
+          "steps_to_reproduce": {"type": "array", "items": {"type": "string"}},
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "screenshot_paths": {"type": "array", "items": {"type": "string"}},
+              "video_path": {"type": "string"},
+              "log_excerpt": {"type": "string"}
+            }
+          }
+        },
+        "required": ["id", "severity", "category", "description"]
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Actionable improvement suggestions",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+          "area": {"type": "string"},
+          "suggestion": {"type": "string"},
+          "rationale": {"type": "string"}
+        },
+        "required": ["priority", "area", "suggestion"]
+      }
+    },
+    "free_form_comments": {
+      "type": "string",
+      "description": "Additional unstructured feedback"
+    }
+  },
+  "required": ["session_metadata"]
+}
