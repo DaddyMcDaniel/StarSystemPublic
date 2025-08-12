@@ -1,0 +1,5 @@
+#!/bin/bash
+# Low Order Prompt - Initialization Command
+# Reads the main low-order prompt for specific role instructions
+
+cat /home/colling/PCC-LanguageV2/agents/prompting/low_order/main_low_order_prompt.md

@@ -1,0 +1,109 @@
+# AI Tools Environment Configuration Template
+# Copy this file to .env and fill in your actual API keys
+
+# =============================================================================
+# API KEYS - Replace with your actual keys
+# =============================================================================
+
+# Exa Search API Key
+# Get from: https://dashboard.exa.ai/
+EXA_API_KEY=your_exa_api_key_here
+
+# Anthropic Claude API Key (existing)
+ANTHROPIC_API_KEY=your_anthropic_key_here
+
+# OpenAI API Key (optional, for additional LLM support)
+OPENAI_API_KEY=your_openai_key_here
+
+# Pieces API Configuration
+# Pieces runs locally, adjust port based on OS:
+# Linux: 5323, macOS/Windows: 1000
+PIECES_BASE_URL=http://localhost:1000
+PIECES_API_KEY=your_pieces_api_key_if_needed
+
+# =============================================================================
+# SEARCH AND RETRIEVAL SETTINGS
+# =============================================================================
+
+# Exa Search Configuration
+EXA_MAX_RESULTS=10
+EXA_SEARCH_TYPE=neural  # Options: neural, keyword, auto
+EXA_INCLUDE_DOMAINS=
+EXA_EXCLUDE_DOMAINS=
+
+# Web Scraping Settings
+USER_AGENT=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+REQUEST_TIMEOUT=30
+MAX_RETRIES=3
+
+# =============================================================================
+# BROWSER AUTOMATION (PLAYWRIGHT)
+# =============================================================================
+
+# Browser settings
+PLAYWRIGHT_BROWSER=chromium  # Options: chromium, firefox, webkit
+PLAYWRIGHT_HEADLESS=true     # Set to false for debugging
+PLAYWRIGHT_TIMEOUT=30000     # Timeout in milliseconds
+
+# =============================================================================
+# GITHUB CREDENTIALS (DO NOT COMMIT REAL VALUES)
+# =============================================================================
+
+# Username is used for UI login via Playwright if you choose that automation path
+GITHUB_USER=
+
+# Password is only needed for UI login automation; prefer PAT for git push
+GITHUB_PASSWORD=
+
+# Fine-grained Personal Access Token for git push via HTTPS
+# NEVER commit a real token; keep this in your private .env
+GITHUB_PAT=
+
+# =============================================================================
+# DATABASE AND CACHING
+# =============================================================================
+
+# SQLite database path (for local storage)
+DATABASE_URL=sqlite:///./ai_tools_cache.db
+
+# Redis configuration (optional, for advanced caching)
+REDIS_URL=redis://localhost:6379/0
+REDIS_ENABLED=false
+
+# =============================================================================
+# LOGGING AND DEBUG
+# =============================================================================
+
+# Logging level
+LOG_LEVEL=INFO  # Options: DEBUG, INFO, WARNING, ERROR
+
+# Debug mode
+DEBUG_MODE=false
+
+# Cache settings
+ENABLE_CACHE=true
+CACHE_EXPIRY_HOURS=24
+
+# =============================================================================
+# REF.SE ACADEMIC SEARCH (Note: No official API found)
+# =============================================================================
+
+# Academic search fallbacks
+ACADEMIC_SEARCH_ENGINES=crossref,arxiv,semantic_scholar
+CROSSREF_EMAIL=your_email@example.com  # Required for Crossref API
+
+# =============================================================================
+# SYSTEM CONFIGURATION
+# =============================================================================
+
+# Operating system detection
+OS_TYPE=linux  # Options: linux, darwin, windows
+
+# File paths
+TEMP_DIR=/tmp/ai_tools
+DOWNLOAD_DIR=./downloads
+CACHE_DIR=./cache
+
+# Rate limiting
+REQUESTS_PER_MINUTE=60
+CONCURRENT_REQUESTS=5

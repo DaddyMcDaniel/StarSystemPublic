@@ -1,0 +1,19 @@
+version: 1
+routing:
+  A:
+    provider: claude_haiku
+    transport: mcp_client
+    fallback: stub
+  B:
+    provider: gpt5_nano
+    transport: local_process
+    fallback: stub
+  C:
+    provider: claude_sonnet_4
+    transport: mcp_client_with_human
+    fallback: stub
+budgets:
+  calls_max: 100
+  seconds_max: 900
+timeouts:
+  per_tool_seconds: 120

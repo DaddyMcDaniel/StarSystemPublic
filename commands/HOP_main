@@ -1,0 +1,5 @@
+#!/bin/bash
+# High Order Prompt - Main Benchmark Command
+# Reads the canonical high-order benchmark that provides overarching context and guidance
+
+cat /home/colling/PCC-LanguageV2/agents/prompting/high_order_benchmark.md

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "generation_preferences": {
+    "movement": {
+      "first_person": true,
+      "use_gravity": true,
+      "jump_enabled": true,
+      "crouch_enabled": true
+    },
+    "maze_generation": {
+      "avoid_grid_duplicates": true,
+      "use_continuous_walls": true,
+      "ensure_exit_reachable": true
+    },
+    "visuals": {
+      "high_contrast_exit": true
+    }
+  },
+  "last_updated": ""
+}
+

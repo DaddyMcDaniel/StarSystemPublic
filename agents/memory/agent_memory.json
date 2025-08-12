@@ -1,0 +1,2527 @@
+{
+  "successful_patterns": {
+    "language_constructs": [
+      {
+        "timestamp": "2025-08-02T21:27:29.108925",
+        "pattern": {
+          "pattern": "maze_with_collectibles",
+          "entities": [
+            "WALL",
+            "COLLECTIBLE",
+            "EXIT"
+          ]
+        },
+        "performance_score": 3.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T21:27:29.108936",
+        "pattern": {
+          "pattern": "shooter_with_enemies",
+          "entities": [
+            "ENEMY",
+            "PLAYER",
+            "WEAPON"
+          ]
+        },
+        "performance_score": 3.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T21:27:29.108944",
+        "pattern": {
+          "pattern": "platformer_with_jumps",
+          "entities": [
+            "PLATFORM",
+            "PLAYER",
+            "COLLECTIBLE"
+          ]
+        },
+        "performance_score": 3.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T22:22:58.127266",
+        "pattern": {
+          "prompt": "Create a adventure game where player must defeat the boss guarding the treasure",
+          "entities": []
+        },
+        "performance_score": 3.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T22:32:47.375235",
+        "pattern": {
+          "prompt": "Create a platformer game where player must defeat all monsters blocking the path",
+          "entities": []
+        },
+        "performance_score": 50.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T22:36:29.009098",
+        "pattern": {
+          "prompt": "Create a puzzle game where player must unlock all doors using colored switches",
+          "entities": []
+        },
+        "performance_score": 50.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T22:38:47.153188",
+        "pattern": {
+          "prompt": "Create a puzzle game where player must activate all portals in the correct sequence",
+          "entities": []
+        },
+        "performance_score": 50.0,
+        "usage_count": 1
+      },
+      {
+        "timestamp": "2025-08-02T23:12:03.949763",
+        "pattern": {
+          "research_score": 3.0
+        },
+        "performance_score": 3.0,
+        "usage_count": 8
+      }
+    ],
+    "rendering_strategies": [],
+    "testing_methods": [],
+    "quality_improvements": []
+  },
+  "evolution_history": [
+    {
+      "timestamp": "2025-08-02T21:27:29.108994",
+      "step": {
+        "generation": 1,
+        "quality_score": 70,
+        "success": true,
+        "patterns_applied": [
+          "maze_with_collectibles",
+          "platformer_with_jumps",
+          "shooter_with_enemies"
+        ]
+      }
+    },
+    {
+      "timestamp": "2025-08-02T21:27:29.109004",
+      "step": {
+        "generation": 2,
+        "quality_score": 75,
+        "success": true,
+        "patterns_applied": [
+          "maze_with_collectibles",
+          "platformer_with_jumps",
+          "shooter_with_enemies"
+        ]
+      }
+    },
+    {
+      "timestamp": "2025-08-02T21:27:29.109012",
+      "step": {
+        "generation": 3,
+        "quality_score": 80,
+        "success": true,
+        "patterns_applied": [
+          "maze_with_collectibles",
+          "platformer_with_jumps",
+          "shooter_with_enemies"
+        ]
+      }
+    },
+    {
+      "timestamp": "2025-08-02T22:23:03.158828",
+      "step": {
+        "game_data": {
+          "prompt": "Create a adventure game where player must defeat the boss guarding the treasure",
+          "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_222258.pcc",
+          "entities": []
+        },
+        "visual_data": {
+          "timestamp": "2025-08-02T22:22:58.127623",
+          "original_game": {
+            "timestamp": "2025-08-02T22:22:58.127039",
+            "prompt": "Create a adventure game where player must defeat the boss guarding the treasure",
+            "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_222258.pcc",
+            "ast": {
+              "type": "GAME",
+              "nodes": [
+                {
+                  "type": "WORLD",
+                  "size": [
+                    10,
+                    10,
+                    1
+                  ],
+                  "entities": [
+                    {
+                      "type": "COLLECTIBLE",
+                      "id": "treasure",
+                      "count": 1
+                    },
+                    {
+                      "type": "BOSS",
+                      "ai": "combat",
+                      "health": 100
+                    }
+                  ]
+                },
+                {
+                  "type": "PLAYER",
+                  "pos": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "controls": [
+                    "WASD"
+                  ]
+                },
+                {
+                  "type": "OBJECTIVE",
+                  "goal": {
+                    "type": "DEFEAT_ALL",
+                    "target": "enemy"
+                  }
+                }
+              ],
+              "compression_id": "C6267"
+            },
+            "compression_level": 1.0,
+            "agent": "A"
+          },
+          "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_222258_3d.json",
+          "visual_quality": 1.0,
+          "render_engine": "opengl",
+          "agent": "D"
+        },
+        "test_result": {
+          "timestamp": "2025-08-02T22:23:03.157868",
+          "step": 3,
+          "visual_game": {
+            "timestamp": "2025-08-02T22:22:58.127623",
+            "original_game": {
+              "timestamp": "2025-08-02T22:22:58.127039",
+              "prompt": "Create a adventure game where player must defeat the boss guarding the treasure",
+              "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_222258.pcc",
+              "ast": {
+                "type": "GAME",
+                "nodes": [
+                  {
+                    "type": "WORLD",
+                    "size": [
+                      10,
+                      10,
+                      1
+                    ],
+                    "entities": [
+                      {
+                        "type": "COLLECTIBLE",
+                        "id": "treasure",
+                        "count": 1
+                      },
+                      {
+                        "type": "BOSS",
+                        "ai": "combat",
+                        "health": 100
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PLAYER",
+                    "pos": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "controls": [
+                      "WASD"
+                    ]
+                  },
+                  {
+                    "type": "OBJECTIVE",
+                    "goal": {
+                      "type": "DEFEAT_ALL",
+                      "target": "enemy"
+                    }
+                  }
+                ],
+                "compression_id": "C6267"
+              },
+              "compression_level": 1.0,
+              "agent": "A"
+            },
+            "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_222258_3d.json",
+            "visual_quality": 1.0,
+            "render_engine": "opengl",
+            "agent": "D"
+          },
+          "gameplay_test": {
+            "success_rate": 1.0,
+            "quality_score": {
+              "overall_score": 30.0,
+              "level": "POOR",
+              "breakdown": {
+                "objective_functionality": 0,
+                "world_design": 50,
+                "interactivity": 30,
+                "visual_design": 90
+              }
+            },
+            "playable": true,
+            "objectives_completed": 1,
+            "moves_made": 1,
+            "game_duration": 6.222724914550781e-05
+          },
+          "agent": "B"
+        },
+        "feedback": {
+          "timestamp": "2025-08-02T22:23:03.158486",
+          "success": false,
+          "compression_ratio": 1.0,
+          "improvements": [
+            "fix_objectives",
+            "improve_design",
+            "enhance_interactivity",
+            "Improve objective functionality - make objectives actually work",
+            "Enhance world design - add more variety and complexity",
+            "Increase interactivity - add more player-entity interactions",
+            "Improve visual design - add more visual variety"
+          ],
+          "quality_score": 30.0,
+          "quality_level": "POOR",
+          "rendering_feedback": {
+            "entity_rendering_issues": [],
+            "objective_mapping_issues": [],
+            "world_complexity_issues": [
+              "World too simple - only planes and spheres"
+            ],
+            "visual_quality_issues": [],
+            "improvement_suggestions": [
+              "Add walls, platforms, complex environments"
+            ]
+          },
+          "agent": "C",
+          "research_based_score": 3.0,
+          "research_assessment": "BROKEN - Unplayable or confusing",
+          "aaa_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "research_recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "research_assessment": {
+          "overall_score": 3.0,
+          "detailed_results": {
+            "core_mechanics_check": {
+              "score": 0,
+              "has_movement": false,
+              "has_interaction": false,
+              "has_combat": false,
+              "has_building": false,
+              "assessment": "Poor"
+            },
+            "objectives_check": {
+              "score": 0,
+              "assessment": "No objectives found"
+            },
+            "feedback_check": {
+              "score": 20,
+              "assessment": "Poor - No clear feedback systems",
+              "missing": [
+                "visual_feedback",
+                "audio_feedback",
+                "progress_indicators"
+              ]
+            },
+            "progression_check": {
+              "score": 0,
+              "has_multiple_levels": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "ui_check": {
+              "score": 10,
+              "assessment": "Poor - No UI elements found",
+              "missing": [
+                "hud",
+                "menus",
+                "tutorials",
+                "help_systems"
+              ]
+            },
+            "engagement_check": {
+              "score": 0,
+              "engagement_factors": 0,
+              "assessment": "Poor"
+            },
+            "balance_check": {
+              "score": 0,
+              "has_challenge": false,
+              "has_rewards": false,
+              "has_tools": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "replayability_check": {
+              "score": 0,
+              "has_randomization": false,
+              "has_multiple_paths": false,
+              "has_achievements": false,
+              "assessment": "Poor"
+            },
+            "flow_check": {
+              "score": 0,
+              "has_clear_goals": false,
+              "has_immediate_feedback": false,
+              "has_progressive_challenge": false,
+              "has_skill_development": false,
+              "assessment": "Poor"
+            },
+            "motivation_check": {
+              "score": 0,
+              "has_autonomy": false,
+              "has_competence": false,
+              "has_relatedness": false,
+              "has_mastery": false,
+              "assessment": "Poor"
+            }
+          },
+          "benchmark_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "assessment": "BROKEN - Unplayable or confusing",
+          "recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "aaa_recommendations": [
+            "Add clear objectives like AAA games (Minecraft, Portal)",
+            "Increase feedback systems like AAA games (Tetris, Call of Duty)",
+            "Ensure responsive controls like AAA games (Super Mario Odyssey)",
+            "Add progressive complexity like AAA games (Minecraft, Portal)",
+            "Avoid repetitive gameplay - add more variety",
+            "Add clear tutorial elements"
+          ],
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "quality_score": 30.0,
+        "research_score": 3.0,
+        "success": false,
+        "timestamp": "2025-08-02T22:23:03.158821"
+      }
+    },
+    {
+      "timestamp": "2025-08-02T22:32:52.406081",
+      "step": {
+        "game_data": {
+          "prompt": "Create a platformer game where player must defeat all monsters blocking the path",
+          "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223247.pcc",
+          "entities": []
+        },
+        "visual_data": {
+          "timestamp": "2025-08-02T22:32:47.375521",
+          "original_game": {
+            "timestamp": "2025-08-02T22:32:47.375013",
+            "prompt": "Create a platformer game where player must defeat all monsters blocking the path",
+            "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223247.pcc",
+            "ast": {
+              "type": "GAME",
+              "nodes": [
+                {
+                  "type": "WORLD",
+                  "size": [
+                    10,
+                    10,
+                    1
+                  ],
+                  "entities": [
+                    {
+                      "type": "ENEMY",
+                      "ai": "chase",
+                      "count": 3
+                    },
+                    {
+                      "type": "PLATFORM",
+                      "pattern": "jump_sequence"
+                    }
+                  ]
+                },
+                {
+                  "type": "PLAYER",
+                  "pos": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "controls": [
+                    "WASD"
+                  ]
+                },
+                {
+                  "type": "OBJECTIVE",
+                  "goal": {
+                    "type": "DEFEAT_ALL",
+                    "target": "enemy"
+                  }
+                }
+              ],
+              "compression_id": "C3695"
+            },
+            "compression_level": 1.0,
+            "agent": "A"
+          },
+          "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223247_3d.json",
+          "visual_quality": 1.0,
+          "render_engine": "opengl",
+          "agent": "D"
+        },
+        "test_result": {
+          "timestamp": "2025-08-02T22:32:52.405205",
+          "step": 3,
+          "visual_game": {
+            "timestamp": "2025-08-02T22:32:47.375521",
+            "original_game": {
+              "timestamp": "2025-08-02T22:32:47.375013",
+              "prompt": "Create a platformer game where player must defeat all monsters blocking the path",
+              "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223247.pcc",
+              "ast": {
+                "type": "GAME",
+                "nodes": [
+                  {
+                    "type": "WORLD",
+                    "size": [
+                      10,
+                      10,
+                      1
+                    ],
+                    "entities": [
+                      {
+                        "type": "ENEMY",
+                        "ai": "chase",
+                        "count": 3
+                      },
+                      {
+                        "type": "PLATFORM",
+                        "pattern": "jump_sequence"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PLAYER",
+                    "pos": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "controls": [
+                      "WASD"
+                    ]
+                  },
+                  {
+                    "type": "OBJECTIVE",
+                    "goal": {
+                      "type": "DEFEAT_ALL",
+                      "target": "enemy"
+                    }
+                  }
+                ],
+                "compression_id": "C3695"
+              },
+              "compression_level": 1.0,
+              "agent": "A"
+            },
+            "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223247_3d.json",
+            "visual_quality": 1.0,
+            "render_engine": "opengl",
+            "agent": "D"
+          },
+          "gameplay_test": {
+            "success_rate": 1.0,
+            "quality_score": {
+              "overall_score": 30.0,
+              "level": "POOR",
+              "breakdown": {
+                "objective_functionality": 0,
+                "world_design": 50,
+                "interactivity": 30,
+                "visual_design": 90
+              }
+            },
+            "playable": true,
+            "objectives_completed": 1,
+            "moves_made": 1,
+            "game_duration": 8.630752563476562e-05
+          },
+          "agent": "B"
+        },
+        "feedback": {
+          "timestamp": "2025-08-02T22:32:52.405828",
+          "success": false,
+          "compression_ratio": 1.0,
+          "improvements": [
+            "fix_objectives",
+            "improve_design",
+            "enhance_interactivity",
+            "Improve objective functionality - make objectives actually work",
+            "Enhance world design - add more variety and complexity",
+            "Increase interactivity - add more player-entity interactions",
+            "Improve visual design - add more visual variety"
+          ],
+          "quality_score": 30.0,
+          "quality_level": "POOR",
+          "rendering_feedback": {
+            "entity_rendering_issues": [],
+            "objective_mapping_issues": [],
+            "world_complexity_issues": [
+              "World too simple - only planes and spheres"
+            ],
+            "visual_quality_issues": [],
+            "improvement_suggestions": [
+              "Add walls, platforms, complex environments"
+            ]
+          },
+          "agent": "C",
+          "research_based_score": 3.0,
+          "research_assessment": "BROKEN - Unplayable or confusing",
+          "aaa_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "research_recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "research_assessment": {
+          "overall_score": 3.0,
+          "detailed_results": {
+            "core_mechanics_check": {
+              "score": 0,
+              "has_movement": false,
+              "has_interaction": false,
+              "has_combat": false,
+              "has_building": false,
+              "assessment": "Poor"
+            },
+            "objectives_check": {
+              "score": 0,
+              "assessment": "No objectives found"
+            },
+            "feedback_check": {
+              "score": 20,
+              "assessment": "Poor - No clear feedback systems",
+              "missing": [
+                "visual_feedback",
+                "audio_feedback",
+                "progress_indicators"
+              ]
+            },
+            "progression_check": {
+              "score": 0,
+              "has_multiple_levels": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "ui_check": {
+              "score": 10,
+              "assessment": "Poor - No UI elements found",
+              "missing": [
+                "hud",
+                "menus",
+                "tutorials",
+                "help_systems"
+              ]
+            },
+            "engagement_check": {
+              "score": 0,
+              "engagement_factors": 0,
+              "assessment": "Poor"
+            },
+            "balance_check": {
+              "score": 0,
+              "has_challenge": false,
+              "has_rewards": false,
+              "has_tools": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "replayability_check": {
+              "score": 0,
+              "has_randomization": false,
+              "has_multiple_paths": false,
+              "has_achievements": false,
+              "assessment": "Poor"
+            },
+            "flow_check": {
+              "score": 0,
+              "has_clear_goals": false,
+              "has_immediate_feedback": false,
+              "has_progressive_challenge": false,
+              "has_skill_development": false,
+              "assessment": "Poor"
+            },
+            "motivation_check": {
+              "score": 0,
+              "has_autonomy": false,
+              "has_competence": false,
+              "has_relatedness": false,
+              "has_mastery": false,
+              "assessment": "Poor"
+            }
+          },
+          "benchmark_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "assessment": "BROKEN - Unplayable or confusing",
+          "recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "aaa_recommendations": [
+            "Add clear objectives like AAA games (Minecraft, Portal)",
+            "Increase feedback systems like AAA games (Tetris, Call of Duty)",
+            "Ensure responsive controls like AAA games (Super Mario Odyssey)",
+            "Add progressive complexity like AAA games (Minecraft, Portal)",
+            "Avoid repetitive gameplay - add more variety",
+            "Add clear tutorial elements"
+          ],
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "quality_score": 30.0,
+        "research_score": 3.0,
+        "success": false,
+        "timestamp": "2025-08-02T22:32:52.406075"
+      }
+    },
+    {
+      "timestamp": "2025-08-02T22:36:34.040458",
+      "step": {
+        "game_data": {
+          "prompt": "Create a puzzle game where player must unlock all doors using colored switches",
+          "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223629.pcc",
+          "entities": []
+        },
+        "visual_data": {
+          "timestamp": "2025-08-02T22:36:29.009304",
+          "original_game": {
+            "timestamp": "2025-08-02T22:36:29.008866",
+            "prompt": "Create a puzzle game where player must unlock all doors using colored switches",
+            "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223629.pcc",
+            "ast": {
+              "type": "GAME",
+              "nodes": [
+                {
+                  "type": "WORLD",
+                  "size": [
+                    10,
+                    10,
+                    1
+                  ],
+                  "entities": [
+                    {
+                      "type": "DOOR",
+                      "state": "locked",
+                      "requires": "key"
+                    },
+                    {
+                      "type": "SWITCH",
+                      "color": "red",
+                      "target": "door"
+                    }
+                  ]
+                },
+                {
+                  "type": "PLAYER",
+                  "pos": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "controls": [
+                    "WASD"
+                  ]
+                },
+                {
+                  "type": "OBJECTIVE",
+                  "goal": {
+                    "type": "SURVIVE",
+                    "time": 60
+                  }
+                }
+              ],
+              "compression_id": "C5389"
+            },
+            "compression_level": 1.0,
+            "agent": "A"
+          },
+          "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223629_3d.json",
+          "visual_quality": 1.0,
+          "render_engine": "opengl",
+          "agent": "D"
+        },
+        "test_result": {
+          "timestamp": "2025-08-02T22:36:34.039634",
+          "step": 3,
+          "visual_game": {
+            "timestamp": "2025-08-02T22:36:29.009304",
+            "original_game": {
+              "timestamp": "2025-08-02T22:36:29.008866",
+              "prompt": "Create a puzzle game where player must unlock all doors using colored switches",
+              "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223629.pcc",
+              "ast": {
+                "type": "GAME",
+                "nodes": [
+                  {
+                    "type": "WORLD",
+                    "size": [
+                      10,
+                      10,
+                      1
+                    ],
+                    "entities": [
+                      {
+                        "type": "DOOR",
+                        "state": "locked",
+                        "requires": "key"
+                      },
+                      {
+                        "type": "SWITCH",
+                        "color": "red",
+                        "target": "door"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PLAYER",
+                    "pos": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "controls": [
+                      "WASD"
+                    ]
+                  },
+                  {
+                    "type": "OBJECTIVE",
+                    "goal": {
+                      "type": "SURVIVE",
+                      "time": 60
+                    }
+                  }
+                ],
+                "compression_id": "C5389"
+              },
+              "compression_level": 1.0,
+              "agent": "A"
+            },
+            "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223629_3d.json",
+            "visual_quality": 1.0,
+            "render_engine": "opengl",
+            "agent": "D"
+          },
+          "gameplay_test": {
+            "success_rate": 1.0,
+            "quality_score": {
+              "overall_score": 0,
+              "level": "ERROR",
+              "breakdown": {}
+            },
+            "playable": true,
+            "objectives_completed": 1,
+            "moves_made": 1,
+            "game_duration": 8.726119995117188e-05
+          },
+          "agent": "B"
+        },
+        "feedback": {
+          "timestamp": "2025-08-02T22:36:34.040224",
+          "success": false,
+          "compression_ratio": 1.0,
+          "improvements": [
+            "fix_objectives",
+            "improve_design",
+            "enhance_interactivity",
+            "Improve objective functionality - make objectives actually work",
+            "Enhance world design - add more variety and complexity",
+            "Increase interactivity - add more player-entity interactions",
+            "Improve visual design - add more visual variety"
+          ],
+          "quality_score": 0,
+          "quality_level": "ERROR",
+          "rendering_feedback": {
+            "entity_rendering_issues": [],
+            "objective_mapping_issues": [],
+            "world_complexity_issues": [
+              "World too simple - only planes and spheres"
+            ],
+            "visual_quality_issues": [
+              "Visual design needs improvement"
+            ],
+            "improvement_suggestions": [
+              "Add walls, platforms, complex environments",
+              "Implement better materials, lighting, and geometry"
+            ]
+          },
+          "agent": "C",
+          "research_based_score": 3.0,
+          "research_assessment": "BROKEN - Unplayable or confusing",
+          "aaa_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "research_recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "research_assessment": {
+          "overall_score": 3.0,
+          "detailed_results": {
+            "core_mechanics_check": {
+              "score": 0,
+              "has_movement": false,
+              "has_interaction": false,
+              "has_combat": false,
+              "has_building": false,
+              "assessment": "Poor"
+            },
+            "objectives_check": {
+              "score": 0,
+              "assessment": "No objectives found"
+            },
+            "feedback_check": {
+              "score": 20,
+              "assessment": "Poor - No clear feedback systems",
+              "missing": [
+                "visual_feedback",
+                "audio_feedback",
+                "progress_indicators"
+              ]
+            },
+            "progression_check": {
+              "score": 0,
+              "has_multiple_levels": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "ui_check": {
+              "score": 10,
+              "assessment": "Poor - No UI elements found",
+              "missing": [
+                "hud",
+                "menus",
+                "tutorials",
+                "help_systems"
+              ]
+            },
+            "engagement_check": {
+              "score": 0,
+              "engagement_factors": 0,
+              "assessment": "Poor"
+            },
+            "balance_check": {
+              "score": 0,
+              "has_challenge": false,
+              "has_rewards": false,
+              "has_tools": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "replayability_check": {
+              "score": 0,
+              "has_randomization": false,
+              "has_multiple_paths": false,
+              "has_achievements": false,
+              "assessment": "Poor"
+            },
+            "flow_check": {
+              "score": 0,
+              "has_clear_goals": false,
+              "has_immediate_feedback": false,
+              "has_progressive_challenge": false,
+              "has_skill_development": false,
+              "assessment": "Poor"
+            },
+            "motivation_check": {
+              "score": 0,
+              "has_autonomy": false,
+              "has_competence": false,
+              "has_relatedness": false,
+              "has_mastery": false,
+              "assessment": "Poor"
+            }
+          },
+          "benchmark_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "assessment": "BROKEN - Unplayable or confusing",
+          "recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "aaa_recommendations": [
+            "Add clear objectives like AAA games (Minecraft, Portal)",
+            "Increase feedback systems like AAA games (Tetris, Call of Duty)",
+            "Ensure responsive controls like AAA games (Super Mario Odyssey)",
+            "Add progressive complexity like AAA games (Minecraft, Portal)",
+            "Avoid repetitive gameplay - add more variety",
+            "Add clear tutorial elements"
+          ],
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "quality_score": 0,
+        "research_score": 3.0,
+        "success": false,
+        "timestamp": "2025-08-02T22:36:34.040453"
+      }
+    },
+    {
+      "timestamp": "2025-08-02T22:38:52.182902",
+      "step": {
+        "game_data": {
+          "prompt": "Create a puzzle game where player must activate all portals in the correct sequence",
+          "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223847.pcc",
+          "entities": []
+        },
+        "visual_data": {
+          "timestamp": "2025-08-02T22:38:47.153382",
+          "original_game": {
+            "timestamp": "2025-08-02T22:38:47.152980",
+            "prompt": "Create a puzzle game where player must activate all portals in the correct sequence",
+            "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223847.pcc",
+            "ast": {
+              "type": "GAME",
+              "nodes": [
+                {
+                  "type": "WORLD",
+                  "size": [
+                    10,
+                    10,
+                    1
+                  ],
+                  "entities": [
+                    {
+                      "type": "PORTAL",
+                      "destination": "exit"
+                    }
+                  ]
+                },
+                {
+                  "type": "PLAYER",
+                  "pos": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "controls": [
+                    "WASD"
+                  ]
+                },
+                {
+                  "type": "OBJECTIVE",
+                  "goal": {
+                    "type": "SURVIVE",
+                    "time": 60
+                  }
+                }
+              ],
+              "compression_id": "C9041"
+            },
+            "compression_level": 1.0,
+            "agent": "A"
+          },
+          "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223847_3d.json",
+          "visual_quality": 1.0,
+          "render_engine": "opengl",
+          "agent": "D"
+        },
+        "test_result": {
+          "timestamp": "2025-08-02T22:38:52.181741",
+          "step": 3,
+          "visual_game": {
+            "timestamp": "2025-08-02T22:38:47.153382",
+            "original_game": {
+              "timestamp": "2025-08-02T22:38:47.152980",
+              "prompt": "Create a puzzle game where player must activate all portals in the correct sequence",
+              "pcc_file": "/home/colling/PCC-Language/tests/examples/game_20250802_223847.pcc",
+              "ast": {
+                "type": "GAME",
+                "nodes": [
+                  {
+                    "type": "WORLD",
+                    "size": [
+                      10,
+                      10,
+                      1
+                    ],
+                    "entities": [
+                      {
+                        "type": "PORTAL",
+                        "destination": "exit"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "PLAYER",
+                    "pos": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "controls": [
+                      "WASD"
+                    ]
+                  },
+                  {
+                    "type": "OBJECTIVE",
+                    "goal": {
+                      "type": "SURVIVE",
+                      "time": 60
+                    }
+                  }
+                ],
+                "compression_id": "C9041"
+              },
+              "compression_level": 1.0,
+              "agent": "A"
+            },
+            "rendered_file": "/home/colling/PCC-Language/rendered_games/game_20250802_223847_3d.json",
+            "visual_quality": 1.0,
+            "render_engine": "opengl",
+            "agent": "D"
+          },
+          "gameplay_test": {
+            "success_rate": 1.0,
+            "quality_score": {
+              "overall_score": 3.0,
+              "level": "BROKEN",
+              "research_assessment": {
+                "overall_score": 3.0,
+                "detailed_results": {
+                  "core_mechanics_check": {
+                    "score": 0,
+                    "has_movement": false,
+                    "has_interaction": false,
+                    "has_combat": false,
+                    "has_building": false,
+                    "assessment": "Poor"
+                  },
+                  "objectives_check": {
+                    "score": 0,
+                    "assessment": "No objectives found"
+                  },
+                  "feedback_check": {
+                    "score": 20,
+                    "assessment": "Poor - No clear feedback systems",
+                    "missing": [
+                      "visual_feedback",
+                      "audio_feedback",
+                      "progress_indicators"
+                    ]
+                  },
+                  "progression_check": {
+                    "score": 0,
+                    "has_multiple_levels": false,
+                    "has_variety": false,
+                    "assessment": "Poor"
+                  },
+                  "ui_check": {
+                    "score": 10,
+                    "assessment": "Poor - No UI elements found",
+                    "missing": [
+                      "hud",
+                      "menus",
+                      "tutorials",
+                      "help_systems"
+                    ]
+                  },
+                  "engagement_check": {
+                    "score": 0,
+                    "engagement_factors": 0,
+                    "assessment": "Poor"
+                  },
+                  "balance_check": {
+                    "score": 0,
+                    "has_challenge": false,
+                    "has_rewards": false,
+                    "has_tools": false,
+                    "has_variety": false,
+                    "assessment": "Poor"
+                  },
+                  "replayability_check": {
+                    "score": 0,
+                    "has_randomization": false,
+                    "has_multiple_paths": false,
+                    "has_achievements": false,
+                    "assessment": "Poor"
+                  },
+                  "flow_check": {
+                    "score": 0,
+                    "has_clear_goals": false,
+                    "has_immediate_feedback": false,
+                    "has_progressive_challenge": false,
+                    "has_skill_development": false,
+                    "assessment": "Poor"
+                  },
+                  "motivation_check": {
+                    "score": 0,
+                    "has_autonomy": false,
+                    "has_competence": false,
+                    "has_relatedness": false,
+                    "has_mastery": false,
+                    "assessment": "Poor"
+                  }
+                },
+                "benchmark_comparison": {
+                  "minecraft": {
+                    "aaa_rating": 92.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.260869565217391
+                  },
+                  "call_of_duty": {
+                    "aaa_rating": 78.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.8461538461538463
+                  },
+                  "portal": {
+                    "aaa_rating": 95.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.1578947368421053
+                  },
+                  "tetris": {
+                    "aaa_rating": 98.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.061224489795918
+                  },
+                  "the_witcher_3": {
+                    "aaa_rating": 93.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.225806451612903
+                  },
+                  "dark_souls": {
+                    "aaa_rating": 91.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.296703296703297
+                  },
+                  "super_mario_odyssey": {
+                    "aaa_rating": 97.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.0927835051546393
+                  },
+                  "breath_of_the_wild": {
+                    "aaa_rating": 95.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.1578947368421053
+                  },
+                  "god_of_war_2018": {
+                    "aaa_rating": 94.0,
+                    "our_score": 3.0,
+                    "percentage_of_aaa": 3.1914893617021276
+                  }
+                },
+                "assessment": "BROKEN - Unplayable or confusing",
+                "recommendations": [
+                  "Add more core mechanics (movement, interaction, combat, building)",
+                  "Add clear objectives and goals",
+                  "Implement feedback systems (visual, audio, progress indicators)",
+                  "Add progression elements (variety, complexity, advancement)",
+                  "Add UI elements (HUD, menus, tutorials, help)",
+                  "Add engagement factors (challenge, rewards, tools, complexity)",
+                  "Improve game balance (challenge vs rewards)",
+                  "Add replayability factors (variety, achievements, multiple paths)",
+                  "Improve flow (clear goals, immediate feedback, progressive challenge)",
+                  "Enhance motivation (autonomy, competence, relatedness)"
+                ],
+                "research_insights": {
+                  "flow_theory_analysis": {
+                    "flow_score": 0,
+                    "in_flow_zone": false,
+                    "recommendations": [
+                      "Add clear goals",
+                      "Increase feedback",
+                      "Add more challenge"
+                    ]
+                  },
+                  "motivation_analysis": {
+                    "motivation_score": 0,
+                    "autonomy_supported": false,
+                    "competence_supported": false,
+                    "relatedness_supported": false,
+                    "recommendations": [
+                      "Add more player choice",
+                      "Include skill development",
+                      "Add more content"
+                    ]
+                  },
+                  "cognitive_load_analysis": {
+                    "cognitive_load": "low",
+                    "complexity_score": 0.0,
+                    "object_count": 0,
+                    "variety_count": 0,
+                    "recommendations": [
+                      "Add more complexity",
+                      "Increase variety",
+                      "Add more mechanics"
+                    ]
+                  },
+                  "balance_analysis": {
+                    "balance_ratio": 0.0,
+                    "has_tool_support": false,
+                    "challenge_count": 0,
+                    "reward_count": 0,
+                    "tool_count": 0,
+                    "recommendations": [
+                      "Add more rewards to balance challenges",
+                      "Add tools to help players overcome challenges"
+                    ]
+                  }
+                },
+                "aaa_recommendations": [
+                  "Add clear objectives like AAA games (Minecraft, Portal)",
+                  "Increase feedback systems like AAA games (Tetris, Call of Duty)",
+                  "Ensure responsive controls like AAA games (Super Mario Odyssey)",
+                  "Add progressive complexity like AAA games (Minecraft, Portal)",
+                  "Avoid repetitive gameplay - add more variety",
+                  "Add clear tutorial elements"
+                ],
+                "human_feedback_analysis": {
+                  "predicted_human_rating": 1,
+                  "positive_factors": 0,
+                  "negative_factors": 2,
+                  "likely_complaints": [
+                    "Too simple and basic",
+                    "No clear objectives",
+                    "Lack of variety",
+                    "Not enough content"
+                  ],
+                  "likely_praises": []
+                }
+              },
+              "assessment_method": "research_based"
+            },
+            "playable": true,
+            "objectives_completed": 1,
+            "moves_made": 1,
+            "game_duration": 0.000301361083984375
+          },
+          "agent": "B"
+        },
+        "feedback": {
+          "timestamp": "2025-08-02T22:38:52.182670",
+          "success": false,
+          "compression_ratio": 1.0,
+          "improvements": [
+            "fix_objectives",
+            "improve_design",
+            "enhance_interactivity",
+            "Improve objective functionality - make objectives actually work",
+            "Enhance world design - add more variety and complexity",
+            "Increase interactivity - add more player-entity interactions",
+            "Improve visual design - add more visual variety"
+          ],
+          "quality_score": 3.0,
+          "quality_level": "BROKEN",
+          "rendering_feedback": {
+            "entity_rendering_issues": [],
+            "objective_mapping_issues": [],
+            "world_complexity_issues": [
+              "World too simple - only planes and spheres"
+            ],
+            "visual_quality_issues": [
+              "Visual design needs improvement"
+            ],
+            "improvement_suggestions": [
+              "Add walls, platforms, complex environments",
+              "Implement better materials, lighting, and geometry"
+            ]
+          },
+          "agent": "C",
+          "research_based_score": 3.0,
+          "research_assessment": "BROKEN - Unplayable or confusing",
+          "aaa_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "research_recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "research_assessment": {
+          "overall_score": 3.0,
+          "detailed_results": {
+            "core_mechanics_check": {
+              "score": 0,
+              "has_movement": false,
+              "has_interaction": false,
+              "has_combat": false,
+              "has_building": false,
+              "assessment": "Poor"
+            },
+            "objectives_check": {
+              "score": 0,
+              "assessment": "No objectives found"
+            },
+            "feedback_check": {
+              "score": 20,
+              "assessment": "Poor - No clear feedback systems",
+              "missing": [
+                "visual_feedback",
+                "audio_feedback",
+                "progress_indicators"
+              ]
+            },
+            "progression_check": {
+              "score": 0,
+              "has_multiple_levels": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "ui_check": {
+              "score": 10,
+              "assessment": "Poor - No UI elements found",
+              "missing": [
+                "hud",
+                "menus",
+                "tutorials",
+                "help_systems"
+              ]
+            },
+            "engagement_check": {
+              "score": 0,
+              "engagement_factors": 0,
+              "assessment": "Poor"
+            },
+            "balance_check": {
+              "score": 0,
+              "has_challenge": false,
+              "has_rewards": false,
+              "has_tools": false,
+              "has_variety": false,
+              "assessment": "Poor"
+            },
+            "replayability_check": {
+              "score": 0,
+              "has_randomization": false,
+              "has_multiple_paths": false,
+              "has_achievements": false,
+              "assessment": "Poor"
+            },
+            "flow_check": {
+              "score": 0,
+              "has_clear_goals": false,
+              "has_immediate_feedback": false,
+              "has_progressive_challenge": false,
+              "has_skill_development": false,
+              "assessment": "Poor"
+            },
+            "motivation_check": {
+              "score": 0,
+              "has_autonomy": false,
+              "has_competence": false,
+              "has_relatedness": false,
+              "has_mastery": false,
+              "assessment": "Poor"
+            }
+          },
+          "benchmark_comparison": {
+            "minecraft": {
+              "aaa_rating": 92.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.260869565217391
+            },
+            "call_of_duty": {
+              "aaa_rating": 78.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.8461538461538463
+            },
+            "portal": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "tetris": {
+              "aaa_rating": 98.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.061224489795918
+            },
+            "the_witcher_3": {
+              "aaa_rating": 93.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.225806451612903
+            },
+            "dark_souls": {
+              "aaa_rating": 91.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.296703296703297
+            },
+            "super_mario_odyssey": {
+              "aaa_rating": 97.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.0927835051546393
+            },
+            "breath_of_the_wild": {
+              "aaa_rating": 95.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1578947368421053
+            },
+            "god_of_war_2018": {
+              "aaa_rating": 94.0,
+              "our_score": 3.0,
+              "percentage_of_aaa": 3.1914893617021276
+            }
+          },
+          "assessment": "BROKEN - Unplayable or confusing",
+          "recommendations": [
+            "Add more core mechanics (movement, interaction, combat, building)",
+            "Add clear objectives and goals",
+            "Implement feedback systems (visual, audio, progress indicators)",
+            "Add progression elements (variety, complexity, advancement)",
+            "Add UI elements (HUD, menus, tutorials, help)",
+            "Add engagement factors (challenge, rewards, tools, complexity)",
+            "Improve game balance (challenge vs rewards)",
+            "Add replayability factors (variety, achievements, multiple paths)",
+            "Improve flow (clear goals, immediate feedback, progressive challenge)",
+            "Enhance motivation (autonomy, competence, relatedness)"
+          ],
+          "research_insights": {
+            "flow_theory_analysis": {
+              "flow_score": 0,
+              "in_flow_zone": false,
+              "recommendations": [
+                "Add clear goals",
+                "Increase feedback",
+                "Add more challenge"
+              ]
+            },
+            "motivation_analysis": {
+              "motivation_score": 0,
+              "autonomy_supported": false,
+              "competence_supported": false,
+              "relatedness_supported": false,
+              "recommendations": [
+                "Add more player choice",
+                "Include skill development",
+                "Add more content"
+              ]
+            },
+            "cognitive_load_analysis": {
+              "cognitive_load": "low",
+              "complexity_score": 0.0,
+              "object_count": 0,
+              "variety_count": 0,
+              "recommendations": [
+                "Add more complexity",
+                "Increase variety",
+                "Add more mechanics"
+              ]
+            },
+            "balance_analysis": {
+              "balance_ratio": 0.0,
+              "has_tool_support": false,
+              "challenge_count": 0,
+              "reward_count": 0,
+              "tool_count": 0,
+              "recommendations": [
+                "Add more rewards to balance challenges",
+                "Add tools to help players overcome challenges"
+              ]
+            }
+          },
+          "aaa_recommendations": [
+            "Add clear objectives like AAA games (Minecraft, Portal)",
+            "Increase feedback systems like AAA games (Tetris, Call of Duty)",
+            "Ensure responsive controls like AAA games (Super Mario Odyssey)",
+            "Add progressive complexity like AAA games (Minecraft, Portal)",
+            "Avoid repetitive gameplay - add more variety",
+            "Add clear tutorial elements"
+          ],
+          "human_feedback_analysis": {
+            "predicted_human_rating": 1,
+            "positive_factors": 0,
+            "negative_factors": 2,
+            "likely_complaints": [
+              "Too simple and basic",
+              "No clear objectives",
+              "Lack of variety",
+              "Not enough content"
+            ],
+            "likely_praises": []
+          }
+        },
+        "quality_score": 3.0,
+        "research_score": 3.0,
+        "success": false,
+        "timestamp": "2025-08-02T22:38:52.182897"
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:25:01.069242",
+      "step": {
+        "generation": 1,
+        "quality_score": 34.56666666666667,
+        "success": false,
+        "template_type": "puzzle_maze",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "puzzle_maze": 0.3456666666666667
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "objectives_accessible"
+            ],
+            "negative": []
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:25:15.654437",
+      "step": {
+        "generation": 2,
+        "quality_score": 34.900000000000006,
+        "success": false,
+        "template_type": "escape_room",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "escape_room": 0.34900000000000003
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "objectives_accessible",
+              "good_navigation"
+            ],
+            "negative": [
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:25:30.239800",
+      "step": {
+        "generation": 3,
+        "quality_score": 34.900000000000006,
+        "success": false,
+        "template_type": "escape_room",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "escape_room": 0.34900000000000003
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "objectives_accessible",
+              "good_navigation"
+            ],
+            "negative": [
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:30:36.416998",
+      "step": {
+        "generation": 1,
+        "quality_score": 38.56666666666667,
+        "success": false,
+        "template_type": "maze_runner",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "maze_runner": 0.3856666666666667
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "good_navigation"
+            ],
+            "negative": [
+              "objectives_inaccessible"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:30:51.006917",
+      "step": {
+        "generation": 2,
+        "quality_score": 38.56666666666667,
+        "success": false,
+        "template_type": "escape_room",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "escape_room": 0.3856666666666667
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "good_navigation"
+            ],
+            "negative": [
+              "objectives_inaccessible",
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:31:05.603768",
+      "step": {
+        "generation": 3,
+        "quality_score": 37.9,
+        "success": false,
+        "template_type": "arena_challenge",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "arena_challenge": 0.379
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "objectives_accessible",
+              "good_navigation"
+            ],
+            "negative": [
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:31:20.183739",
+      "step": {
+        "generation": 4,
+        "quality_score": 38.56666666666667,
+        "success": false,
+        "template_type": "maze_runner",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "maze_runner": 0.3856666666666667
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "good_navigation"
+            ],
+            "negative": [
+              "objectives_inaccessible",
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2025-08-03T12:31:34.776761",
+      "step": {
+        "generation": 5,
+        "quality_score": 34.900000000000006,
+        "success": false,
+        "template_type": "escape_room",
+        "ai_victory": false,
+        "grs_score": 26.5,
+        "patterns_applied": {
+          "template_performance": {
+            "escape_room": 0.34900000000000003
+          },
+          "optimal_orb_count": null,
+          "optimal_arena_size": null,
+          "ai_completion_factors": {
+            "positive": [
+              "objectives_accessible",
+              "good_navigation"
+            ],
+            "negative": [
+              "too_difficult"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "performance_metrics": {},
+  "timestamp": "2025-08-03T12:31:34.776780"
+}

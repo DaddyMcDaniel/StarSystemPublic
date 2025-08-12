@@ -1,31 +1,14 @@
-# Build artifacts
-*.o
-*.a
-*.so
-*.exe
-pcc_vm
+venv/
+node_modules/
+.DS_Store/
+.env
+.env.local
+runs/
+.cache/
+automation/playwright/out/
+__pycache__/
+*.pyc
 build/
 bin/
-
-# Development files
-.vscode/
-.clangd/
-*.tmp
-*.log
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Agent logs and experiments
-agents/logs/
-agents/experiments/
-agents/temp/
-
-# Test outputs
-tests/output/
-tests/temp/
-
-# Dependencies (if any)
-deps/
-third_party/
+.venv/
+.venv_rl/

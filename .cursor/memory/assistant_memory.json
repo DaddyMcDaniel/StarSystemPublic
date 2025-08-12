@@ -1,0 +1,64 @@
+{
+  "entries": [
+    {
+      "type": "tools_check",
+      "timestamp": "2025-08-08T20:22:52.907093Z",
+      "data": {
+        "exa_search": {
+          "ok": true
+        },
+        "playwright": {
+          "ok": true,
+          "version": "1.54.0",
+          "browsers_installed": true
+        },
+        "ripgrep": {
+          "ok": true,
+          "version": "13.0.0"
+        },
+        "pieces_os": {
+          "ok": false,
+          "health_http_status": 0
+        }
+      }
+    },
+    {
+      "type": "repo_cleanup_plan_init",
+      "timestamp": "2025-08-08T20:31:12.327531Z",
+      "data": {
+        "docs_added": [
+          "docs/CLEANUP_PLAN.md"
+        ],
+        "edits": [
+          "Main/Main.py: renderer path default to project-local renderer/"
+        ],
+        "next_steps": [
+          "consolidate viewers",
+          "standardize evolution loop entrypoint",
+          "disable pygame default paths"
+        ]
+      }
+    }
+    ,
+    {
+      "type": "agent_b_mvp_progress",
+      "timestamp": "2025-08-09T00:00:00Z",
+      "data": {
+        "viewer_bridge": {
+          "telemetry": ["stall_secs", "coverage.visited_pct", "camera_clip_ratio"],
+          "ring_buffer": {"fps": 10, "budget_mb": 200, "flush": "ffmpeg thread"},
+          "api": ["key_hold", "key_down", "key_up", "step", "telemetry_request", "frame_request"]
+        },
+        "critic_gate": {
+          "spec": "agent_b_plan/spec/test_spec.json",
+          "gate": "agent_b_plan/gating/gate_config.json",
+          "wired_in_run": true
+        },
+        "runner_flags": ["--spec", "--gate", "--episodes", "--seed"],
+        "next": ["compute true clip ratio", "input latency aggregation", "coverage grid tuning"]
+      }
+    }
+  ],
+  "last_updated": "2025-08-09T00:00:00Z",
+  "schema_version": 1
+}

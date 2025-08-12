@@ -1,0 +1,28 @@
+# Summary: Declarative mapping of agent roles to model targets and prompt files.
+
+agents:
+  A:
+    role: "Generator"
+    description: "Explores and proposes PCC language specs, DSL evolutions, and scenario seeds."
+    model_target: "anthropic/claude-3-haiku"   # Claude 3 Haiku
+    low_order_prompt: "agents/prompting/low_order/agent_a.md"
+  B:
+    role: "Tester"
+    description: "Validates, simulates, and critiques outputs; proposes precise fixes."
+    model_target: "openai/gpt-4o"              # GPT-4o
+    low_order_prompt: "agents/prompting/low_order/agent_b.md"
+  C:
+    role: "Supervisor"
+    description: "Sets objectives, enforces constraints, approves or rejects iterations."
+    model_target: "anthropic/claude-sonnet-4"  # Claude Sonnet 4 (as requested)
+    low_order_prompt: "agents/prompting/low_order/agent_c.md"
+
+high_order_prompt: "agents/prompting/high_order_benchmark.md"
+
+# Notes:
+# - model_target strings are descriptive labels for your terminal-based Claude Code sessions.
+#   This repo does not invoke remote APIs; paste assembled prompts into the appropriate
+#   model session tabs in your terminal client.
+# - Keep all files inside PCC-LanguageV2 for simpler future context as preferred.
+
+

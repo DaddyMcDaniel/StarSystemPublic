@@ -1,42 +1,20 @@
-# PCC Language (Procedural-Compressed-Code)
+# StarSystem + The Forge (Pre-alpha)
+Local-first, MCP-driven sandbox hub and creator tool. Week-1 scaffold.
 
-## Revolutionary AI-Native Programming Language
+## Terminal agent prompts (high/low-order)
 
-PCC is an ultra-compressed programming language designed for maximum efficiency in AI-generated code. Programs are written directly as AST (Abstract Syntax Tree) nodes, eliminating parsing overhead and achieving alien-like compression ratios.
+- Use the CLI to emit terminal-ready prompts assembled from a canonical benchmark plus role-specific low-order instructions:
 
-### Key Features
-
-- **Direct AST Programming**: No parsing - write AST nodes directly
-- **Ultra-Compressed**: Maximum semantic density per byte
-- **AI-Native**: Optimized for LLM code generation and evolution
-- **Agent-Driven Development**: Evolved by competing AI agents
-- **Pure VM Execution**: Standalone interpreter with no dependencies
-
-### Project Structure
-
-```
-PCC-Language/
-├── src/                    # Core PCC implementation
-│   ├── pcc_ast.h/cpp      # AST node definitions
-│   ├── pcc_parser.h/cpp   # Parser (transitional)
-│   └── pcc_interpreter.h/cpp # VM/Interpreter
-├── docs/                   # Language specification
-├── agents/                 # AI agent implementations
-├── tests/examples/         # .pcc test programs
-└── README.md              # This file
+```bash
+python3 -m agents.emit_prompts --agent a > agents/memory/agent_a_prompt.txt
+python3 -m agents.emit_prompts --agent b > agents/memory/agent_b_prompt.txt
+python3 -m agents.emit_prompts --agent c > agents/memory/agent_c_prompt.txt
 ```
 
-### Goals
+- Model assignments for terminal sessions:
+  - Agent A: Claude 3 Haiku
+  - Agent B: GPT-4o
+  - Agent C: Claude Sonnet 4
 
-1. **AAA Games in Seconds**: Ultra-compressed game code generation
-2. **Agent Evolution**: Self-improving agent-generated programs  
-3. **Maximum Efficiency**: Alien-like programming paradigms
-4. **Pure Architecture**: No legacy human-designed constraints
-
-### Status
-
-🚧 **Active Development** - Extracting from Godot to pure standalone VM
-
-### Philosophy
-
-This is not just another programming language. PCC represents a fundamental shift toward AI-native code that operates at compression ratios impossible for human-written programs.
+The canonical high-order benchmark lives at `agents/prompting/high_order_benchmark.md`. Low-order prompts for each role live under `agents/prompting/low_order/` and must align to the benchmark.
+MD < /dev/null
