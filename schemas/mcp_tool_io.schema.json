@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/mcp_tool_io.schema.json",
+  "title": "MCP Tool Input/Output Schema",
+  "description": "Base schema for MCP tool inputs and outputs with deterministic seeding",
+  "definitions": {
+    "tool_input": {
+      "type": "object",
+      "properties": {
+        "tool_name": {"type": "string"},
+        "seed": {"type": "integer", "minimum": 0},
+        "inputs": {"type": "object"}
+      },
+      "required": ["tool_name", "seed", "inputs"]
+    },
+    "tool_output": {
+      "type": "object",
+      "properties": {
+        "success": {"type": "boolean"},
+        "data": {"type": "object"},
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {"enum": ["godot_missing", "gate_violation", "lock_timeout", "timeout", "budget_exceeded", "invalid_schema"]},
+            "message": {"type": "string"}
+          }
+        },
+        "seed_used": {"type": "integer"},
+        "execution_time_ms": {"type": "number"}
+      },
+      "required": ["success"]
+    }
+  }
+}

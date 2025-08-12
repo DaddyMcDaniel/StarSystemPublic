@@ -1,0 +1,24 @@
+gates:
+  hard_caps:
+    tri_count: 120000
+    materials: 32
+  priorities:
+    - readability
+    - perf_proxy  
+    - tri_count
+  tolerances:
+    tri_count:
+      worsen_max_pct: 2.0
+    materials:
+      worsen_max: 1
+  tie_breakers:
+    - perf_proxy
+    - tri_count
+  nan_policy: treat_as_worst
+
+budgets:
+  calls_max: 100
+  wall_seconds: 900
+  per_call_timeout: 120
+  fixer_max_iters: 3
+  cancel_on_gate_violation: true
