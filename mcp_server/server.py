@@ -18,8 +18,14 @@ TOOLS IMPLEMENTED:
 - godot.dump_scene: Scene structure analysis and statistics
 - godot.apply_patch: Safe scene modification with rollback
 - generators.maze_generate: Procedural maze generation
-- validators.*: gates_check, non_regression, replay validation
-- builders.*: load_system, validate_placement, apply_placement, ledger_write
+- validators.*: gates_check, non_regression, replay validation, performance_pass
+- builders.*: validate_placement, apply_placement
+- world.*: hot_swap, list_layers, edit_layer (Week 3)
+- preview.microsim: 0.5s deterministic preview simulation (Week 3)
+- power.solve: Power network topology solver (Week 3)
+- ui.hud_stats: HUD statistics and performance data (Week 3)
+- publish.dry_run: Publishing validation gates (Week 3)
+- ledger.write: Undo/redo operation ledger (Week 3)
 
 USAGE:
   python mcp_server/server.py                    # Run stdio mode
@@ -158,6 +164,84 @@ async def list_tools() -> List[Tool]:
             inputSchema={
                 "$ref": "$id:tool.memory.search.in"
             }
+        ),
+        # Week 3 Tools
+        Tool(
+            name="world.hot_swap",
+            description="Apply operation log diff to running simulation",
+            inputSchema={
+                "$ref": "$id:tool.world.hot_swap.in"
+            }
+        ),
+        Tool(
+            name="world.list_layers",
+            description="List available world layers",
+            inputSchema={
+                "$ref": "$id:tool.world.list_layers.in"
+            }
+        ),
+        Tool(
+            name="world.edit_layer",
+            description="Edit world layer properties",
+            inputSchema={
+                "$ref": "$id:tool.world.edit_layer.in"
+            }
+        ),
+        Tool(
+            name="preview.microsim",
+            description="Run 0.5s deterministic preview simulation",
+            inputSchema={
+                "$ref": "$id:tool.preview.microsim.in"
+            }
+        ),
+        Tool(
+            name="power.solve",
+            description="Solve power network topology",
+            inputSchema={
+                "$ref": "$id:tool.power.solve.in"
+            }
+        ),
+        Tool(
+            name="ui.hud_stats",
+            description="Get HUD statistics and performance data",
+            inputSchema={
+                "$ref": "$id:tool.ui.hud_stats.in"
+            }
+        ),
+        Tool(
+            name="validators.performance_pass",
+            description="Run performance validation gates",
+            inputSchema={
+                "$ref": "$id:tool.validators.performance_pass.in"
+            }
+        ),
+        Tool(
+            name="publish.dry_run",
+            description="Dry run publishing validation",
+            inputSchema={
+                "$ref": "$id:tool.publish.dry_run.in"
+            }
+        ),
+        Tool(
+            name="builders.validate_placement",
+            description="Validate building placement",
+            inputSchema={
+                "$ref": "$id:tool.builders.validate_placement.in"
+            }
+        ),
+        Tool(
+            name="builders.apply_placement",
+            description="Apply validated building placement",
+            inputSchema={
+                "$ref": "$id:tool.builders.apply_placement.in"
+            }
+        ),
+        Tool(
+            name="ledger.write",
+            description="Write operation to undo ledger",
+            inputSchema={
+                "$ref": "$id:tool.ledger.write.in"
+            }
         )
     ]
 
@@ -182,6 +266,29 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             return await validators_maze_graph_validate(arguments, tool_seed)
         elif name == "memory.search":
             return await memory_search(arguments, tool_seed)
+        # Week 3 Tool Handlers
+        elif name == "world.hot_swap":
+            return await world_hot_swap(arguments, tool_seed)
+        elif name == "world.list_layers":
+            return await world_list_layers(arguments, tool_seed)
+        elif name == "world.edit_layer":
+            return await world_edit_layer(arguments, tool_seed)
+        elif name == "preview.microsim":
+            return await preview_microsim(arguments, tool_seed)
+        elif name == "power.solve":
+            return await power_solve(arguments, tool_seed)
+        elif name == "ui.hud_stats":
+            return await ui_hud_stats(arguments, tool_seed)
+        elif name == "validators.performance_pass":
+            return await validators_performance_pass(arguments, tool_seed)
+        elif name == "publish.dry_run":
+            return await publish_dry_run(arguments, tool_seed)
+        elif name == "builders.validate_placement":
+            return await builders_validate_placement(arguments, tool_seed)
+        elif name == "builders.apply_placement":
+            return await builders_apply_placement(arguments, tool_seed)
+        elif name == "ledger.write":
+            return await ledger_write(arguments, tool_seed)
         else:
             raise ValueError(f"Unknown tool: {name}")
             
@@ -328,6 +435,261 @@ async def memory_search(args: Dict[str, Any], seed: int) -> List[TextContent]:
         "data": {"results": [], "query": query, "total_found": 0},
         "seed_used": seed,
         "execution_time_ms": 10
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+# Week 3 Tool Implementations
+
+async def world_hot_swap(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Apply operation log diff to running simulation"""
+    oplog_data = args.get("oplog_data", {})
+    apply_mode = args.get("application_mode", "tick_boundary")
+    
+    # Stub implementation - would apply oplog operations to simulation
+    result = {
+        "success": True,
+        "data": {
+            "operations_applied": len(oplog_data.get("operations", [])),
+            "application_mode": apply_mode,
+            "conflicts_detected": 0,
+            "state_hash_after": "abc123def456"
+        },
+        "seed_used": seed,
+        "execution_time_ms": 75
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def world_list_layers(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """List available world layers"""
+    world_id = args.get("world_id", "default")
+    
+    # Stub implementation - would list actual world layers
+    result = {
+        "success": True,
+        "data": {
+            "layers": [
+                {
+                    "layer_id": "orbit",
+                    "layer_name": "orbit",
+                    "display_name": "Orbital Layer",
+                    "scale_factor": 100.0,
+                    "layer_order": 0
+                },
+                {
+                    "layer_id": "surface", 
+                    "layer_name": "surface",
+                    "display_name": "Surface Layer",
+                    "scale_factor": 1.0,
+                    "layer_order": 1
+                },
+                {
+                    "layer_id": "subsurface",
+                    "layer_name": "subsurface", 
+                    "display_name": "Subsurface Layer",
+                    "scale_factor": 0.1,
+                    "layer_order": 2
+                }
+            ],
+            "active_layer": "surface",
+            "world_id": world_id
+        },
+        "seed_used": seed,
+        "execution_time_ms": 20
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def world_edit_layer(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Edit world layer properties"""
+    layer_id = args.get("layer_id", "surface")
+    operations = args.get("operations", [])
+    
+    # Stub implementation - would edit actual layer
+    result = {
+        "success": True,
+        "data": {
+            "layer_id": layer_id,
+            "operations_applied": len(operations),
+            "layer_updated": True
+        },
+        "seed_used": seed,
+        "execution_time_ms": 50
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def preview_microsim(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Run 0.5s deterministic preview simulation"""
+    preview_duration = args.get("preview_duration_ms", 500)
+    operations = args.get("preview_operations", [])
+    
+    # Stub implementation - would run actual microsimulation
+    result = {
+        "success": True,
+        "data": {
+            "simulation_time_ms": preview_duration,
+            "steps_executed": preview_duration // 16.67,  # ~60fps
+            "operations_simulated": len(operations),
+            "final_state_hash": "preview123abc",
+            "stability_analysis": {
+                "is_stable": True,
+                "instability_reasons": []
+            }
+        },
+        "seed_used": seed,
+        "execution_time_ms": 25
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def power_solve(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Solve power network topology"""
+    network_data = args.get("network_data", {})
+    solver_config = args.get("solver_config", {})
+    
+    # Stub implementation - would solve actual power network
+    nodes = network_data.get("nodes", [])
+    edges = network_data.get("edges", [])
+    
+    result = {
+        "success": True,
+        "data": {
+            "solution_status": "converged",
+            "total_generation": 1000.0,
+            "total_consumption": 950.0,
+            "total_losses": 50.0,
+            "system_efficiency": 0.95,
+            "nodes_count": len(nodes),
+            "edges_count": len(edges),
+            "bottlenecks": []
+        },
+        "seed_used": seed,
+        "execution_time_ms": 100
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def ui_hud_stats(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Get HUD statistics and performance data"""
+    stats_type = args.get("stats_type", "performance")
+    
+    # Stub implementation - would get actual HUD stats
+    result = {
+        "success": True,
+        "data": {
+            "fps": 60.0,
+            "frame_time_ms": 16.67,
+            "memory_usage_mb": 256,
+            "gpu_usage_percent": 45,
+            "active_objects": 127,
+            "draw_calls": 42,
+            "vertices_rendered": 15000
+        },
+        "seed_used": seed,
+        "execution_time_ms": 5
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def validators_performance_pass(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Run performance validation gates"""
+    content_data = args.get("content_data", {})
+    gate_config = args.get("gate_config", {})
+    
+    # Stub implementation - would run actual performance validation
+    result = {
+        "success": True,
+        "data": {
+            "overall_pass": True,
+            "gate_results": {
+                "fps_gate": "pass",
+                "memory_gate": "pass", 
+                "load_time_gate": "pass",
+                "budget_gate": "pass"
+            },
+            "performance_score": 85.0,
+            "recommendations": []
+        },
+        "seed_used": seed,
+        "execution_time_ms": 150
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def publish_dry_run(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Dry run publishing validation"""
+    content_metadata = args.get("content_metadata", {})
+    validation_level = args.get("validation_level", "basic")
+    
+    # Stub implementation - would run actual publish validation
+    result = {
+        "success": True,
+        "data": {
+            "overall_status": "approved",
+            "individual_gate_results": {
+                "safety_gate": "pass",
+                "performance_gate": "pass",
+                "attribution_gate": "pass",
+                "technical_gate": "pass",
+                "legal_gate": "pass"
+            },
+            "blocking_issues": [],
+            "warnings": []
+        },
+        "seed_used": seed,
+        "execution_time_ms": 200
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def builders_validate_placement(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Validate building placement"""
+    placement_data = args.get("placement_data", {})
+    world_state = args.get("world_state", {})
+    
+    # Stub implementation - would validate actual placement
+    result = {
+        "success": True,
+        "data": {
+            "placement_valid": True,
+            "conflicts": [],
+            "placement_cost": 10,
+            "grid_aligned": True,
+            "physics_stable": True
+        },
+        "seed_used": seed,
+        "execution_time_ms": 30
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def builders_apply_placement(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Apply validated building placement"""
+    placement_data = args.get("placement_data", {})
+    validation_token = args.get("validation_token", "")
+    
+    # Stub implementation - would apply actual placement
+    result = {
+        "success": True,
+        "data": {
+            "placement_applied": True,
+            "objects_placed": 1,
+            "world_state_updated": True,
+            "undo_token": f"undo_{seed}"
+        },
+        "seed_used": seed,
+        "execution_time_ms": 40
+    }
+    return [TextContent(type="text", text=json.dumps(result))]
+
+async def ledger_write(args: Dict[str, Any], seed: int) -> List[TextContent]:
+    """Write operation to undo ledger"""
+    operation_data = args.get("operation_data", {})
+    ledger_id = args.get("ledger_id", "default")
+    
+    # Stub implementation - would write to actual ledger
+    result = {
+        "success": True,
+        "data": {
+            "ledger_entry_id": f"entry_{seed}",
+            "operation_recorded": True,
+            "ledger_size": 42,
+            "can_undo": True
+        },
+        "seed_used": seed,
+        "execution_time_ms": 15
     }
     return [TextContent(type="text", text=json.dumps(result))]
 

@@ -1,0 +1,228 @@
+/*
+SUMMARY: Publish Gate Schema v1
+================================
+Defines publishing validation gates including privacy, safety, performance, and attribution checks.
+Ensures content meets quality standards before community sharing.
+
+KEY COMPONENTS:
+- validation_checks: Comprehensive gate checks (safety, performance, legal)
+- publish_metadata: Content description and sharing configuration
+- attribution_audit: Creator credits and remix lineage verification
+- gate_results: Pass/fail decisions with detailed rationale
+
+USAGE:
+- Used by tools.publish.dry_run for pre-publishing validation
+- Blocks publishing until safety_tag + performance_pass requirements met
+- Ensures proper attribution and legal compliance
+- Optional Week 3 feature for community content sharing
+
+RELATED FILES:
+- tools: publish.dry_run
+- scripts/publish_dry_run.py - Publishing validation script
+- artifacts: runs/{run_id}/publish_report.json
+- Integrates with safety_tag and performance_pass schemas
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:publish_gate:v1",
+  "version": 1,
+  "title": "Publish Gate Schema v1",
+  "description": "Publishing validation gates for privacy, safety, performance, and attribution compliance",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "gate_metadata": {
+      "type": "object",
+      "description": "Publishing gate context and identification",
+      "additionalProperties": false,
+      "properties": {
+        "gate_id": {"type": "string"},
+        "content_id": {"type": "string"},
+        "author": {"type": "string"},
+        "validation_timestamp": {"type": "string", "format": "date-time"},
+        "content_type": {"type": "string", "enum": ["world", "schematic_card", "blueprint_chip", "replay", "tutorial"]},
+        "target_visibility": {"type": "string", "enum": ["private", "friends", "community", "public"], "default": "private"},
+        "publishing_platform": {"type": "string", "enum": ["local", "community_hub", "external_share"], "default": "local"}
+      },
+      "required": ["gate_id", "content_id", "author", "validation_timestamp"]
+    },
+    "content_metadata": {
+      "type": "object",
+      "description": "Content description and sharing configuration",
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string", "maxLength": 100},
+        "description": {"type": "string", "maxLength": 1000},
+        "tags": {"type": "array", "items": {"type": "string"}, "maxItems": 20},
+        "category": {"type": "string", "enum": ["building", "art", "game", "tutorial", "experiment", "showcase"]},
+        "difficulty_level": {"type": "string", "enum": ["beginner", "intermediate", "advanced", "expert"]},
+        "estimated_play_time": {"type": "string"},
+        "content_warnings": {"type": "array", "items": {"type": "string"}},
+        "license": {"type": "string", "enum": ["CC0", "CC-BY", "CC-BY-SA", "CC-BY-NC", "CC-BY-NC-SA", "custom"], "default": "CC-BY-SA"},
+        "custom_license_text": {"type": "string"}
+      },
+      "required": ["title", "description", "category"]
+    },
+    "validation_checks": {
+      "type": "object",
+      "description": "Comprehensive gate checks for publishing approval",
+      "additionalProperties": false,
+      "properties": {
+        "safety_check": {
+          "type": "object",
+          "properties": {
+            "safety_tag_present": {"type": "boolean"},
+            "safety_tag_approved": {"type": "boolean"},
+            "content_rating": {"type": "string"},
+            "automated_scan_passed": {"type": "boolean"},
+            "manual_review_status": {"type": "string", "enum": ["not_required", "pending", "approved", "rejected"]},
+            "community_reports_count": {"type": "integer", "minimum": 0}
+          },
+          "required": ["safety_tag_present", "safety_tag_approved"]
+        },
+        "performance_check": {
+          "type": "object",
+          "properties": {
+            "performance_pass_present": {"type": "boolean"},
+            "performance_pass_approved": {"type": "boolean"},
+            "budget_compliance": {"type": "boolean"},
+            "gate_violations": {"type": "array", "items": {"type": "string"}},
+            "optimization_recommendations": {"type": "array", "items": {"type": "string"}},
+            "performance_score": {"type": "number", "minimum": 0, "maximum": 100}
+          },
+          "required": ["performance_pass_present", "budget_compliance"]
+        },
+        "attribution_check": {
+          "type": "object",
+          "properties": {
+            "provenance_complete": {"type": "boolean"},
+            "all_credits_present": {"type": "boolean"},
+            "remix_splits_valid": {"type": "boolean"},
+            "license_compatibility": {"type": "boolean"},
+            "attribution_conflicts": {"type": "array", "items": {"type": "string"}},
+            "third_party_content": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "content_id": {"type": "string"},
+                  "source": {"type": "string"},
+                  "license": {"type": "string"},
+                  "attribution_required": {"type": "boolean"}
+                }
+              }
+            }
+          },
+          "required": ["provenance_complete", "all_credits_present"]
+        },
+        "technical_check": {
+          "type": "object",
+          "properties": {
+            "schema_validation_passed": {"type": "boolean"},
+            "file_integrity_verified": {"type": "boolean"},
+            "compatibility_tested": {"type": "boolean"},
+            "size_within_limits": {"type": "boolean"},
+            "technical_errors": {"type": "array", "items": {"type": "string"}},
+            "supported_platforms": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["schema_validation_passed", "file_integrity_verified"]
+        },
+        "legal_check": {
+          "type": "object",
+          "properties": {
+            "copyright_clear": {"type": "boolean"},
+            "trademark_clear": {"type": "boolean"},
+            "terms_of_service_compliant": {"type": "boolean"},
+            "privacy_compliant": {"type": "boolean"},
+            "age_appropriate": {"type": "boolean"},
+            "legal_issues": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["copyright_clear", "terms_of_service_compliant"]
+        }
+      },
+      "required": ["safety_check", "performance_check", "attribution_check", "technical_check"]
+    },
+    "gate_results": {
+      "type": "object",
+      "description": "Pass/fail decisions with detailed rationale",
+      "additionalProperties": false,
+      "properties": {
+        "overall_status": {
+          "type": "string",
+          "enum": ["approved", "rejected", "conditional_approval", "requires_review"]
+        },
+        "individual_gate_results": {
+          "type": "object",
+          "properties": {
+            "safety_gate": {"type": "string", "enum": ["pass", "fail", "warning"]},
+            "performance_gate": {"type": "string", "enum": ["pass", "fail", "warning"]},
+            "attribution_gate": {"type": "string", "enum": ["pass", "fail", "warning"]},
+            "technical_gate": {"type": "string", "enum": ["pass", "fail", "warning"]},
+            "legal_gate": {"type": "string", "enum": ["pass", "fail", "warning"]}
+          }
+        },
+        "blocking_issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "issue_type": {"type": "string"},
+              "severity": {"type": "string", "enum": ["critical", "major", "minor"]},
+              "description": {"type": "string"},
+              "resolution_steps": {"type": "array", "items": {"type": "string"}},
+              "estimated_fix_time": {"type": "string"}
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "warning_type": {"type": "string"},
+              "description": {"type": "string"},
+              "recommendation": {"type": "string"}
+            }
+          }
+        },
+        "approval_conditions": {
+          "type": "array",
+          "description": "Conditions that must be met for conditional approval",
+          "items": {"type": "string"}
+        },
+        "review_timeline": {
+          "type": "object",
+          "properties": {
+            "estimated_review_time": {"type": "string"},
+            "priority_level": {"type": "string", "enum": ["low", "normal", "high", "urgent"]},
+            "reviewer_assigned": {"type": "string"}
+          }
+        }
+      },
+      "required": ["overall_status", "individual_gate_results"]
+    },
+    "publish_configuration": {
+      "type": "object",
+      "description": "Configuration for approved publishing",
+      "additionalProperties": false,
+      "properties": {
+        "publish_url": {"type": "string"},
+        "share_code": {"type": "string"},
+        "download_enabled": {"type": "boolean", "default": true},
+        "remix_allowed": {"type": "boolean", "default": true},
+        "commercial_use_allowed": {"type": "boolean", "default": false},
+        "visibility_settings": {
+          "type": "object",
+          "properties": {
+            "searchable": {"type": "boolean", "default": true},
+            "featured_eligible": {"type": "boolean", "default": false},
+            "age_restricted": {"type": "boolean", "default": false}
+          }
+        },
+        "analytics_enabled": {"type": "boolean", "default": true}
+      }
+    }
+  },
+  "required": ["gate_metadata", "content_metadata", "validation_checks", "gate_results"]
+}

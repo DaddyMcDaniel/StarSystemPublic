@@ -1,0 +1,284 @@
+/*
+SUMMARY: World Layers Schema v1
+===============================
+Defines layer management system for orbit/surface/subsurface building contexts.
+Enables seamless transitions between different building environments and scales.
+
+KEY COMPONENTS:
+- layer_definitions: Available layers with properties and constraints
+- active_layer_state: Current editing context and navigation state
+- layer_transitions: Rules for switching between layers seamlessly
+- visibility_settings: Layer rendering and interaction controls
+
+USAGE:
+- Used by tools.world.list_layers/edit_layer for layer management
+- Enables orbit/surface/subsurface building contexts
+- Supports scale transitions and context switching
+- Essential for Week 3 multi-scale building experience
+
+RELATED FILES:
+- tools: world.list_layers, world.edit_layer
+- forge/modules/ui/mode_switcher.py - Layer switching UI
+- forge/modules/layers/manager.py - Layer management system
+- artifacts: runs/{run_id}/layer_context.json
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:world_layers:v1",
+  "version": 1,
+  "title": "World Layers Schema v1",
+  "description": "Layer management system for multi-scale building contexts (orbit/surface/subsurface)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "layer_metadata": {
+      "type": "object",
+      "description": "Layer system identification and context",
+      "additionalProperties": false,
+      "properties": {
+        "world_id": {"type": "string"},
+        "layer_system_version": {"type": "string", "default": "v1"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "last_modified": {"type": "string", "format": "date-time"},
+        "total_layers": {"type": "integer", "minimum": 1}
+      },
+      "required": ["world_id"]
+    },
+    "layer_definitions": {
+      "type": "array",
+      "description": "Available layers with properties and constraints",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "layer_id": {"type": "string"},
+          "layer_name": {
+            "type": "string",
+            "enum": ["orbit", "surface", "subsurface"],
+            "description": "Standard layer types for mini-planet building"
+          },
+          "display_name": {"type": "string"},
+          "description": {"type": "string"},
+          "scale_factor": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 1000,
+            "description": "Relative scale compared to surface layer (1.0)"
+          },
+          "coordinate_system": {
+            "type": "object",
+            "properties": {
+              "origin": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+              "bounds": {
+                "type": "object",
+                "properties": {
+                  "min": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+                  "max": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}}
+                }
+              },
+              "grid_size": {"type": "number", "minimum": 0.1},
+              "snap_precision": {"type": "number", "minimum": 0.01}
+            }
+          },
+          "building_constraints": {
+            "type": "object",
+            "properties": {
+              "allowed_block_types": {"type": "array", "items": {"type": "string"}},
+              "max_structure_size": {"type": "integer", "minimum": 1},
+              "gravity_enabled": {"type": "boolean", "default": true},
+              "physics_enabled": {"type": "boolean", "default": true},
+              "collision_detection": {"type": "boolean", "default": true}
+            }
+          },
+          "visual_properties": {
+            "type": "object",
+            "properties": {
+              "background_color": {"type": "string"},
+              "ambient_lighting": {"type": "number", "minimum": 0, "maximum": 1},
+              "fog_enabled": {"type": "boolean", "default": false},
+              "skybox": {"type": "string"},
+              "default_camera_distance": {"type": "number", "minimum": 1}
+            }
+          },
+          "layer_order": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Rendering order for nested layers"
+          }
+        },
+        "required": ["layer_id", "layer_name", "scale_factor", "layer_order"]
+      }
+    },
+    "active_layer_state": {
+      "type": "object",
+      "description": "Current editing context and navigation state",
+      "additionalProperties": false,
+      "properties": {
+        "current_layer_id": {"type": "string"},
+        "edit_mode": {
+          "type": "string",
+          "enum": ["building", "navigation", "inspection", "camera"],
+          "default": "building"
+        },
+        "camera_state": {
+          "type": "object",
+          "properties": {
+            "position": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+            "rotation": {"type": "object", "properties": {"pitch": {"type": "number"}, "yaw": {"type": "number"}, "roll": {"type": "number"}}},
+            "field_of_view": {"type": "number", "minimum": 30, "maximum": 120, "default": 75},
+            "movement_speed": {"type": "number", "minimum": 0.1, "default": 5.0}
+          }
+        },
+        "cursor_state": {
+          "type": "object",
+          "properties": {
+            "world_position": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+            "grid_position": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+            "preview_block": {"type": "string"},
+            "snap_enabled": {"type": "boolean", "default": true}
+          }
+        },
+        "selection_state": {
+          "type": "object",
+          "properties": {
+            "selected_blocks": {"type": "array", "items": {"type": "string"}},
+            "selection_box": {
+              "type": "object",
+              "properties": {
+                "start": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}},
+                "end": {"type": "object", "properties": {"x": {"type": "integer"}, "y": {"type": "integer"}, "z": {"type": "integer"}}}
+              }
+            },
+            "multi_select_enabled": {"type": "boolean", "default": false}
+          }
+        }
+      },
+      "required": ["current_layer_id", "edit_mode"]
+    },
+    "layer_transitions": {
+      "type": "object",
+      "description": "Rules for switching between layers seamlessly",
+      "additionalProperties": false,
+      "properties": {
+        "transition_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_layer": {"type": "string"},
+              "to_layer": {"type": "string"},
+              "transition_type": {
+                "type": "string",
+                "enum": ["zoom_in", "zoom_out", "teleport", "portal", "elevator"]
+              },
+              "trigger_conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "condition_type": {"type": "string", "enum": ["key_press", "mouse_wheel", "ui_button", "proximity"]},
+                    "parameters": {"type": "object"}
+                  }
+                }
+              },
+              "animation_duration_ms": {"type": "integer", "minimum": 0, "default": 500},
+              "camera_interpolation": {
+                "type": "string",
+                "enum": ["linear", "ease_in", "ease_out", "ease_in_out"],
+                "default": "ease_in_out"
+              }
+            }
+          }
+        },
+        "default_transitions": {
+          "type": "object",
+          "properties": {
+            "surface_to_orbit": {"type": "string", "default": "zoom_out"},
+            "surface_to_subsurface": {"type": "string", "default": "zoom_in"},
+            "orbit_to_surface": {"type": "string", "default": "zoom_in"},
+            "subsurface_to_surface": {"type": "string", "default": "zoom_out"}
+          }
+        }
+      }
+    },
+    "visibility_settings": {
+      "type": "object",
+      "description": "Layer rendering and interaction controls",
+      "additionalProperties": false,
+      "properties": {
+        "layer_visibility": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "visible": {"type": "boolean", "default": true},
+              "opacity": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0},
+              "wireframe_mode": {"type": "boolean", "default": false},
+              "lighting_enabled": {"type": "boolean", "default": true}
+            }
+          }
+        },
+        "layer_interactions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "selectable": {"type": "boolean", "default": true},
+              "editable": {"type": "boolean", "default": true},
+              "collidable": {"type": "boolean", "default": true},
+              "cast_shadows": {"type": "boolean", "default": true}
+            }
+          }
+        },
+        "performance_settings": {
+          "type": "object",
+          "properties": {
+            "max_visible_layers": {"type": "integer", "minimum": 1, "default": 3},
+            "level_of_detail_enabled": {"type": "boolean", "default": true},
+            "frustum_culling": {"type": "boolean", "default": true},
+            "occlusion_culling": {"type": "boolean", "default": false}
+          }
+        }
+      }
+    },
+    "layer_content": {
+      "type": "object",
+      "description": "Content and objects within each layer",
+      "additionalProperties": false,
+      "properties": {
+        "objects_by_layer": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_id": {"type": "string"},
+                "object_type": {"type": "string"},
+                "position": {"type": "object"},
+                "properties": {"type": "object"}
+              }
+            }
+          }
+        },
+        "layer_connections": {
+          "type": "array",
+          "description": "Cross-layer connections and references",
+          "items": {
+            "type": "object",
+            "properties": {
+              "connection_id": {"type": "string"},
+              "source_layer": {"type": "string"},
+              "target_layer": {"type": "string"},
+              "connection_type": {"type": "string", "enum": ["portal", "elevator", "pipe", "cable", "reference"]},
+              "source_position": {"type": "object"},
+              "target_position": {"type": "object"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["layer_metadata", "layer_definitions", "active_layer_state", "visibility_settings"]
+}

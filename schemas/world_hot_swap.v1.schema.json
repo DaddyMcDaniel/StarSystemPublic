@@ -1,0 +1,166 @@
+/*
+SUMMARY: World Hot-Swap Schema v1
+==================================
+Defines operation log (oplog) format for live world editing and diff application.
+Enables seamless editing while simulation continues running in StarSystem.
+
+KEY COMPONENTS:
+- oplog_operations: Atomic world modification operations with rollback data
+- diff_application: Safe application of edit operations to running simulation
+- conflict_resolution: Handling concurrent modifications during hot-swap
+- state_synchronization: Ensuring consistency between edit and sim worlds
+
+USAGE:
+- Used by tools.world.hot_swap for live world editing without stopping simulation
+- Enables EditWorld → SimWorld operation log diff application
+- Supports concurrent editing while game continues running
+- Essential for seamless building experience in Week 3 alpha
+
+RELATED FILES:
+- tools: world.hot_swap
+- forge/core/oplog.py - Operation log implementation
+- forge/core/engine.py - Hot-swap application logic
+- artifacts: runs/{run_id}/oplog.jsonl
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:world_hot_swap:v1",
+  "version": 1,
+  "title": "World Hot-Swap Schema v1",
+  "description": "Operation log format for live world editing and seamless diff application",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "oplog_metadata": {
+      "type": "object",
+      "description": "Operation log context and identification",
+      "additionalProperties": false,
+      "properties": {
+        "oplog_id": {"type": "string"},
+        "world_id": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "edit_session_id": {"type": "string"},
+        "base_state_hash": {"type": "string"},
+        "target_state_hash": {"type": "string"},
+        "operation_count": {"type": "integer", "minimum": 0}
+      },
+      "required": ["oplog_id", "world_id", "created_at"]
+    },
+    "operations": {
+      "type": "array",
+      "description": "Ordered list of atomic world modification operations",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "op_id": {"type": "string"},
+          "sequence_number": {"type": "integer", "minimum": 0},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "operation_type": {
+            "type": "string",
+            "enum": ["place_block", "remove_block", "modify_block", "place_structure", "terrain_edit", "layer_change"],
+            "description": "Type of world modification operation"
+          },
+          "target_location": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "z": {"type": "number"},
+              "layer": {"type": "string", "enum": ["orbit", "surface", "subsurface"]}
+            },
+            "required": ["x", "y", "z"]
+          },
+          "operation_data": {
+            "type": "object",
+            "description": "Operation-specific payload data",
+            "properties": {
+              "block_type": {"type": "string"},
+              "material": {"type": "string"},
+              "rotation": {"type": "integer", "minimum": 0, "maximum": 3},
+              "properties": {"type": "object"},
+              "structure_id": {"type": "string"}
+            }
+          },
+          "rollback_data": {
+            "type": "object",
+            "description": "Data needed to reverse this operation",
+            "properties": {
+              "previous_block_type": {"type": "string"},
+              "previous_properties": {"type": "object"},
+              "affected_connections": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "Other operations this one depends on",
+            "items": {"type": "string"}
+          },
+          "conflicts": {
+            "type": "array",
+            "description": "Operations that conflict with this one",
+            "items": {"type": "string"}
+          }
+        },
+        "required": ["op_id", "sequence_number", "operation_type", "target_location", "operation_data"]
+      }
+    },
+    "diff_application": {
+      "type": "object",
+      "description": "Configuration for applying operations to simulation",
+      "additionalProperties": false,
+      "properties": {
+        "application_mode": {
+          "type": "string",
+          "enum": ["immediate", "batched", "tick_boundary"],
+          "default": "tick_boundary"
+        },
+        "batch_size": {"type": "integer", "minimum": 1, "default": 10},
+        "max_ops_per_tick": {"type": "integer", "minimum": 1, "default": 5},
+        "validation_level": {
+          "type": "string",
+          "enum": ["none", "basic", "strict"],
+          "default": "basic"
+        },
+        "rollback_on_conflict": {"type": "boolean", "default": true},
+        "preserve_simulation_state": {"type": "boolean", "default": true}
+      }
+    },
+    "conflict_resolution": {
+      "type": "object",
+      "description": "Strategies for handling concurrent modifications",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["last_writer_wins", "merge_compatible", "user_resolve", "simulation_priority"],
+          "default": "simulation_priority"
+        },
+        "conflict_window_ms": {"type": "integer", "minimum": 0, "default": 100},
+        "auto_merge_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {"type": "string"},
+              "action": {"type": "string", "enum": ["accept", "reject", "modify", "defer"]}
+            }
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "description": "Operation log integrity and validation",
+      "additionalProperties": false,
+      "properties": {
+        "checksum": {"type": "string"},
+        "operation_hashes": {"type": "array", "items": {"type": "string"}},
+        "state_consistency_check": {"type": "boolean", "default": true},
+        "deterministic_replay": {"type": "boolean", "default": true}
+      }
+    }
+  },
+  "required": ["oplog_metadata", "operations"]
+}

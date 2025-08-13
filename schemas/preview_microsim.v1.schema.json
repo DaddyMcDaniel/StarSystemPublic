@@ -1,0 +1,216 @@
+/*
+SUMMARY: Preview Microsim Schema v1
+====================================
+Defines 0.5-second deterministic look-ahead simulation for pending placements.
+Enables instant preview of building results before committing changes.
+
+KEY COMPONENTS:
+- simulation_config: Fixed-step simulation parameters for deterministic results
+- preview_operations: Pending operations to simulate without committing
+- result_snapshot: Complete state after preview simulation
+- visual_feedback: Rendering hints for preview visualization
+
+USAGE:
+- Used by tools.preview.microsim for 0.5s time-scrub preview
+- Shows immediate results of pending building operations
+- Deterministic simulation ensures consistent previews
+- Essential for responsive building UX in Week 3 alpha
+
+RELATED FILES:
+- tools: preview.microsim
+- forge/core/preview/microsim.py - Preview simulation implementation
+- artifacts: runs/{run_id}/replays/{GLOBAL_SEED}.jsonl
+- Supports building system instant feedback
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:preview_microsim:v1",
+  "version": 1,
+  "title": "Preview Microsim Schema v1",
+  "description": "0.5-second deterministic look-ahead simulation for building preview",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "simulation_config": {
+      "type": "object",
+      "description": "Fixed-step simulation parameters for deterministic results",
+      "additionalProperties": false,
+      "properties": {
+        "preview_duration_ms": {"type": "integer", "minimum": 100, "maximum": 1000, "default": 500},
+        "time_step_ms": {"type": "number", "minimum": 1, "maximum": 50, "default": 16.67},
+        "max_simulation_steps": {"type": "integer", "minimum": 1, "default": 30},
+        "physics_enabled": {"type": "boolean", "default": true},
+        "collision_detection": {"type": "boolean", "default": true},
+        "network_simulation": {"type": "boolean", "default": false},
+        "deterministic_mode": {"type": "boolean", "default": true}
+      },
+      "required": ["preview_duration_ms", "time_step_ms"]
+    },
+    "base_state": {
+      "type": "object",
+      "description": "Current world state to use as simulation starting point",
+      "additionalProperties": false,
+      "properties": {
+        "world_id": {"type": "string"},
+        "state_hash": {"type": "string"},
+        "timestamp": {"type": "string", "format": "date-time"},
+        "active_objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "object_id": {"type": "string"},
+              "position": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+              "velocity": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}},
+              "properties": {"type": "object"}
+            }
+          }
+        },
+        "environmental_state": {
+          "type": "object",
+          "properties": {
+            "gravity": {"type": "number", "default": 9.8},
+            "air_resistance": {"type": "number", "default": 0.1},
+            "temperature": {"type": "number"}
+          }
+        }
+      },
+      "required": ["world_id", "state_hash"]
+    },
+    "preview_operations": {
+      "type": "array",
+      "description": "Pending operations to simulate without committing",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {"type": "string"},
+          "operation_type": {
+            "type": "string",
+            "enum": ["place_block", "remove_block", "apply_force", "change_material", "activate_mechanism"]
+          },
+          "target_location": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "z": {"type": "number"}
+            },
+            "required": ["x", "y", "z"]
+          },
+          "operation_data": {"type": "object"},
+          "timing": {
+            "type": "object",
+            "properties": {
+              "delay_ms": {"type": "integer", "minimum": 0, "default": 0},
+              "duration_ms": {"type": "integer", "minimum": 1}
+            }
+          },
+          "preview_hints": {
+            "type": "object",
+            "properties": {
+              "highlight_color": {"type": "string"},
+              "show_trajectory": {"type": "boolean", "default": false},
+              "ghost_mode": {"type": "boolean", "default": true}
+            }
+          }
+        },
+        "required": ["operation_id", "operation_type", "target_location"]
+      }
+    },
+    "result_snapshot": {
+      "type": "object",
+      "description": "Complete state after preview simulation",
+      "additionalProperties": false,
+      "properties": {
+        "final_state_hash": {"type": "string"},
+        "simulation_time_ms": {"type": "number"},
+        "steps_executed": {"type": "integer"},
+        "modified_objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "object_id": {"type": "string"},
+              "initial_state": {"type": "object"},
+              "final_state": {"type": "object"},
+              "trajectory": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp_ms": {"type": "number"},
+                    "position": {"type": "object"},
+                    "velocity": {"type": "object"}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "stability_analysis": {
+          "type": "object",
+          "properties": {
+            "is_stable": {"type": "boolean"},
+            "instability_reasons": {"type": "array", "items": {"type": "string"}},
+            "recommended_fixes": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "performance_metrics": {
+          "type": "object",
+          "properties": {
+            "simulation_fps": {"type": "number"},
+            "computation_time_ms": {"type": "number"},
+            "memory_usage_kb": {"type": "integer"}
+          }
+        }
+      },
+      "required": ["final_state_hash", "simulation_time_ms", "steps_executed"]
+    },
+    "visual_feedback": {
+      "type": "object",
+      "description": "Rendering hints for preview visualization",
+      "additionalProperties": false,
+      "properties": {
+        "render_mode": {
+          "type": "string",
+          "enum": ["overlay", "ghosted", "highlighted", "wireframe"],
+          "default": "ghosted"
+        },
+        "transparency": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5},
+        "highlight_effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["glow", "outline", "particle_trail", "trajectory_line"]
+          }
+        },
+        "animation_speed": {"type": "number", "minimum": 0.1, "maximum": 2.0, "default": 1.0},
+        "show_physics_debug": {"type": "boolean", "default": false}
+      }
+    },
+    "replay_data": {
+      "type": "object",
+      "description": "Data for exact replay reproduction",
+      "additionalProperties": false,
+      "properties": {
+        "seed_used": {"type": "integer", "minimum": 0},
+        "random_state": {"type": "string"},
+        "deterministic_log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": {"type": "integer"},
+              "event_type": {"type": "string"},
+              "event_data": {"type": "object"}
+            }
+          }
+        }
+      },
+      "required": ["seed_used"]
+    }
+  },
+  "required": ["simulation_config", "base_state", "preview_operations", "result_snapshot"]
+}

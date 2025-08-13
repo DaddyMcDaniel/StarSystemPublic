@@ -1,0 +1,234 @@
+/*
+SUMMARY: Power Graph Schema v1
+===============================
+Defines power network topology with generators, cables, and consumers.
+Supports power flow calculations and network solver integration.
+
+KEY COMPONENTS:
+- network_topology: Nodes (generators/consumers) and edges (cables/connections)
+- power_flow: Generation, consumption, and transmission calculations
+- solver_config: Parameters for power distribution algorithm
+- overlay_visualization: Rendering hints for power network display
+
+USAGE:
+- Used by tools.power.solve for power network calculations
+- Integrates with schematic_card I/O ports for modular building
+- Enables visual power overlay in building interface
+- Optional Week 3 feature for advanced building systems
+
+RELATED FILES:
+- tools: power.solve
+- forge/modules/power/graph.py - Power network implementation
+- forge/modules/power/overlay.py - Visualization system
+- artifacts: runs/{run_id}/power_overlay.json
+*/
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:starsystem:schema:power_graph:v1",
+  "version": 1,
+  "title": "Power Graph Schema v1",
+  "description": "Power network topology with generators, cables, consumers, and solver configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "network_metadata": {
+      "type": "object",
+      "description": "Power network identification and context",
+      "additionalProperties": false,
+      "properties": {
+        "network_id": {"type": "string"},
+        "world_id": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "network_type": {"type": "string", "enum": ["electric", "mechanical", "hydraulic", "pneumatic"], "default": "electric"},
+        "voltage_level": {"type": "string", "enum": ["low", "medium", "high"], "default": "low"},
+        "total_capacity": {"type": "number", "minimum": 0}
+      },
+      "required": ["network_id", "world_id"]
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Power network nodes (generators, consumers, transformers)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {"type": "string"},
+          "node_type": {
+            "type": "string",
+            "enum": ["generator", "consumer", "transformer", "storage", "switch", "junction"]
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "z": {"type": "number"}
+            },
+            "required": ["x", "y", "z"]
+          },
+          "power_specs": {
+            "type": "object",
+            "properties": {
+              "capacity": {"type": "number", "minimum": 0},
+              "efficiency": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0},
+              "voltage": {"type": "number", "minimum": 0},
+              "frequency": {"type": "number", "minimum": 0},
+              "power_factor": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0}
+            }
+          },
+          "operational_state": {
+            "type": "object",
+            "properties": {
+              "is_active": {"type": "boolean", "default": true},
+              "current_output": {"type": "number", "minimum": 0},
+              "current_consumption": {"type": "number", "minimum": 0},
+              "temperature": {"type": "number"},
+              "maintenance_status": {"type": "string", "enum": ["good", "warning", "critical"], "default": "good"}
+            }
+          },
+          "connection_ports": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "port_id": {"type": "string"},
+                "port_type": {"type": "string", "enum": ["input", "output", "bidirectional"]},
+                "voltage_rating": {"type": "number"},
+                "current_rating": {"type": "number"},
+                "connected_to": {"type": "string"}
+              }
+            }
+          },
+          "schematic_reference": {
+            "type": "string",
+            "description": "Reference to schematic_card if this node is from a prefab"
+          }
+        },
+        "required": ["node_id", "node_type", "position"]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Power transmission connections (cables, wires, pipes)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "edge_id": {"type": "string"},
+          "connection_type": {
+            "type": "string",
+            "enum": ["cable", "wire", "pipe", "duct", "beam", "wireless"]
+          },
+          "from_node": {"type": "string"},
+          "to_node": {"type": "string"},
+          "from_port": {"type": "string"},
+          "to_port": {"type": "string"},
+          "transmission_specs": {
+            "type": "object",
+            "properties": {
+              "max_capacity": {"type": "number", "minimum": 0},
+              "resistance": {"type": "number", "minimum": 0},
+              "length": {"type": "number", "minimum": 0},
+              "material": {"type": "string"},
+              "insulation_rating": {"type": "number"}
+            }
+          },
+          "path_geometry": {
+            "type": "array",
+            "description": "3D path for cable routing",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {"type": "number"},
+                "y": {"type": "number"},
+                "z": {"type": "number"}
+              }
+            }
+          },
+          "operational_state": {
+            "type": "object",
+            "properties": {
+              "is_connected": {"type": "boolean", "default": true},
+              "current_flow": {"type": "number"},
+              "power_loss": {"type": "number", "minimum": 0},
+              "temperature": {"type": "number"}
+            }
+          }
+        },
+        "required": ["edge_id", "connection_type", "from_node", "to_node"]
+      }
+    },
+    "solver_config": {
+      "type": "object",
+      "description": "Parameters for power distribution algorithm",
+      "additionalProperties": false,
+      "properties": {
+        "solver_type": {
+          "type": "string",
+          "enum": ["load_flow", "optimal_flow", "shortest_path", "capacity_constrained"],
+          "default": "load_flow"
+        },
+        "convergence_tolerance": {"type": "number", "minimum": 0, "default": 1e-6},
+        "max_iterations": {"type": "integer", "minimum": 1, "default": 100},
+        "load_balancing": {"type": "boolean", "default": true},
+        "voltage_regulation": {"type": "boolean", "default": true},
+        "power_factor_correction": {"type": "boolean", "default": false},
+        "fault_detection": {"type": "boolean", "default": true}
+      }
+    },
+    "power_flow_results": {
+      "type": "object",
+      "description": "Results from power flow calculation",
+      "additionalProperties": false,
+      "properties": {
+        "solution_status": {
+          "type": "string",
+          "enum": ["converged", "diverged", "max_iterations", "infeasible"]
+        },
+        "total_generation": {"type": "number", "minimum": 0},
+        "total_consumption": {"type": "number", "minimum": 0},
+        "total_losses": {"type": "number", "minimum": 0},
+        "system_efficiency": {"type": "number", "minimum": 0, "maximum": 1},
+        "node_voltages": {
+          "type": "object",
+          "additionalProperties": {"type": "number"}
+        },
+        "edge_flows": {
+          "type": "object",
+          "additionalProperties": {"type": "number"}
+        },
+        "bottlenecks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component_id": {"type": "string"},
+              "component_type": {"type": "string"},
+              "utilization_percent": {"type": "number", "minimum": 0},
+              "recommended_upgrade": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "overlay_visualization": {
+      "type": "object",
+      "description": "Rendering hints for power network display",
+      "additionalProperties": false,
+      "properties": {
+        "show_flow_direction": {"type": "boolean", "default": true},
+        "show_capacity_utilization": {"type": "boolean", "default": true},
+        "color_scheme": {
+          "type": "string",
+          "enum": ["traffic_light", "heat_map", "voltage_levels", "power_types"],
+          "default": "traffic_light"
+        },
+        "animation_speed": {"type": "number", "minimum": 0, "default": 1.0},
+        "show_labels": {"type": "boolean", "default": false},
+        "transparency": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.8}
+      }
+    }
+  },
+  "required": ["network_metadata", "nodes", "edges", "solver_config"]
+}
