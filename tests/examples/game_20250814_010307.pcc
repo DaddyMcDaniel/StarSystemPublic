@@ -1,0 +1,61 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "sphere",
+        "radius": 21.083688464471354,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "glow_earth"
+      },
+      "features": [
+        {
+          "type": "ATMOSPHERIC_EFFECT",
+          "style": "orbital_rings",
+          "visibility": "high"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "TRANSPORT_HUB",
+          "capacity": "multi_player",
+          "material": "structure_hub"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "CONNECT_ZONES",
+        "target": "transport_system",
+        "efficiency": "optimal"
+      }
+    }
+  ],
+  "compression_id": "C9016",
+  "planet_seed": 379915,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1"
+  ]
+}

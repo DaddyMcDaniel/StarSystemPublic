@@ -1,0 +1,63 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "sphere",
+        "radius": 31.21256482134912,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "metal_sand"
+      },
+      "features": [
+        {
+          "type": "CRYSTAL_FORMATION",
+          "distribution": "scattered",
+          "material": "resource_crystal"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "CRAFT_STATION",
+          "recipes": "basic",
+          "material": "structure_workbench"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "EXPLORE_PLANET",
+        "coverage": 0.8,
+        "time_limit": null
+      }
+    }
+  ],
+  "compression_id": "C7828",
+  "planet_seed": 912857,
+  "assets": [
+    "crystal_cluster_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

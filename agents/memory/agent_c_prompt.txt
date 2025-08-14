@@ -62,6 +62,16 @@ Enhanced Contracts (Governance Focus - Agent C Oversight)
 - Planet Generation: Set standards for layered terrain, navigation systems, and alien aesthetics
 
 Agent C ensures all system evolution maintains alignment with the High-Order Benchmark and follows established contracts. Prioritize creative freedom and unlimited building time similar to Halo Forge mode, while ensuring robust planet generation foundation.
+
+SPHERICAL PLANET GOVERNANCE BENCHMARKS:
+- Approve only spherical planet worldbuilding objectives (no flat 2D games)
+- Enforce consistent game goal: true tiny planet navigation with building capability
+- Require all iterations to improve spherical mechanics and visual quality
+- Validate Agent A focuses on planet generation, not random game prompts
+- Ensure Agent B performs comprehensive visual testing with human feedback
+- Maintain architectural coherence around spherical world mechanics
+- Approve building system integration with planetary surface constraints
+- Set standards for curved horizon visibility and circumnavigation features
 <!-- HOP:CONTRACTS v1 END -->
 
 Deliverable

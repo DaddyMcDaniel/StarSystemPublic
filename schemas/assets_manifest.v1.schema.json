@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Assets Manifest",
+  "type": "object",
+  "properties": {
+    "schema": {"const": "assets_manifest.v1"},
+    "game_id": {"type": "string"},
+    "terrain_material": {"type": "string"},
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id","prompt","category","format"],
+        "properties": {
+          "id": {"type": "string"},
+          "prompt": {"type": "string"},
+          "category": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "format": {"type": "string", "enum": ["glb","gltf"]},
+          "lod": {"type": "array", "items": {"type": "integer"}},
+          "scale_hint_meters": {"type": "number"},
+          "grounded": {"type": "boolean"},
+          "pivot": {"type": "string"},
+          "physics": {"type": "object"}
+        }
+      }
+    },
+    "placements": {"type": "array", "items": {"type": "object"}},
+    "delivery": {"type": "object"}
+  },
+  "required": ["schema","game_id","assets","delivery"]
+}
+

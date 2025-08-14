@@ -44,14 +44,18 @@ import argparse
 import threading
 import socket
 import time
+import os
 from pathlib import Path
+from typing import Dict, List, Tuple, Any, Optional
 
 try:
     from OpenGL.GL import *
     from OpenGL.GLU import *
     from OpenGL.GLUT import *
-except ImportError:
-    print("❌ OpenGL not available")
+except ImportError as e:
+    print(f"❌ OpenGL not available: {e}")
+    print(f"Python path: {sys.path}")
+    print(f"Current working directory: {os.getcwd()}")
     sys.exit(1)
 
 class Vector3:
@@ -101,10 +105,12 @@ class SphericalPlanetViewer:
         self.planet_radius = terrain.get('radius', 15.0)
         self.planet_center = Vector3(*terrain.get('center', [0, 0, 0]))
         
-        # Player position on sphere surface (start at north pole)
-        self.surface_height_offset = 1.8  # Player height above surface
-        self.player_sphere_pos = Vector3(0, self.planet_radius, 0)  # North pole
-        self.player_world_pos = self.planet_center + self.player_sphere_pos + Vector3(0, self.surface_height_offset, 0)
+        # Player position on sphere surface (start at equator to avoid north pole beacon)
+        self.surface_height_offset = 2.5  # Player height above surface (increased)
+        # Start at equator position to avoid spawning inside north pole beacon
+        self.player_sphere_pos = Vector3(self.planet_radius, 0, 0)  # Equator (east)
+        surface_normal = self.get_surface_normal(self.player_sphere_pos)
+        self.player_world_pos = self.planet_center + self.player_sphere_pos + surface_normal * self.surface_height_offset
         
         # Surface-relative camera orientation
         self.surface_yaw = 0.0    # Rotation around surface normal (left/right)
@@ -121,6 +127,8 @@ class SphericalPlanetViewer:
         self.last_mouse_x = 400
         self.last_mouse_y = 300
         self.first_mouse = True
+        self.window_width = 1024
+        self.window_height = 768
         
         # Input state
         self.keys_pressed = set()
@@ -134,6 +142,9 @@ class SphericalPlanetViewer:
         self.bridge_server = None
         if bridge_port:
             self.setup_bridge_server(bridge_port)
+        
+        # Ensure we don't spawn intersecting any placed object
+        self._ensure_safe_spawn_position()
     
     def load_scene(self):
         """Load 3D scene data"""
@@ -360,60 +371,336 @@ class SphericalPlanetViewer:
             glEnable(GL_LIGHTING)
             glPopMatrix()
     
+    def get_material_color(self, material, obj_type):
+        """Get color based on material type with Agent B feedback enhancements"""
+        material_colors = {
+            # Legacy materials
+            "terrain": (0.6, 0.4, 0.2),      # Brown
+            "resource": (1.0, 1.0, 0.0),     # Yellow
+            "structure": (0.7, 0.7, 0.7),    # Gray
+            "beacon": (0.0, 1.0, 1.0),       # Cyan
+            
+            # Agent B feedback: Enhanced terrain variety
+            "terrain_rock": (0.5, 0.4, 0.3),     # Dark brown rock
+            "terrain_grass": (0.2, 0.6, 0.2),    # Green grass
+            "terrain_sand": (0.8, 0.7, 0.4),     # Sandy beige
+            "terrain_crystal": (0.7, 0.5, 0.9),  # Purple crystal
+            "terrain_metal": (0.6, 0.6, 0.7),    # Metallic gray
+            
+            # Enhanced resource variety
+            "resource_ore": (0.8, 0.6, 0.2),     # Bronze ore
+            "resource_crystal": (0.4, 0.8, 1.0), # Blue crystal
+            "resource_energy": (1.0, 0.4, 0.8),  # Pink energy
+            "resource_rare": (0.9, 0.1, 0.9),    # Rare purple
+            
+            # Landmark materials
+            "landmark_stone": (0.4, 0.4, 0.4),   # Dark stone
+            "landmark_crater": (0.3, 0.2, 0.2),  # Dark crater rim
+            "landmark_pillar": (0.8, 0.8, 0.9),  # Light pillar
+            "landmark_arch": (0.6, 0.5, 0.4),    # Sandstone arch
+            "landmark_spire": (0.9, 0.9, 1.0),   # White spire
+            
+            # Enhanced structures
+            "structure_temple": (0.8, 0.7, 0.5), # Golden temple
+            "structure_monument": (0.4, 0.4, 0.5), # Dark monument
+            "beacon_major": (0.2, 1.0, 1.0),     # Bright cyan beacon
+            "cave_entrance": (0.1, 0.1, 0.1),    # Dark cave
+            
+            # Legacy
+            "boss": (1.0, 0.0, 0.0),         # Red
+            "enemy": (0.8, 0.2, 0.2),        # Dark red
+            "collectible": (1.0, 1.0, 0.0),  # Yellow
+            "player": (0.0, 1.0, 0.0),       # Green
+        }
+        
+        if material in material_colors:
+            return material_colors[material]
+        elif obj_type == "CUBE":
+            return (0.5, 0.5, 1.0)  # Default blue for cubes
+        else:
+            return (1.0, 1.0, 1.0)  # Default white for spheres
+
+    def _is_position_colliding(self, world_pos: "Vector3", clearance: float = 1.5) -> bool:
+        """Approximate collision test against scene objects using spherical bounds."""
+        for obj in self.scene_data.get("objects", []):
+            pos = obj.get("pos", [0, 0, 0])
+            dx = world_pos.x - float(pos[0])
+            dy = world_pos.y - float(pos[1])
+            dz = world_pos.z - float(pos[2])
+            dist_sq = dx*dx + dy*dy + dz*dz
+            if obj.get("type") == "SPHERE":
+                r = max(float(obj.get("radius", 0.5)), 0.3)
+                if dist_sq < (r + clearance) * (r + clearance):
+                    return True
+            elif obj.get("type") == "CUBE":
+                size = obj.get("size", [1, 1, 1])
+                r = 0.5 * float(max(size[0], size[1], size[2]))
+                if dist_sq < (r + clearance) * (r + clearance):
+                    return True
+        return False
+
+    def _ensure_safe_spawn_position(self):
+        """Rotate around equator to find a non-colliding spawn position, else raise height a bit."""
+        for angle_deg in range(0, 360, 10):
+            ang = math.radians(angle_deg)
+            candidate_sphere = Vector3(self.planet_radius * math.cos(ang), 0.0, self.planet_radius * math.sin(ang))
+            nrm = self.get_surface_normal(candidate_sphere)
+            candidate_world = self.planet_center + candidate_sphere + nrm * self.surface_height_offset
+            if not self._is_position_colliding(candidate_world, clearance=1.0):
+                self.player_sphere_pos = candidate_sphere
+                self.player_world_pos = candidate_world
+                return
+        # Fallback: lift up slightly if all equator spots are blocked
+        nrm = self.get_surface_normal(self.player_sphere_pos)
+        self.player_world_pos = self.planet_center + self.player_sphere_pos + nrm * (self.surface_height_offset + 1.0)
+
     def draw_enhanced_objects(self):
         """Draw scene objects with enhanced Valheim-style materials"""
         for obj in self.scene_data.get("objects", []):
             obj_type = obj.get("type", "")
             pos = obj.get("pos", [0, 0, 0])
             material = obj.get("material", "")
+            mesh_file = obj.get("mesh_file") if obj_type == "MESH" else None
             
             glPushMatrix()
             glTranslatef(pos[0], pos[1], pos[2])
             
             if obj_type == "CUBE":
                 size = obj.get("size", [1, 1, 1])
+                # Align cube so its local +Y points along provided up vector (toward surface normal)
+                up = obj.get("up")
+                if up:
+                    ux, uy, uz = float(up[0]), float(up[1]), float(up[2])
+                    # Build rotation matrix to map (0,1,0) to (ux,uy,uz)
+                    # Axis = cross((0,1,0), up), angle = arccos(dot)
+                    dot = max(-1.0, min(1.0, uy))
+                    angle_deg = math.degrees(math.acos(dot))
+                    ax = -uz
+                    ay = 0.0
+                    az = ux
+                    al = math.sqrt(ax*ax + ay*ay + az*az) or 1.0
+                    ax, ay, az = ax/al, ay/al, az/al
+                    if angle_deg > 1e-3:
+                        glRotatef(angle_deg, ax, ay, az)
                 glScalef(size[0], size[1], size[2])
                 
-                # Enhanced material colors
-                if material == "terrain":
-                    glColor3f(0.6, 0.4, 0.3)  # Rich earth
-                    glutSolidCube(1.0)
-                    # Add stone texture lines
-                    glColor3f(0.4, 0.3, 0.2)
+                # Get enhanced material color
+                color = self.get_material_color(material, obj_type)
+                glColor3f(*color)
+                glutSolidCube(1.0)
+                
+                # Add texture effects for special materials
+                if material.startswith("terrain_crystal"):
+                    # Add crystal sparkle effect
+                    glColor3f(min(1.0, color[0] + 0.3), min(1.0, color[1] + 0.3), min(1.0, color[2] + 0.3))
                     glutWireCube(1.02)
-                elif material == "structure":
-                    glColor3f(0.7, 0.6, 0.5)  # Stone building
-                    glutSolidCube(1.0)
-                    # Add masonry lines
-                    glColor3f(0.5, 0.4, 0.3)
+                elif material.startswith("landmark_"):
+                    # Add detailed lines for landmarks
+                    glColor3f(max(0.0, color[0] - 0.2), max(0.0, color[1] - 0.2), max(0.0, color[2] - 0.2))
                     glutWireCube(1.01)
-                else:
-                    glColor3f(0.5, 0.5, 0.8)  # Default blue-gray
-                    glutSolidCube(1.0)
+                elif material.startswith("structure_"):
+                    # Add masonry lines for structures
+                    glColor3f(max(0.0, color[0] - 0.15), max(0.0, color[1] - 0.15), max(0.0, color[2] - 0.15))
+                    glutWireCube(1.005)
                     
             elif obj_type == "SPHERE":
                 radius = max(obj.get("radius", 0.5), 0.3)
                 
-                if material == "resource":
-                    glColor3f(1.0, 0.8, 0.2)  # Golden ore
-                    glutSolidSphere(radius, 12, 12)
-                    # Add sparkle effect
-                    glColor3f(1.0, 1.0, 0.5)
-                    glutWireSphere(radius * 1.1, 8, 8)
-                elif material == "beacon":
+                # Get enhanced material color
+                color = self.get_material_color(material, obj_type)
+                glColor3f(*color)
+                glutSolidSphere(radius, 16, 16)
+                
+                # Add special effects for specific materials
+                if material.startswith("resource_crystal"):
+                    # Add crystal sparkle effect
+                    glColor3f(min(1.0, color[0] + 0.4), min(1.0, color[1] + 0.4), min(1.0, color[2] + 0.4))
+                    glutWireSphere(radius * 1.1, 12, 12)
+                elif material.startswith("beacon"):
                     # Animated beacon with glow
                     glow = 0.5 + 0.5 * math.sin(time.time() * 3)
-                    glColor3f(0.2 + glow * 0.8, 1.0, 1.0)
-                    glutSolidSphere(radius, 16, 16)
+                    glColor4f(color[0], color[1], color[2], 0.7)
+                    glutWireSphere(radius * 1.3, 16, 16)
                     
-                    # Glow halo
-                    glColor4f(0.0, 1.0, 1.0, 0.3)
-                    glutWireSphere(radius * 1.5, 12, 12)
+                    # Pulsing outer glow
+                    glColor4f(color[0] * 0.5, color[1] * 0.5, color[2] * 0.5, 0.3 * glow)
+                    glutWireSphere(radius * 1.6, 12, 12)
+                elif material == "cave_entrance":
+                    # Dark cave with mysterious glow
+                    glColor4f(0.3, 0.2, 0.6, 0.5)  # Purple mysterious glow
+                    glutWireSphere(radius * 1.2, 10, 10)
+            elif obj_type == "MESH":
+                # Complex multi-component mesh objects
+                components = obj.get("components", [])
+                mesh_file = obj.get("mesh_file")
+                size = obj.get("size", [1.0, 1.0, 1.0])
+                
+                # Apply surface alignment
+                up = obj.get("up")
+                if up:
+                    ux, uy, uz = float(up[0]), float(up[1]), float(up[2])
+                    dot = max(-1.0, min(1.0, uy))
+                    angle_deg = math.degrees(math.acos(dot))
+                    ax = -uz
+                    ay = 0.0
+                    az = ux
+                    al = math.sqrt(ax*ax + ay*ay + az*az) or 1.0
+                    ax, ay, az = ax/al, ay/al, az/al
+                    if angle_deg > 1e-3:
+                        glRotatef(angle_deg, ax, ay, az)
+                
+                if components:
+                    # Render multi-component asset (house made of 2x4s, etc.)
+                    self._render_multi_component_asset(components)
+                elif mesh_file:
+                    # Render single mesh file
+                    self._render_mesh_file(mesh_file, size, material)
                 else:
-                    glColor3f(0.8, 0.8, 0.9)  # Stone
-                    glutSolidSphere(radius, 12, 12)
+                    # Fallback: render as enhanced placeholder
+                    glScalef(size[0], size[1], size[2])
+                    
+                    # Enhanced building-like placeholder
+                    color = self.get_material_color(material, obj_type)
+                    glColor3f(*color)
+                    
+                    # Main structure
+                    glutSolidCube(0.8)
+                    
+                    # Add architectural details
+                    glColor3f(max(0.0, color[0] - 0.2), max(0.0, color[1] - 0.2), max(0.0, color[2] - 0.2))
+                    
+                    # Roof
+                    glPushMatrix()
+                    glTranslatef(0, 0.5, 0)
+                    glScalef(0.9, 0.3, 0.9)
+                    glutSolidCube(1.0)
+                    glPopMatrix()
+                    
+                    # Foundation
+                    glPushMatrix()
+                    glTranslatef(0, -0.5, 0)
+                    glScalef(1.1, 0.2, 1.1)
+                    glutSolidCube(1.0)
+                    glPopMatrix()
+                    
+                    # Framework outline
+                    glColor3f(min(1.0, color[0] + 0.3), min(1.0, color[1] + 0.3), min(1.0, color[2] + 0.3))
+                    glutWireCube(0.85)
             
             glPopMatrix()
+    
+    def _render_multi_component_asset(self, components: List[Dict]):
+        """Render complex asset built from multiple component meshes."""
+        # Group components by material for efficient rendering
+        material_groups = {}
+        for comp in components:
+            material = comp.get("material", "default")
+            if material not in material_groups:
+                material_groups[material] = []
+            material_groups[material].append(comp)
+        
+        # Render each material group
+        for material, comps in material_groups.items():
+            color = self._get_component_material_color(material)
+            glColor3f(*color)
+            
+            for comp in comps:
+                comp_pos = comp.get("position", [0, 0, 0])
+                comp_dims = comp.get("dimensions", [0.1, 0.1, 0.1])
+                comp_type = comp.get("component_type", "unknown")
+                
+                glPushMatrix()
+                
+                # Position component relative to asset origin
+                glTranslatef(comp_pos[0], comp_pos[1], comp_pos[2])
+                
+                # Scale to component dimensions  
+                glScalef(comp_dims[0], comp_dims[1], comp_dims[2])
+                
+                # Render component based on type
+                if comp_type in ["beam", "post", "joist", "rafter"]:
+                    # Structural lumber - render as solid beam
+                    glutSolidCube(1.0)
+                    
+                    # Add wood grain lines
+                    glColor3f(max(0.0, color[0] - 0.1), max(0.0, color[1] - 0.1), max(0.0, color[2] - 0.1))
+                    glutWireCube(1.02)
+                    
+                elif comp_type in ["siding", "wall_board", "plank"]:
+                    # Siding/boards - render as flat planks
+                    glScalef(1.0, 0.3, 1.0)  # Thinner profile
+                    glutSolidCube(1.0)
+                    
+                    # Add board lines
+                    glColor3f(max(0.0, color[0] - 0.15), max(0.0, color[1] - 0.15), max(0.0, color[2] - 0.15))
+                    glutWireCube(1.01)
+                    
+                elif comp_type in ["foundation", "foundation_wall"]:
+                    # Foundation blocks - render as masonry
+                    glutSolidCube(1.0)
+                    
+                    # Add mortar lines
+                    glColor3f(max(0.0, color[0] - 0.2), max(0.0, color[1] - 0.2), max(0.0, color[2] - 0.2))
+                    glutWireCube(1.05)
+                    
+                elif comp_type in ["shingles", "roofing"]:
+                    # Roofing - render as overlapped scales
+                    glScalef(1.0, 0.1, 1.0)  # Very thin
+                    glutSolidCube(1.0)
+                    
+                else:
+                    # Default component rendering
+                    glutSolidCube(1.0)
+                
+                glPopMatrix()
+    
+    def _render_mesh_file(self, mesh_file: str, size: List[float], material: str):
+        """Render mesh from GLB file (placeholder for now)."""
+        # TODO: Implement actual GLB loading with trimesh/pygltflib
+        # For now, render as enhanced placeholder
+        
+        glScalef(size[0], size[1], size[2])
+        color = self.get_material_color(material, "MESH")
+        glColor3f(*color)
+        
+        # Render as detailed proxy mesh
+        glutSolidCube(0.9)
+        
+        # Add mesh wireframe overlay
+        glColor3f(min(1.0, color[0] + 0.2), min(1.0, color[1] + 0.2), min(1.0, color[2] + 0.2))
+        glutWireCube(0.95)
+        
+        # Add file reference indicator
+        glColor3f(1.0, 1.0, 0.0)  # Yellow indicator
+        glPushMatrix()
+        glTranslatef(0, 0.6, 0)
+        glScalef(0.1, 0.1, 0.1)
+        glutSolidSphere(1.0, 8, 8)
+        glPopMatrix()
+    
+    def _get_component_material_color(self, material: str) -> Tuple[float, float, float]:
+        """Get color for component materials."""
+        component_colors = {
+            # Wood materials
+            "wood_frame": (0.6, 0.4, 0.2),       # Natural lumber
+            "wood_siding": (0.5, 0.35, 0.15),    # Weathered siding
+            "wood_planks": (0.7, 0.45, 0.25),    # Fresh planks
+            
+            # Masonry materials  
+            "concrete": (0.7, 0.7, 0.7),         # Gray concrete
+            "concrete_block": (0.6, 0.6, 0.6),   # CMU blocks
+            "brick": (0.7, 0.3, 0.2),            # Red brick
+            
+            # Roofing materials
+            "roofing_asphalt": (0.2, 0.2, 0.3),  # Dark shingles
+            "roofing_metal": (0.5, 0.5, 0.6),    # Metal roofing
+            "roofing_tile": (0.8, 0.4, 0.3),     # Clay tile
+            
+            # Default
+            "default": (0.5, 0.5, 0.5)
+        }
+        
+        return component_colors.get(material, component_colors["default"])
     
     def display(self):
         """Main display function with spherical camera"""
@@ -494,18 +781,18 @@ class SphericalPlanetViewer:
             self.mouse_captured = not self.mouse_captured
             if self.mouse_captured:
                 glutSetCursor(GLUT_CURSOR_NONE)
-                glutWarpPointer(400, 300)
+                glutWarpPointer(self.window_width // 2, self.window_height // 2)
                 print("🔒 Mouse captured - spherical look")
             else:
                 glutSetCursor(GLUT_CURSOR_INHERIT)
                 print("🔓 Mouse released")
-        elif key == b'r' or key == b'R':  # Reset to north pole
-            self.player_sphere_pos = Vector3(0, self.planet_radius, 0)
+        elif key == b'r' or key == b'R':  # Reset to equator (safe spawn)
+            # Try equator positions for a safe spawn
             self.surface_yaw = 0.0
             self.surface_pitch = 0.0
-            surface_normal = self.get_surface_normal(self.player_sphere_pos)
-            self.player_world_pos = self.planet_center + self.player_sphere_pos + surface_normal * self.surface_height_offset
-            print("🔄 Reset to north pole")
+            self.player_sphere_pos = Vector3(self.planet_radius, 0, 0)
+            self._ensure_safe_spawn_position()
+            print("🔄 Reset to equator (safe spawn position)")
         elif key == b'+' or key == b'=':
             self.movement_speed = min(self.movement_speed * 1.2, 15.0)
             print(f"🏃 Speed: {self.movement_speed:.1f}")
@@ -525,30 +812,18 @@ class SphericalPlanetViewer:
         if not self.mouse_captured:
             return
             
-        if self.first_mouse:
-            self.last_mouse_x = x
-            self.last_mouse_y = y
-            self.first_mouse = False
-            return
-        
-        # Calculate mouse movement
-        delta_x = x - self.last_mouse_x
-        delta_y = y - self.last_mouse_y
-        
-        # Update surface-relative angles
-        self.surface_yaw += delta_x * self.mouse_sensitivity
-        self.surface_pitch -= delta_y * self.mouse_sensitivity  # Inverted Y
-        
-        # Clamp pitch
-        self.surface_pitch = max(-89.0, min(89.0, self.surface_pitch))
-        
-        # Keep yaw in range
-        self.surface_yaw = self.surface_yaw % 360.0
-        
-        self.last_mouse_x = x
-        self.last_mouse_y = y
-        
-        glutPostRedisplay()
+        # Use delta from window center and recenter to allow infinite turning
+        center_x = self.window_width // 2
+        center_y = self.window_height // 2
+        delta_x = x - center_x
+        delta_y = y - center_y
+        if abs(delta_x) > 1 or abs(delta_y) > 1:
+            self.surface_yaw += delta_x * self.mouse_sensitivity
+            self.surface_pitch -= delta_y * self.mouse_sensitivity
+            self.surface_pitch = max(-89.0, min(89.0, self.surface_pitch))
+            self.surface_yaw = self.surface_yaw % 360.0
+            glutPostRedisplay()
+            glutWarpPointer(center_x, center_y)
     
     def mouse_passive_motion(self, x, y):
         """Handle passive mouse motion"""
@@ -556,20 +831,40 @@ class SphericalPlanetViewer:
     
     def reshape(self, width, height):
         """Handle window reshape"""
-        glViewport(0, 0, width, height)
+        self.window_width = max(1, int(width))
+        self.window_height = max(1, int(height))
+        glViewport(0, 0, self.window_width, self.window_height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         
         # Wide FOV to see planet curvature
-        gluPerspective(75, width/height, 0.1, 200.0)
+        aspect = self.window_width / max(1, self.window_height)
+        gluPerspective(75, aspect, 0.1, 200.0)
         glMatrixMode(GL_MODELVIEW)
     
     def run(self):
         """Run the spherical planet viewer"""
         glutInit()
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-        glutInitWindowSize(1024, 768)  # Larger window for better experience
-        glutInitWindowPosition(100, 100)
+        
+        # Check for fullscreen mode (for auto loop screenshots)
+        fullscreen_mode = os.getenv('GL_FULLSCREEN', '0') == '1'
+        
+        if fullscreen_mode:
+            # Fullscreen mode for auto loop screenshots
+            glutGameModeString("1920x1080:32@60")
+            if glutGameModeGet(GLUT_GAME_MODE_POSSIBLE):
+                glutEnterGameMode()
+                print("🖥️ Fullscreen mode enabled for screenshot capture")
+            else:
+                # Fallback to large window
+                glutInitWindowSize(1920, 1080)
+                glutInitWindowPosition(0, 0)
+                print("⚠️ Fullscreen not available, using large window")
+        else:
+            # Normal windowed mode for manual testing
+            glutInitWindowSize(self.window_width, self.window_height)
+            glutInitWindowPosition(100, 100)
         
         scene_name = Path(self.scene_file).name
         window_title = f"StarSystem Spherical Planet - {scene_name}"
@@ -592,7 +887,7 @@ class SphericalPlanetViewer:
         
         # Start with mouse captured
         glutSetCursor(GLUT_CURSOR_NONE)
-        glutWarpPointer(400, 300)
+        glutWarpPointer(self.window_width // 2, self.window_height // 2)
         
         print("🌍 Spherical Planet Viewer - Week 3 Enhanced")
         print("📋 True Planet Surface Navigation:")

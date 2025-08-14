@@ -46,17 +46,25 @@ pip install -r requirements-rl.txt
 
 ### Running the Evolution System
 ```bash
-# Run main evolution loop (Agent A→D→B→C cycle)
+# AUTO LOOP: Automated A→D→B→C cycle with fullscreen screenshots
+python run_auto_loop.py                    # Single cycle with fullscreen Agent B
+python run_auto_loop.py --iterations 5     # Multiple automated cycles
+python run_auto_loop.py --bridge-port 8765 # Custom bridge port
+
+# MANUAL LOOP: Human-in-the-loop A→D→Human→C cycle  
+python run_manual_loop.py                  # Human plays and provides feedback
+python run_manual_loop.py --iterations 3   # Multiple manual cycles
+python run_manual_loop.py --skip-generation # Use existing world
+python run_manual_loop.py --test-mode      # Non-interactive with simulated feedback
+python run_manual_loop.py --no-viewer      # Skip viewer, feedback only
+
+# INDIVIDUAL AGENTS: Test components separately
+python agents/agent_a_generator.py         # Generate spherical planet
+python agents/agent_b_manual.py <planet>   # Human testing interface
+python agents/agent_b_tester.py            # Automated testing
+
+# LEGACY: Original evolution loop (deprecated)
 python agents/run_evolution_loop.py
-
-# Run Agent B MVP with bridge
-python run.py --agent-b-mvp --bridge-port 8765
-
-# Test individual agents
-python agents/agent_a_generator.py
-python agents/agent_b_game_player.py
-python agents/agent_c_supervisor.py
-python agents/agent_d_renderer.py
 ```
 
 ### Rendering and Visualization

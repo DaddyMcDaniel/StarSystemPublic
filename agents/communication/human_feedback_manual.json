@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-13T00:00:00Z",
+  "tester": "human",
+  "planet_file": "runs/miniplanet_seed_42.json",
+  "testing_method": "manual_spherical_viewer",
+  "surface_walking": "good",
+  "spawn_position": "inside_object",
+  "horizon_curvature": "clearly_visible",
+  "circumnavigation": "yes_easily",
+  "gravity_orientation": "always",
+  "planet_size": "perfect",
+  "terrain_variety": "basic",
+  "material_diversity": "Random colors; needs themed sets",
+  "lighting": "good",
+  "atmosphere": "good",
+  "building_zones": "limited",
+  "resource_visibility": "some",
+  "landmarks": "basic",
+  "exploration_appeal": "Random floating shapes reduce immersion",
+  "rating": 6,
+  "biggest_issue": "Mouse stops at window border; spawn inside object",
+  "best_feature": "Spherical walking and curved horizon",
+  "next_priority": "Ground all objects to surface with coherent scales and materials; define safe spawn zones",
+  "building_readiness": "needs_improvement"
+}
+

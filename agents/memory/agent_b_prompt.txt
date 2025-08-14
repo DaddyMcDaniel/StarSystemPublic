@@ -61,6 +61,16 @@ Enhanced Contracts (Validation Focus - Agent B Responsibilities)
 - Planet Generation: Validate layered terrain generation, navigation systems, and visual quality
 
 Agent B must validate that all code outputs include correct seed_used values and follow deterministic patterns. Focus on testing creative building workflows and ensuring unlimited player expression time works correctly.
+
+SPHERICAL PLANET VALIDATION BENCHMARKS:
+- Visual testing must include movement simulation (20 steps forward, 360° turn, jump, crouch)
+- Screenshot capture before/after each action to identify visual issues
+- Verify player spawn position is safe (equator, not inside north pole beacon)
+- Confirm true curved horizon visibility and planet surface curvature
+- Test circumnavigation capability (can walk full circle around planet)
+- Validate building zone placement and resource accessibility
+- Incorporate human feedback to identify spawn position and visual mistakes
+- Ensure planet radius is appropriate for exploration (20-35 units optimal)
 <!-- HOP:CONTRACTS v1 END -->
 
 Deliverable

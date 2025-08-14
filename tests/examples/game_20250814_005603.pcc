@@ -1,0 +1,61 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "sphere",
+        "radius": 29.28592273304092,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "glow_earth"
+      },
+      "features": [
+        {
+          "type": "CAVE_SYSTEMS",
+          "material": "cave_entrance",
+          "depth": "surface"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "PLATFORM_ZONE",
+          "size": "medium",
+          "material": "structure_platform"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "BUILD_STRUCTURE",
+        "target": "platform_base",
+        "circumnavigation_required": true
+      }
+    }
+  ],
+  "compression_id": "C3287",
+  "planet_seed": 926331,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "sphere",
+        "radius": 22.585149021991935,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "volcanic_rock"
+      },
+      "features": [
+        {
+          "type": "RESOURCE_NODES",
+          "material": "resource_ore",
+          "density": "medium"
+        },
+        {
+          "type": "CAVE_SYSTEMS",
+          "material": "cave_entrance",
+          "depth": "surface"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "EXTRACTION_ZONE",
+          "resource_type": "ore",
+          "efficiency": "standard"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "ESTABLISH_MINING",
+        "target": "resource_network",
+        "planet_coverage": 0.3
+      }
+    }
+  ],
+  "compression_id": "C4827",
+  "planet_seed": 648431,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}
