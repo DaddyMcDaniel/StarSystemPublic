@@ -1,0 +1,74 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://face4_L2_0.875_0.125_positions.bin",
+    "normals": "buffer://face4_L2_0.875_0.125_normals.bin",
+    "tangents": "buffer://face4_L2_0.875_0.125_tangents.bin",
+    "uv0": "buffer://face4_L2_0.875_0.125_uvs.bin",
+    "indices": "buffer://face4_L2_0.875_0.125_indices.bin",
+    "bounds": {
+      "center": [
+        0.5404125452041626,
+        -0.5412459969520569,
+        0.7294578552246094
+      ],
+      "radius": 0.2532443702220917
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.py",
+    "face_resolution": 24,
+    "vertex_count": 144,
+    "triangle_count": 242,
+    "shading_basis": "angle_weighted_normals_mikktspace_tangents",
+    "displacement": "none",
+    "chunk_type": "quadtree_leaf",
+    "displacement_scale": 0.15
+  },
+  "chunk": {
+    "chunk_id": "face4_L2_0.875_0.125",
+    "face_id": 4,
+    "level": 2,
+    "uv_bounds": {
+      "min": [
+        0.75,
+        0.0
+      ],
+      "max": [
+        1.0,
+        0.25
+      ],
+      "center": [
+        0.875,
+        0.125
+      ],
+      "size": [
+        0.25,
+        0.25
+      ]
+    },
+    "aabb": {
+      "min": [
+        0.35848569869995117,
+        -0.7169713973999023,
+        0.6191846132278442
+      ],
+      "max": [
+        0.6998804807662964,
+        -0.3499402403831482,
+        0.8731838464736938
+      ],
+      "center": [
+        0.5291830897331238,
+        -0.5334558486938477,
+        0.746184229850769
+      ],
+      "size": [
+        0.3413947820663452,
+        0.36703115701675415,
+        0.2539992332458496
+      ]
+    },
+    "resolution": 12
+  }
+}

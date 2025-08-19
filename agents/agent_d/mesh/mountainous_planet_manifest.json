@@ -1,0 +1,26 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://mountainous_planet_manifest_positions.bin",
+    "normals": "buffer://mountainous_planet_manifest_normals.bin",
+    "tangents": "buffer://mountainous_planet_manifest_tangents.bin",
+    "uv0": "buffer://mountainous_planet_manifest_uvs.bin",
+    "indices": "buffer://mountainous_planet_manifest_indices.bin",
+    "bounds": {
+      "center": [
+        7.070263109199004e-06,
+        -3.491066308924928e-05,
+        -4.222110874252394e-05
+      ],
+      "radius": 1.16685152053833
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.py",
+    "face_resolution": 529,
+    "vertex_count": 3176,
+    "triangle_count": 6348,
+    "shading_basis": "angle_weighted_normals_mikktspace_tangents",
+    "displacement": "none"
+  }
+}

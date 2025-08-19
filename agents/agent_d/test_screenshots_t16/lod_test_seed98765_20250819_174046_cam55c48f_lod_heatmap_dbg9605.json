@@ -1,0 +1,33 @@
+{
+  "pcc_name": "lod_test",
+  "pcc_file_path": "",
+  "seed": 98765,
+  "camera_position": [
+    200.0,
+    150.0,
+    200.0
+  ],
+  "camera_target": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera_fov": 60.0,
+  "timestamp": 1755639646.0920563,
+  "human_timestamp": "2025-08-19T17:40:46.092056",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "capture_mode": "lod_heatmap",
+  "debug_toggles": [
+    "lod_level_0"
+  ],
+  "render_settings": {},
+  "performance_stats": {},
+  "description": "LOD level 0",
+  "tags": [
+    "lod_sequence",
+    "lod_0"
+  ]
+}

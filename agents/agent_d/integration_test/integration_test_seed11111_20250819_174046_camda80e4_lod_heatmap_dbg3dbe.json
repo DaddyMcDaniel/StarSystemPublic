@@ -1,0 +1,30 @@
+{
+  "pcc_name": "integration_test",
+  "pcc_file_path": "",
+  "seed": 11111,
+  "camera_position": [
+    0.0,
+    1500.0,
+    0.0
+  ],
+  "camera_target": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera_fov": 60.0,
+  "timestamp": 1755639646.0982702,
+  "human_timestamp": "2025-08-19T17:40:46.098270",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "capture_mode": "lod_heatmap",
+  "debug_toggles": [
+    "lod_heatmap"
+  ],
+  "render_settings": {},
+  "performance_stats": {},
+  "description": "",
+  "tags": []
+}

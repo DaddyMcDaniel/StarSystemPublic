@@ -1,0 +1,19 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://cubesphere_32_positions.bin",
+    "normals": "buffer://cubesphere_32_normals.bin",
+    "uv0": "buffer://cubesphere_32_uvs.bin",
+    "indices": "buffer://cubesphere_32_indices.bin",
+    "bounds": {
+      "center": [0.000000, -0.000000, 0.000000],
+      "radius": 1.000000
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.cpp",
+    "face_resolution": 32,
+    "vertex_count": 5768,
+    "triangle_count": 11532
+  }
+}

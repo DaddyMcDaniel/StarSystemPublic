@@ -1,0 +1,65 @@
+{
+  "terrain": {
+    "name": "Example Mountainous Terrain",
+    "description": "Ridged mountain base with FBM detail and domain warping for organic flow",
+    "heightfield": {
+      "base_height": 0.0,
+      "height_scale": 0.25,
+      "evaluation_space": "unit_sphere"
+    },
+    "nodes": {
+      "type": "Composite",
+      "operation": "add",
+      "weights": [
+        1.0,
+        0.4,
+        0.15
+      ],
+      "description": "Layered composition: ridged base + detail + micro variation",
+      "nodes": [
+        {
+          "name": "Mountain Base Layer",
+          "type": "RidgedMF",
+          "seed": 1000,
+          "octaves": 4,
+          "frequency": 1.8,
+          "amplitude": 1.0,
+          "lacunarity": 2.2,
+          "persistence": 0.65,
+          "ridge_offset": 0.95,
+          "description": "Sharp mountain ridges and valleys"
+        },
+        {
+          "name": "Warped Detail Layer",
+          "type": "DomainWarp",
+          "seed": 2000,
+          "strength": 0.08,
+          "frequency": 1.2,
+          "description": "FBM detail with gentle domain distortion for flow",
+          "source": {
+            "name": "Detail Noise",
+            "type": "NoiseFBM",
+            "seed": 3000,
+            "octaves": 5,
+            "frequency": 3.5,
+            "amplitude": 1.0,
+            "lacunarity": 2.0,
+            "persistence": 0.45,
+            "description": "Medium-frequency detail variation"
+          }
+        },
+        {
+          "name": "Micro Variation",
+          "type": "NoiseFBM",
+          "seed": 4000,
+          "octaves": 3,
+          "frequency": 8.0,
+          "amplitude": 1.0,
+          "lacunarity": 2.1,
+          "persistence": 0.35,
+          "description": "High-frequency surface detail"
+        }
+      ]
+    }
+  }
+}

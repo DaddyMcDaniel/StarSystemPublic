@@ -1,0 +1,26 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://displaced_planet_manifest_positions.bin",
+    "normals": "buffer://displaced_planet_manifest_normals.bin",
+    "tangents": "buffer://displaced_planet_manifest_tangents.bin",
+    "uv0": "buffer://displaced_planet_manifest_uvs.bin",
+    "indices": "buffer://displaced_planet_manifest_indices.bin",
+    "bounds": {
+      "center": [
+        -1.5911618902464397e-05,
+        -5.997174957883544e-05,
+        -6.541534821735695e-05
+      ],
+      "radius": 1.107588768005371
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.py",
+    "face_resolution": 225,
+    "vertex_count": 1352,
+    "triangle_count": 2700,
+    "shading_basis": "angle_weighted_normals_mikktspace_tangents",
+    "displacement": "none"
+  }
+}

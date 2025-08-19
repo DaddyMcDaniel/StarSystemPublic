@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Minimal Sphere",
+    "description": "Simplest possible PCC terrain - just a sphere primitive",
+    "author": "PCC T15 Schema",
+    "created": "2024-08-19T00:00:00Z",
+    "tags": ["minimal", "sphere", "basic"]
+  },
+  "nodes": [
+    {
+      "id": "base_sphere",
+      "type": "CubeSphere",
+      "parameters": {
+        "radius": 100.0,
+        "resolution": 16,
+        "center": [0.0, 0.0, 0.0]
+      }
+    },
+    {
+      "id": "mesh_output",
+      "type": "MarchingCubes",
+      "parameters": {
+        "iso_value": 0.0,
+        "resolution": 64,
+        "bounds_min": [-120.0, -120.0, -120.0],
+        "bounds_max": [120.0, 120.0, 120.0],
+        "generate_normals": true,
+        "generate_tangents": false
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from_node": "base_sphere",
+      "from_output": "heightfield",
+      "to_node": "mesh_output",
+      "to_input": "sdf_field"
+    }
+  ],
+  "output_settings": {
+    "target_node": "mesh_output",
+    "output_format": "mesh",
+    "resolution": 64,
+    "bounds": {
+      "min": [-120.0, -120.0, -120.0],
+      "max": [120.0, 120.0, 120.0]
+    }
+  }
+}

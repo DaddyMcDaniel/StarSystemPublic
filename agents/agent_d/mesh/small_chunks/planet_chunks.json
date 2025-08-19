@@ -1,0 +1,49 @@
+{
+  "planet": {
+    "type": "chunked_quadtree",
+    "max_depth": 1,
+    "chunk_resolution": 8,
+    "total_chunks": 24,
+    "chunks_per_face": 4,
+    "base_radius": 1.0,
+    "displacement_scale": 0.25,
+    "has_terrain": true
+  },
+  "chunks": [
+    "face0_L1_0.250_0.250.json",
+    "face0_L1_0.750_0.250.json",
+    "face0_L1_0.250_0.750.json",
+    "face0_L1_0.750_0.750.json",
+    "face1_L1_0.250_0.250.json",
+    "face1_L1_0.750_0.250.json",
+    "face1_L1_0.250_0.750.json",
+    "face1_L1_0.750_0.750.json",
+    "face2_L1_0.250_0.250.json",
+    "face2_L1_0.750_0.250.json",
+    "face2_L1_0.250_0.750.json",
+    "face2_L1_0.750_0.750.json",
+    "face3_L1_0.250_0.250.json",
+    "face3_L1_0.750_0.250.json",
+    "face3_L1_0.250_0.750.json",
+    "face3_L1_0.750_0.750.json",
+    "face4_L1_0.250_0.250.json",
+    "face4_L1_0.750_0.250.json",
+    "face4_L1_0.250_0.750.json",
+    "face4_L1_0.750_0.750.json",
+    "face5_L1_0.250_0.250.json",
+    "face5_L1_0.750_0.250.json",
+    "face5_L1_0.250_0.750.json",
+    "face5_L1_0.750_0.750.json"
+  ],
+  "statistics": {
+    "total_vertices": 1536,
+    "total_triangles": 2352,
+    "vertices_per_chunk": 64,
+    "triangles_per_chunk": 98
+  },
+  "metadata": {
+    "generator": "quadtree_chunking.py",
+    "version": "T06",
+    "format": "quadtree_chunks"
+  }
+}

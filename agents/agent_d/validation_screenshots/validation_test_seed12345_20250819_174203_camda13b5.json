@@ -1,0 +1,28 @@
+{
+  "pcc_name": "validation_test",
+  "pcc_file_path": "",
+  "seed": 12345,
+  "camera_position": [
+    100.0,
+    100.0,
+    100.0
+  ],
+  "camera_target": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera_fov": 60.0,
+  "timestamp": 1755639723.8012583,
+  "human_timestamp": "2025-08-19T17:42:03.801258",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "render_settings": {},
+  "performance_stats": {},
+  "description": "Validation screenshot",
+  "tags": []
+}

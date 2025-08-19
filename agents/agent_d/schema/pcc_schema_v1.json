@@ -1,0 +1,517 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pcc-lang.org/schemas/terrain/v1.0.0",
+  "title": "PCC Terrain Pipeline Schema v1.0.0",
+  "description": "JSON schema for PCC terrain generation pipeline with hardened node definitions",
+  "type": "object",
+  "required": ["version", "nodes", "connections"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "PCC schema version"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "author": {"type": "string"},
+        "created": {"type": "string", "format": "date-time"},
+        "tags": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Array of PCC nodes in the terrain pipeline",
+      "items": {"$ref": "#/$defs/pcc_node"}
+    },
+    "connections": {
+      "type": "array",
+      "description": "Data flow connections between nodes",
+      "items": {"$ref": "#/$defs/pcc_connection"}
+    },
+    "output_settings": {
+      "type": "object",
+      "properties": {
+        "target_node": {"type": "string"},
+        "output_format": {"enum": ["mesh", "heightfield", "sdf_field"]},
+        "resolution": {"type": "integer", "minimum": 8, "maximum": 2048},
+        "bounds": {"$ref": "#/$defs/bounds_3d"}
+      }
+    }
+  },
+  "$defs": {
+    "pcc_node": {
+      "type": "object",
+      "required": ["id", "type", "parameters"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Unique node identifier"
+        },
+        "type": {
+          "enum": [
+            "CubeSphere",
+            "NoiseFBM", 
+            "RidgedMF",
+            "DomainWarp",
+            "Displace",
+            "SDF.Union",
+            "SDF.Subtract", 
+            "SDF.Intersect",
+            "SDF.Smooth",
+            "MarchingCubes",
+            "QuadtreeLOD"
+          ],
+          "description": "PCC node type from finalized terrain set"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Node-specific parameters"
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "CubeSphere"}}},
+          "then": {"$ref": "#/$defs/cube_sphere_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "NoiseFBM"}}},
+          "then": {"$ref": "#/$defs/noise_fbm_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "RidgedMF"}}},
+          "then": {"$ref": "#/$defs/ridged_mf_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "DomainWarp"}}},
+          "then": {"$ref": "#/$defs/domain_warp_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "Displace"}}},
+          "then": {"$ref": "#/$defs/displace_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "SDF.Union"}}},
+          "then": {"$ref": "#/$defs/sdf_union_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "SDF.Subtract"}}},
+          "then": {"$ref": "#/$defs/sdf_subtract_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "SDF.Intersect"}}},
+          "then": {"$ref": "#/$defs/sdf_intersect_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "SDF.Smooth"}}},
+          "then": {"$ref": "#/$defs/sdf_smooth_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "MarchingCubes"}}},
+          "then": {"$ref": "#/$defs/marching_cubes_node"}
+        },
+        {
+          "if": {"properties": {"type": {"const": "QuadtreeLOD"}}},
+          "then": {"$ref": "#/$defs/quadtree_lod_node"}
+        }
+      ]
+    },
+    "pcc_connection": {
+      "type": "object",
+      "required": ["from_node", "from_output", "to_node", "to_input"],
+      "properties": {
+        "from_node": {"type": "string"},
+        "from_output": {"type": "string"},
+        "to_node": {"type": "string"},
+        "to_input": {"type": "string"}
+      }
+    },
+    "vector3": {
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "3D vector [x, y, z]"
+    },
+    "bounds_3d": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {"$ref": "#/$defs/vector3"},
+        "max": {"$ref": "#/$defs/vector3"}
+      }
+    },
+    "stochastic_base": {
+      "type": "object",
+      "required": ["seed", "units"],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "description": "Random seed for reproducible generation (required for stochastic nodes)"
+        },
+        "units": {
+          "enum": ["m", "km", "wu", "norm"],
+          "description": "Spatial units: m=meters, km=kilometers, wu=world_units, norm=normalized"
+        }
+      }
+    },
+    "cube_sphere_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["radius", "resolution"],
+          "properties": {
+            "radius": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10000.0,
+              "description": "Sphere radius in meters"
+            },
+            "resolution": {
+              "type": "integer", 
+              "minimum": 4,
+              "maximum": 256,
+              "description": "Tessellation resolution per cube face"
+            },
+            "center": {
+              "$ref": "#/$defs/vector3",
+              "description": "Sphere center position [x, y, z] in meters"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "noise_fbm_node": {
+      "properties": {
+        "parameters": {
+          "allOf": [
+            {"$ref": "#/$defs/stochastic_base"},
+            {
+              "type": "object",
+              "required": ["frequency", "amplitude", "octaves"],
+              "properties": {
+                "frequency": {
+                  "type": "number",
+                  "minimum": 0.0001,
+                  "maximum": 10.0,
+                  "description": "Base noise frequency"
+                },
+                "amplitude": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1000.0,
+                  "description": "Maximum noise amplitude"
+                },
+                "octaves": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16,
+                  "description": "Number of noise octaves"
+                },
+                "lacunarity": {
+                  "type": "number",
+                  "minimum": 1.0,
+                  "maximum": 4.0,
+                  "default": 2.0,
+                  "description": "Frequency multiplier between octaves"
+                },
+                "persistence": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "default": 0.5,
+                  "description": "Amplitude multiplier between octaves"
+                },
+                "offset": {
+                  "$ref": "#/$defs/vector3",
+                  "description": "Noise sampling offset [x, y, z]"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "ridged_mf_node": {
+      "properties": {
+        "parameters": {
+          "allOf": [
+            {"$ref": "#/$defs/stochastic_base"},
+            {
+              "type": "object", 
+              "required": ["frequency", "amplitude", "octaves"],
+              "properties": {
+                "frequency": {
+                  "type": "number",
+                  "minimum": 0.0001,
+                  "maximum": 10.0,
+                  "description": "Base noise frequency"
+                },
+                "amplitude": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1000.0,
+                  "description": "Maximum noise amplitude"
+                },
+                "octaves": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16,
+                  "description": "Number of noise octaves"
+                },
+                "lacunarity": {
+                  "type": "number",
+                  "minimum": 1.0,
+                  "maximum": 4.0,
+                  "default": 2.0,
+                  "description": "Frequency multiplier between octaves"
+                },
+                "gain": {
+                  "type": "number",
+                  "minimum": 0.5,
+                  "maximum": 4.0,
+                  "default": 2.0,
+                  "description": "Ridge sharpness factor"
+                },
+                "ridge_offset": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 2.0,
+                  "default": 1.0,
+                  "description": "Ridge formation offset"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "domain_warp_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["strength"],
+          "properties": {
+            "strength": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 100.0,
+              "description": "Warp strength multiplier"
+            },
+            "warp_type": {
+              "enum": ["fbm", "ridged", "curl"],
+              "default": "fbm",
+              "description": "Warp pattern type"
+            },
+            "scale": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10.0,
+              "default": 1.0,
+              "description": "Warp pattern scale"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "displace_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["amount"],
+          "properties": {
+            "amount": {
+              "type": "number",
+              "minimum": -1000.0,
+              "maximum": 1000.0,
+              "description": "Displacement amount in meters"
+            },
+            "direction": {
+              "$ref": "#/$defs/vector3",
+              "description": "Displacement direction (should be normalized)"
+            },
+            "clamp_min": {
+              "type": "number",
+              "minimum": -1000.0,
+              "maximum": 1000.0,
+              "description": "Minimum displacement limit"
+            },
+            "clamp_max": {
+              "type": "number",
+              "minimum": -1000.0,
+              "maximum": 1000.0,
+              "description": "Maximum displacement limit"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "sdf_union_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smooth_radius": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 10.0,
+              "default": 0.0,
+              "description": "Smoothing radius for smooth union in meters"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "sdf_subtract_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smooth_radius": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 10.0,
+              "default": 0.0,
+              "description": "Smoothing radius for smooth subtraction in meters"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "sdf_intersect_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smooth_radius": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 10.0,
+              "default": 0.0,
+              "description": "Smoothing radius for smooth intersection in meters"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "sdf_smooth_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["radius"],
+          "properties": {
+            "radius": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 20.0,
+              "description": "Smoothing radius in meters"
+            },
+            "iterations": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 1,
+              "description": "Number of smoothing iterations"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "marching_cubes_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["resolution", "bounds_min", "bounds_max"],
+          "properties": {
+            "iso_value": {
+              "type": "number",
+              "minimum": -10.0,
+              "maximum": 10.0,
+              "default": 0.0,
+              "description": "ISO surface value for mesh extraction"
+            },
+            "resolution": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 512,
+              "description": "Voxel grid resolution per axis"
+            },
+            "bounds_min": {
+              "$ref": "#/$defs/vector3",
+              "description": "Minimum sampling bounds [x, y, z] in meters"
+            },
+            "bounds_max": {
+              "$ref": "#/$defs/vector3", 
+              "description": "Maximum sampling bounds [x, y, z] in meters"
+            },
+            "generate_normals": {
+              "type": "boolean",
+              "default": true,
+              "description": "Generate vertex normals"
+            },
+            "generate_tangents": {
+              "type": "boolean",
+              "default": false,
+              "description": "Generate tangent space vectors"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "quadtree_lod_node": {
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "required": ["max_depth", "chunk_size", "distance_threshold", "camera_position"],
+          "properties": {
+            "max_depth": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 16,
+              "description": "Maximum quadtree depth"
+            },
+            "chunk_size": {
+              "type": "number",
+              "minimum": 1.0,
+              "maximum": 1000.0,
+              "description": "Base chunk size in meters"
+            },
+            "distance_threshold": {
+              "type": "number",
+              "minimum": 10.0,
+              "maximum": 10000.0,
+              "description": "Distance threshold for LOD transitions in meters"
+            },
+            "camera_position": {
+              "$ref": "#/$defs/vector3",
+              "description": "Camera position for distance calculations [x, y, z] in meters"
+            },
+            "quality_bias": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 5.0,
+              "default": 1.0,
+              "description": "Quality bias factor (higher = more detail)"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}

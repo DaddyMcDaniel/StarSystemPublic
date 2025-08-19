@@ -1,0 +1,270 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Hero Planet Terrain",
+    "description": "Complex planetary terrain showcasing the full PCC terrain pipeline with mountains, caves, and LOD",
+    "author": "PCC T15 Schema",
+    "created": "2024-08-19T00:00:00Z",
+    "tags": ["planet", "mountains", "caves", "complex", "hero", "showcase"]
+  },
+  "nodes": [
+    {
+      "id": "planet_base",
+      "type": "CubeSphere",
+      "parameters": {
+        "radius": 1000.0,
+        "resolution": 64,
+        "center": [0.0, 0.0, 0.0]
+      }
+    },
+    {
+      "id": "continental_noise",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 12345,
+        "units": "km",
+        "frequency": 0.002,
+        "amplitude": 200.0,
+        "octaves": 4,
+        "lacunarity": 2.0,
+        "persistence": 0.6,
+        "offset": [0.0, 0.0, 0.0]
+      }
+    },
+    {
+      "id": "mountain_ridges",
+      "type": "RidgedMF",
+      "parameters": {
+        "seed": 23456,
+        "units": "km", 
+        "frequency": 0.008,
+        "amplitude": 400.0,
+        "octaves": 6,
+        "lacunarity": 2.2,
+        "gain": 2.5,
+        "ridge_offset": 1.2
+      }
+    },
+    {
+      "id": "detail_noise",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 34567,
+        "units": "m",
+        "frequency": 0.05,
+        "amplitude": 25.0,
+        "octaves": 8,
+        "lacunarity": 2.1,
+        "persistence": 0.4,
+        "offset": [100.0, 50.0, 200.0]
+      }
+    },
+    {
+      "id": "terrain_warp",
+      "type": "DomainWarp",
+      "parameters": {
+        "strength": 0.3,
+        "warp_type": "fbm",
+        "scale": 1.5
+      }
+    },
+    {
+      "id": "continental_displace",
+      "type": "Displace",
+      "parameters": {
+        "amount": 1.0,
+        "direction": [0.0, 1.0, 0.0],
+        "clamp_min": -500.0,
+        "clamp_max": 800.0
+      }
+    },
+    {
+      "id": "mountain_displace",
+      "type": "Displace",
+      "parameters": {
+        "amount": 1.0,
+        "direction": [0.0, 1.0, 0.0],
+        "clamp_min": -200.0,
+        "clamp_max": 600.0
+      }
+    },
+    {
+      "id": "detail_displace",
+      "type": "Displace",
+      "parameters": {
+        "amount": 1.0,
+        "direction": [0.0, 1.0, 0.0],
+        "clamp_min": -50.0,
+        "clamp_max": 50.0
+      }
+    },
+    {
+      "id": "cave_system_base",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 45678,
+        "units": "m",
+        "frequency": 0.02,
+        "amplitude": 1.0,
+        "octaves": 3,
+        "lacunarity": 2.0,
+        "persistence": 0.5,
+        "offset": [500.0, 0.0, 300.0]
+      }
+    },
+    {
+      "id": "cave_detail",
+      "type": "RidgedMF",
+      "parameters": {
+        "seed": 56789,
+        "units": "m",
+        "frequency": 0.08,
+        "amplitude": 0.5,
+        "octaves": 4,
+        "lacunarity": 2.0,
+        "gain": 1.5,
+        "ridge_offset": 0.8
+      }
+    },
+    {
+      "id": "cave_union",
+      "type": "SDF.Union",
+      "parameters": {
+        "smooth_radius": 5.0
+      }
+    },
+    {
+      "id": "cave_smooth",
+      "type": "SDF.Smooth",
+      "parameters": {
+        "radius": 3.0,
+        "iterations": 2
+      }
+    },
+    {
+      "id": "terrain_cave_subtract",
+      "type": "SDF.Subtract",
+      "parameters": {
+        "smooth_radius": 2.0
+      }
+    },
+    {
+      "id": "final_mesh",
+      "type": "MarchingCubes",
+      "parameters": {
+        "iso_value": 0.0,
+        "resolution": 128,
+        "bounds_min": [-1500.0, -800.0, -1500.0],
+        "bounds_max": [1500.0, 1200.0, 1500.0],
+        "generate_normals": true,
+        "generate_tangents": true
+      }
+    },
+    {
+      "id": "lod_system",
+      "type": "QuadtreeLOD",
+      "parameters": {
+        "max_depth": 10,
+        "chunk_size": 256.0,
+        "distance_threshold": 1000.0,
+        "camera_position": [0.0, 1200.0, 2000.0],
+        "quality_bias": 1.2
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from_node": "planet_base",
+      "from_output": "heightfield",
+      "to_node": "continental_displace",
+      "to_input": "heightfield"
+    },
+    {
+      "from_node": "continental_noise",
+      "from_output": "scalar_field",
+      "to_node": "continental_displace",
+      "to_input": "scalar_field"
+    },
+    {
+      "from_node": "continental_displace",
+      "from_output": "heightfield",
+      "to_node": "terrain_warp",
+      "to_input": "heightfield"
+    },
+    {
+      "from_node": "terrain_warp",
+      "from_output": "heightfield",
+      "to_node": "mountain_displace",
+      "to_input": "heightfield"
+    },
+    {
+      "from_node": "mountain_ridges",
+      "from_output": "scalar_field",
+      "to_node": "mountain_displace",
+      "to_input": "scalar_field"
+    },
+    {
+      "from_node": "mountain_displace",
+      "from_output": "heightfield",
+      "to_node": "detail_displace",
+      "to_input": "heightfield"
+    },
+    {
+      "from_node": "detail_noise",
+      "from_output": "scalar_field",
+      "to_node": "detail_displace",
+      "to_input": "scalar_field"
+    },
+    {
+      "from_node": "cave_system_base",
+      "from_output": "scalar_field",
+      "to_node": "cave_union",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "cave_detail",
+      "from_output": "scalar_field",
+      "to_node": "cave_union",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "cave_union",
+      "from_output": "sdf_field",
+      "to_node": "cave_smooth",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "detail_displace",
+      "from_output": "heightfield",
+      "to_node": "terrain_cave_subtract",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "cave_smooth",
+      "from_output": "sdf_field",
+      "to_node": "terrain_cave_subtract",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "terrain_cave_subtract",
+      "from_output": "sdf_field",
+      "to_node": "final_mesh",
+      "to_input": "sdf_field"
+    },
+    {
+      "from_node": "final_mesh",
+      "from_output": "mesh",
+      "to_node": "lod_system",
+      "to_input": "mesh"
+    }
+  ],
+  "output_settings": {
+    "target_node": "lod_system",
+    "output_format": "mesh",
+    "resolution": 128,
+    "bounds": {
+      "min": [-1500.0, -800.0, -1500.0],
+      "max": [1500.0, 1200.0, 1500.0]
+    }
+  }
+}

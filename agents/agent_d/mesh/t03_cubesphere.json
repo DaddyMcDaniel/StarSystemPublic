@@ -1,0 +1,25 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://t03_cubesphere_positions.bin",
+    "normals": "buffer://t03_cubesphere_normals.bin",
+    "tangents": "buffer://t03_cubesphere_tangents.bin",
+    "uv0": "buffer://t03_cubesphere_uvs.bin",
+    "indices": "buffer://t03_cubesphere_indices.bin",
+    "bounds": {
+      "center": [
+        -6.242378169929452e-09,
+        -9.464250716462175e-09,
+        4.631441896663091e-09
+      ],
+      "radius": 1.0
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.py",
+    "face_resolution": 49,
+    "vertex_count": 296,
+    "triangle_count": 588,
+    "shading_basis": "angle_weighted_normals_mikktspace_tangents"
+  }
+}

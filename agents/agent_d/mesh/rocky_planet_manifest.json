@@ -1,0 +1,26 @@
+{
+  "mesh": {
+    "primitive_topology": "triangles",
+    "positions": "buffer://rocky_planet_manifest_positions.bin",
+    "normals": "buffer://rocky_planet_manifest_normals.bin",
+    "tangents": "buffer://rocky_planet_manifest_tangents.bin",
+    "uv0": "buffer://rocky_planet_manifest_uvs.bin",
+    "indices": "buffer://rocky_planet_manifest_indices.bin",
+    "bounds": {
+      "center": [
+        4.772742613567971e-06,
+        -1.6889742255443707e-05,
+        1.2037162377964705e-05
+      ],
+      "radius": 1.0826406478881836
+    }
+  },
+  "metadata": {
+    "generator": "cubesphere.py",
+    "face_resolution": 961,
+    "vertex_count": 5768,
+    "triangle_count": 11532,
+    "shading_basis": "angle_weighted_normals_mikktspace_tangents",
+    "displacement": "none"
+  }
+}
