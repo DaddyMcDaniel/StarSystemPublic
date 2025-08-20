@@ -1,0 +1,329 @@
+{
+  "hero_world_screenshot_index": {
+    "metadata": {
+      "planet_name": "hero_world",
+      "seed": 31415926,
+      "generation_time": 1755662893.5207703,
+      "pcc_file": "/home/colling/PCC-LanguageV2/agents/agent_d/examples/planets/hero_world.pcc.json",
+      "documentation_type": "simulation",
+      "viewer_tools_version": "T16"
+    },
+    "total_screenshots": 28,
+    "sequences": {
+      "overview_sequence": {
+        "count": 4,
+        "description": "Complete planet overview from multiple distances"
+      },
+      "face_coverage": {
+        "count": 6,
+        "description": "Complete cube face coverage for planet inspection"
+      },
+      "terrain_features": {
+        "count": 4,
+        "description": "Detailed showcase of major terrain features"
+      },
+      "cave_system": {
+        "count": 5,
+        "description": "Underground cave system exploration"
+      },
+      "debug_modes": {
+        "count": 6,
+        "description": "Debug visualization modes comparison"
+      },
+      "performance_documentation": {
+        "count": 3,
+        "description": "Performance optimization scenarios with HUD overlay"
+      }
+    },
+    "screenshots": [
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam950464_standard.png",
+        "description": "Overview - Far overview (5000m)",
+        "capture_mode": "standard",
+        "tags": [
+          "overview",
+          "distance_5000"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam767064_standard.png",
+        "description": "Overview - Medium overview (3000m)",
+        "capture_mode": "standard",
+        "tags": [
+          "overview",
+          "distance_3000"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam467646_standard.png",
+        "description": "Overview - Close overview (1500m)",
+        "capture_mode": "standard",
+        "tags": [
+          "overview",
+          "distance_1500"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam610120_standard.png",
+        "description": "Overview - Surface approach (800m)",
+        "capture_mode": "standard",
+        "tags": [
+          "overview",
+          "distance_800"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam692752_standard.png",
+        "description": "Face coverage - front",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_front"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam983587_standard.png",
+        "description": "Face coverage - back",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_back"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam216917_standard.png",
+        "description": "Face coverage - left",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_left"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam883788_standard.png",
+        "description": "Face coverage - right",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_right"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam801665_standard.png",
+        "description": "Face coverage - top",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_top"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam043197_standard.png",
+        "description": "Face coverage - bottom",
+        "capture_mode": "standard",
+        "tags": [
+          "face_coverage",
+          "face_bottom"
+        ],
+        "performance_rating": "Excellent"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam587525_standard.png",
+        "description": "Terrain feature - Ridged mountain macro features",
+        "capture_mode": "standard",
+        "tags": [
+          "terrain_features",
+          "ridged_mountains"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam458180_standard.png",
+        "description": "Terrain feature - Warped dune micro detail",
+        "capture_mode": "standard",
+        "tags": [
+          "terrain_features",
+          "warped_dunes"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam572432_standard.png",
+        "description": "Terrain feature - Equatorial island chains",
+        "capture_mode": "standard",
+        "tags": [
+          "terrain_features",
+          "equatorial_archipelago"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam488900_standard.png",
+        "description": "Terrain feature - Polar terrain variation",
+        "capture_mode": "standard",
+        "tags": [
+          "terrain_features",
+          "polar_regions"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam785758_standard_dbg2816.png",
+        "description": "Cave system interior view 1",
+        "capture_mode": "standard",
+        "tags": [
+          "cave_system",
+          "interior",
+          "position_1"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam416954_standard_dbg2816.png",
+        "description": "Cave system interior view 2",
+        "capture_mode": "standard",
+        "tags": [
+          "cave_system",
+          "interior",
+          "position_2"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam726816_standard_dbg2816.png",
+        "description": "Cave system interior view 3",
+        "capture_mode": "standard",
+        "tags": [
+          "cave_system",
+          "interior",
+          "position_3"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam537678_standard_dbg2816.png",
+        "description": "Cave system interior view 4",
+        "capture_mode": "standard",
+        "tags": [
+          "cave_system",
+          "interior",
+          "position_4"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam219484_standard_dbg2816.png",
+        "description": "Cave system interior view 5",
+        "capture_mode": "standard",
+        "tags": [
+          "cave_system",
+          "interior",
+          "position_5"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_standard.png",
+        "description": "Debug mode - standard",
+        "capture_mode": "standard",
+        "tags": [
+          "debug_modes",
+          "standard"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_wireframe_dbg3651.png",
+        "description": "Debug mode - wireframe",
+        "capture_mode": "wireframe",
+        "tags": [
+          "debug_modes",
+          "wireframe"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_normals_dbg1882.png",
+        "description": "Debug mode - normals",
+        "capture_mode": "normals",
+        "tags": [
+          "debug_modes",
+          "normals"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_lod_heatmap_dbg5926.png",
+        "description": "Debug mode - lod_heatmap",
+        "capture_mode": "lod_heatmap",
+        "tags": [
+          "debug_modes",
+          "lod_heatmap"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_chunk_ids_dbg6885.png",
+        "description": "Debug mode - chunk_ids",
+        "capture_mode": "chunk_ids",
+        "tags": [
+          "debug_modes",
+          "chunk_ids"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam776576_chunk_boundaries_dbg6945.png",
+        "description": "Debug mode - chunk_boundaries",
+        "capture_mode": "chunk_boundaries",
+        "tags": [
+          "debug_modes",
+          "chunk_boundaries"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam474423_debug_overlay_dbg8852.png",
+        "description": "Performance - 60+ fps scenario",
+        "capture_mode": "debug_overlay",
+        "tags": [
+          "performance",
+          "optimal_performance",
+          "distance_1000"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam933662_debug_overlay_dbg8852.png",
+        "description": "Performance - High detail stress test",
+        "capture_mode": "debug_overlay",
+        "tags": [
+          "performance",
+          "stress_test",
+          "distance_200"
+        ],
+        "performance_rating": "Good"
+      },
+      {
+        "filename": "hero_world_seed31415926_1755662893_cam816905_debug_overlay_dbg8852.png",
+        "description": "Performance - Long distance performance",
+        "capture_mode": "debug_overlay",
+        "tags": [
+          "performance",
+          "long_distance",
+          "distance_5000"
+        ],
+        "performance_rating": "Excellent"
+      }
+    ]
+  }
+}

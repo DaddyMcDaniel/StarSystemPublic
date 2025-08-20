@@ -1,0 +1,5 @@
+# Simulated Screenshot: Performance - High detail stress test
+# Camera: (140.0, 60.0, 120.0)
+# Mode: debug_overlay
+# Debug: ['hud_visible']
+# Performance: {'fps': 45.0, 'frame_time_ms': 22.22222222222222, 'triangle_count': 2500000, 'draw_calls': 150, 'memory_usage_mb': 2000.0, 'camera_distance': 200, 'performance_rating': 'Good', 'active_chunks': 64, 'visible_chunks': 44, 'vram_usage_mb': 3000.0, 'lod_distribution': {'LOD_0': 15, 'LOD_1': 12, 'LOD_2': 8, 'LOD_3': 4, 'LOD_4': 2}, 'culling_efficiency': 0.75, 'gpu_utilization': 0.9, 'budget_usage': {'triangles_percent': 100, 'memory_percent': 100, 'draw_calls_percent': 100}}

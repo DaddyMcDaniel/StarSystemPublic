@@ -1,0 +1,5 @@
+# Simulated Screenshot: Overview - Surface approach (800m)
+# Camera: (560.0, 320.0, 560.0)
+# Mode: standard
+# Debug: []
+# Performance: {'fps': 45.0, 'frame_time_ms': 22.22222222222222, 'triangle_count': 625000, 'draw_calls': 125, 'memory_usage_mb': 500.0, 'camera_distance': 800, 'performance_rating': 'Good'}

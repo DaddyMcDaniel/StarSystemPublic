@@ -1,0 +1,1008 @@
+{
+  "metadata": {
+    "planet_name": "hero_world",
+    "seed": 31415926,
+    "generation_time": 1755662893.5207703,
+    "pcc_file": "/home/colling/PCC-LanguageV2/agents/agent_d/examples/planets/hero_world.pcc.json",
+    "documentation_type": "simulation",
+    "viewer_tools_version": "T16"
+  },
+  "sequences": {
+    "overview_sequence": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam950464_standard.png",
+          "description": "Overview - Far overview (5000m)",
+          "camera_position": [
+            3500.0,
+            2000.0,
+            3500.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 72.0,
+            "frame_time_ms": 13.88888888888889,
+            "triangle_count": 100000,
+            "draw_calls": 20,
+            "memory_usage_mb": 80.0,
+            "camera_distance": 5000,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "overview",
+            "distance_5000"
+          ],
+          "timestamp": 1755662893.5207865
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam767064_standard.png",
+          "description": "Overview - Medium overview (3000m)",
+          "camera_position": [
+            2100.0,
+            1200.0,
+            2100.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 72.0,
+            "frame_time_ms": 13.88888888888889,
+            "triangle_count": 166666,
+            "draw_calls": 33,
+            "memory_usage_mb": 133.33280000000002,
+            "camera_distance": 3000,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "overview",
+            "distance_3000"
+          ],
+          "timestamp": 1755662893.521058
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam467646_standard.png",
+          "description": "Overview - Close overview (1500m)",
+          "camera_position": [
+            1050.0,
+            600.0,
+            1050.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "overview",
+            "distance_1500"
+          ],
+          "timestamp": 1755662893.521202
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam610120_standard.png",
+          "description": "Overview - Surface approach (800m)",
+          "camera_position": [
+            560.0,
+            320.0,
+            560.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 625000,
+            "draw_calls": 125,
+            "memory_usage_mb": 500.0,
+            "camera_distance": 800,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "overview",
+            "distance_800"
+          ],
+          "timestamp": 1755662893.5213294
+        }
+      ],
+      "series_name": "hero_world_overview",
+      "total_shots": 4,
+      "notes": "Complete planet overview from multiple distances"
+    },
+    "face_coverage": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam692752_standard.png",
+          "description": "Face coverage - front",
+          "camera_position": [
+            0,
+            0,
+            1500
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_front"
+          ],
+          "timestamp": 1755662893.521457
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam983587_standard.png",
+          "description": "Face coverage - back",
+          "camera_position": [
+            0,
+            0,
+            -1500
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_back"
+          ],
+          "timestamp": 1755662893.5216467
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam216917_standard.png",
+          "description": "Face coverage - left",
+          "camera_position": [
+            -1500,
+            0,
+            0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_left"
+          ],
+          "timestamp": 1755662893.521874
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam883788_standard.png",
+          "description": "Face coverage - right",
+          "camera_position": [
+            1500,
+            0,
+            0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_right"
+          ],
+          "timestamp": 1755662893.521995
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam801665_standard.png",
+          "description": "Face coverage - top",
+          "camera_position": [
+            0,
+            1500,
+            0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_top"
+          ],
+          "timestamp": 1755662893.5221403
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam043197_standard.png",
+          "description": "Face coverage - bottom",
+          "camera_position": [
+            0,
+            -1500,
+            0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 65.0,
+            "frame_time_ms": 15.384615384615385,
+            "triangle_count": 333333,
+            "draw_calls": 66,
+            "memory_usage_mb": 266.6664,
+            "camera_distance": 1500,
+            "performance_rating": "Excellent"
+          },
+          "tags": [
+            "face_coverage",
+            "face_bottom"
+          ],
+          "timestamp": 1755662893.5222666
+        }
+      ],
+      "series_name": "hero_world_face_coverage",
+      "total_shots": 6,
+      "notes": "Complete cube face coverage for planet inspection"
+    },
+    "terrain_features": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam587525_standard.png",
+          "description": "Terrain feature - Ridged mountain macro features",
+          "camera_position": [
+            0,
+            1200,
+            800
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 45.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 500000,
+            "draw_calls": 100,
+            "memory_usage_mb": 400.0,
+            "camera_distance": 1000,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "terrain_features",
+            "ridged_mountains"
+          ],
+          "timestamp": 1755662893.5223954
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam458180_standard.png",
+          "description": "Terrain feature - Warped dune micro detail",
+          "camera_position": [
+            800,
+            300,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 45.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 500000,
+            "draw_calls": 100,
+            "memory_usage_mb": 400.0,
+            "camera_distance": 1000,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "terrain_features",
+            "warped_dunes"
+          ],
+          "timestamp": 1755662893.5225246
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam572432_standard.png",
+          "description": "Terrain feature - Equatorial island chains",
+          "camera_position": [
+            1000,
+            200,
+            500
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 45.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 500000,
+            "draw_calls": 100,
+            "memory_usage_mb": 400.0,
+            "camera_distance": 1000,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "terrain_features",
+            "equatorial_archipelago"
+          ],
+          "timestamp": 1755662893.5227556
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam488900_standard.png",
+          "description": "Terrain feature - Polar terrain variation",
+          "camera_position": [
+            600,
+            -1200,
+            400
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 45.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 500000,
+            "draw_calls": 100,
+            "memory_usage_mb": 400.0,
+            "camera_distance": 1000,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "terrain_features",
+            "polar_regions"
+          ],
+          "timestamp": 1755662893.522889
+        }
+      ],
+      "series_name": "hero_world_terrain_features",
+      "total_shots": 4,
+      "notes": "Detailed showcase of major terrain features"
+    },
+    "cave_system": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam785758_standard_dbg2816.png",
+          "description": "Cave system interior view 1",
+          "camera_position": [
+            500,
+            0,
+            500
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 75.0,
+          "capture_mode": "standard",
+          "debug_toggles": [
+            "cave_only"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 833333,
+            "draw_calls": 150,
+            "memory_usage_mb": 666.6664000000001,
+            "camera_distance": 600,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "cave_system",
+            "interior",
+            "position_1"
+          ],
+          "timestamp": 1755662893.5230377
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam416954_standard_dbg2816.png",
+          "description": "Cave system interior view 2",
+          "camera_position": [
+            -300,
+            200,
+            400
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 75.0,
+          "capture_mode": "standard",
+          "debug_toggles": [
+            "cave_only"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 833333,
+            "draw_calls": 150,
+            "memory_usage_mb": 666.6664000000001,
+            "camera_distance": 600,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "cave_system",
+            "interior",
+            "position_2"
+          ],
+          "timestamp": 1755662893.5231986
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam726816_standard_dbg2816.png",
+          "description": "Cave system interior view 3",
+          "camera_position": [
+            200,
+            -100,
+            -600
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 75.0,
+          "capture_mode": "standard",
+          "debug_toggles": [
+            "cave_only"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 833333,
+            "draw_calls": 150,
+            "memory_usage_mb": 666.6664000000001,
+            "camera_distance": 600,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "cave_system",
+            "interior",
+            "position_3"
+          ],
+          "timestamp": 1755662893.5233264
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam537678_standard_dbg2816.png",
+          "description": "Cave system interior view 4",
+          "camera_position": [
+            0,
+            300,
+            0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 75.0,
+          "capture_mode": "standard",
+          "debug_toggles": [
+            "cave_only"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 833333,
+            "draw_calls": 150,
+            "memory_usage_mb": 666.6664000000001,
+            "camera_distance": 600,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "cave_system",
+            "interior",
+            "position_4"
+          ],
+          "timestamp": 1755662893.523451
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam219484_standard_dbg2816.png",
+          "description": "Cave system interior view 5",
+          "camera_position": [
+            -400,
+            -200,
+            300
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 75.0,
+          "capture_mode": "standard",
+          "debug_toggles": [
+            "cave_only"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 833333,
+            "draw_calls": 150,
+            "memory_usage_mb": 666.6664000000001,
+            "camera_distance": 600,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "cave_system",
+            "interior",
+            "position_5"
+          ],
+          "timestamp": 1755662893.5235755
+        }
+      ],
+      "series_name": "hero_world_cave_system",
+      "total_shots": 5,
+      "notes": "Underground cave system exploration"
+    },
+    "debug_modes": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_standard.png",
+          "description": "Debug mode - standard",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "standard",
+          "debug_toggles": [],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "standard"
+          ],
+          "timestamp": 1755662893.5237079
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_wireframe_dbg3651.png",
+          "description": "Debug mode - wireframe",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "wireframe",
+          "debug_toggles": [
+            "wireframe"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "wireframe"
+          ],
+          "timestamp": 1755662893.5238411
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_normals_dbg1882.png",
+          "description": "Debug mode - normals",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "normals",
+          "debug_toggles": [
+            "normals"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "normals"
+          ],
+          "timestamp": 1755662893.523974
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_lod_heatmap_dbg5926.png",
+          "description": "Debug mode - lod_heatmap",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "lod_heatmap",
+          "debug_toggles": [
+            "lod_heatmap"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "lod_heatmap"
+          ],
+          "timestamp": 1755662893.5241008
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_chunk_ids_dbg6885.png",
+          "description": "Debug mode - chunk_ids",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "chunk_ids",
+          "debug_toggles": [
+            "chunk_ids"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "chunk_ids"
+          ],
+          "timestamp": 1755662893.5242758
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam776576_chunk_boundaries_dbg6945.png",
+          "description": "Debug mode - chunk_boundaries",
+          "camera_position": [
+            1200,
+            600,
+            1000
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "chunk_boundaries",
+          "debug_toggles": [
+            "chunk_boundaries"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 416666,
+            "draw_calls": 83,
+            "memory_usage_mb": 333.3328,
+            "camera_distance": 1200,
+            "performance_rating": "Good"
+          },
+          "tags": [
+            "debug_modes",
+            "chunk_boundaries"
+          ],
+          "timestamp": 1755662893.5244029
+        }
+      ],
+      "series_name": "hero_world_debug_modes",
+      "total_shots": 6,
+      "notes": "Debug visualization modes comparison"
+    },
+    "performance_documentation": {
+      "screenshots": [
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam474423_debug_overlay_dbg8852.png",
+          "description": "Performance - 60+ fps scenario",
+          "camera_position": [
+            700.0,
+            300.0,
+            600.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "debug_overlay",
+          "debug_toggles": [
+            "hud_visible"
+          ],
+          "performance_data": {
+            "fps": 58.0,
+            "frame_time_ms": 17.24137931034483,
+            "triangle_count": 500000,
+            "draw_calls": 100,
+            "memory_usage_mb": 400.0,
+            "camera_distance": 1000,
+            "performance_rating": "Good",
+            "active_chunks": 50,
+            "visible_chunks": 35,
+            "vram_usage_mb": 600.0,
+            "lod_distribution": {
+              "LOD_0": 8,
+              "LOD_1": 15,
+              "LOD_2": 12,
+              "LOD_3": 8,
+              "LOD_4": 4,
+              "LOD_5": 2
+            },
+            "culling_efficiency": 0.75,
+            "gpu_utilization": 0.9,
+            "budget_usage": {
+              "triangles_percent": 100,
+              "memory_percent": 78.125,
+              "draw_calls_percent": 66.66666666666666
+            }
+          },
+          "tags": [
+            "performance",
+            "optimal_performance",
+            "distance_1000"
+          ],
+          "timestamp": 1755662893.5245564
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam933662_debug_overlay_dbg8852.png",
+          "description": "Performance - High detail stress test",
+          "camera_position": [
+            140.0,
+            60.0,
+            120.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "debug_overlay",
+          "debug_toggles": [
+            "hud_visible"
+          ],
+          "performance_data": {
+            "fps": 45.0,
+            "frame_time_ms": 22.22222222222222,
+            "triangle_count": 2500000,
+            "draw_calls": 150,
+            "memory_usage_mb": 2000.0,
+            "camera_distance": 200,
+            "performance_rating": "Good",
+            "active_chunks": 64,
+            "visible_chunks": 44,
+            "vram_usage_mb": 3000.0,
+            "lod_distribution": {
+              "LOD_0": 15,
+              "LOD_1": 12,
+              "LOD_2": 8,
+              "LOD_3": 4,
+              "LOD_4": 2
+            },
+            "culling_efficiency": 0.75,
+            "gpu_utilization": 0.9,
+            "budget_usage": {
+              "triangles_percent": 100,
+              "memory_percent": 100,
+              "draw_calls_percent": 100
+            }
+          },
+          "tags": [
+            "performance",
+            "stress_test",
+            "distance_200"
+          ],
+          "timestamp": 1755662893.524712
+        },
+        {
+          "filename": "hero_world_seed31415926_1755662893_cam816905_debug_overlay_dbg8852.png",
+          "description": "Performance - Long distance performance",
+          "camera_position": [
+            3500.0,
+            1500.0,
+            3000.0
+          ],
+          "camera_target": [
+            0,
+            0,
+            0
+          ],
+          "camera_fov": 60.0,
+          "capture_mode": "debug_overlay",
+          "debug_toggles": [
+            "hud_visible"
+          ],
+          "performance_data": {
+            "fps": 72.0,
+            "frame_time_ms": 13.88888888888889,
+            "triangle_count": 100000,
+            "draw_calls": 20,
+            "memory_usage_mb": 80.0,
+            "camera_distance": 5000,
+            "performance_rating": "Excellent",
+            "active_chunks": 10,
+            "visible_chunks": 7,
+            "vram_usage_mb": 120.0,
+            "lod_distribution": {
+              "LOD_4": 4,
+              "LOD_5": 8,
+              "LOD_6": 12,
+              "LOD_7": 8,
+              "LOD_8": 3
+            },
+            "culling_efficiency": 0.75,
+            "gpu_utilization": 0.2,
+            "budget_usage": {
+              "triangles_percent": 20.0,
+              "memory_percent": 15.625,
+              "draw_calls_percent": 13.333333333333334
+            }
+          },
+          "tags": [
+            "performance",
+            "long_distance",
+            "distance_5000"
+          ],
+          "timestamp": 1755662893.5248592
+        }
+      ],
+      "series_name": "hero_world_performance",
+      "total_shots": 3,
+      "notes": "Performance optimization scenarios with HUD overlay"
+    }
+  }
+}

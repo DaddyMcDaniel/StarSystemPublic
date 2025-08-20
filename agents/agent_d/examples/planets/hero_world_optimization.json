@@ -1,0 +1,111 @@
+{
+  "performance_target": {
+    "target_fps": 60.0,
+    "min_fps": 45.0,
+    "max_triangles_per_frame": 500000,
+    "memory_budget_mb": 512,
+    "draw_call_budget": 150,
+    "gpu_tier": "mid"
+  },
+  "content_complexity": {
+    "mountain_complexity": 1.4,
+    "cave_complexity": 1.8,
+    "dune_complexity": 0.9,
+    "archipelago_complexity": 1.1,
+    "base_triangle_density": 1.2
+  },
+  "optimized_lod_config": {
+    "base_chunk_size": 48.0,
+    "max_depth": 7,
+    "lod_distances": [
+      84.09986859395532,
+      197.4664914586071,
+      453.4664914586071,
+      1024.0000000000002,
+      2282.134034165572,
+      5032.5361366622865,
+      11001.608409986862,
+      23876.289093298292
+    ],
+    "chunk_transition_zones": [
+      25.229960578186596,
+      59.239947437582124,
+      136.03994743758213,
+      307.20000000000005,
+      684.6402102496716,
+      1509.7608409986858,
+      3300.4825229960584,
+      7162.886727989488
+    ],
+    "quality_multipliers": [
+      1.0,
+      0.8333333333333334,
+      0.7142857142857143,
+      0.625,
+      0.5555555555555556,
+      0.5,
+      0.45454545454545453,
+      0.41666666666666663
+    ]
+  },
+  "performance_report": {
+    "optimization_summary": {
+      "target_fps": 60.0,
+      "estimated_fps": 72.0,
+      "performance_margin": 1.2,
+      "optimization_iterations": 0
+    },
+    "resource_usage": {
+      "triangles": {
+        "count": 36860,
+        "budget": 500000,
+        "usage_percent": 7.371999999999999
+      },
+      "memory": {
+        "usage_mb": 3.599609375000001,
+        "budget_mb": 512,
+        "usage_percent": 0.7030487060546877
+      },
+      "draw_calls": {
+        "count": 33,
+        "budget": 150,
+        "usage_percent": 22.0
+      }
+    },
+    "lod_configuration": {
+      "base_chunk_size": 48.0,
+      "max_depth": 7,
+      "lod_distances": [
+        84.09986859395532,
+        197.4664914586071,
+        453.4664914586071,
+        1024.0000000000002,
+        2282.134034165572,
+        5032.5361366622865,
+        11001.608409986862,
+        23876.289093298292
+      ],
+      "transition_zones": [
+        25.229960578186596,
+        59.239947437582124,
+        136.03994743758213,
+        307.20000000000005,
+        684.6402102496716,
+        1509.7608409986858,
+        3300.4825229960584,
+        7162.886727989488
+      ],
+      "quality_multipliers": [
+        1.0,
+        0.8333333333333334,
+        0.7142857142857143,
+        0.625,
+        0.5555555555555556,
+        0.5,
+        0.45454545454545453,
+        0.41666666666666663
+      ]
+    },
+    "optimization_history": []
+  }
+}

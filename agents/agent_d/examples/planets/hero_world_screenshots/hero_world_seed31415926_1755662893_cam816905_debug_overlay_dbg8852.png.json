@@ -1,0 +1,53 @@
+{
+  "filename": "hero_world_seed31415926_1755662893_cam816905_debug_overlay_dbg8852.png",
+  "description": "Performance - Long distance performance",
+  "camera_position": [
+    3500.0,
+    1500.0,
+    3000.0
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "debug_overlay",
+  "debug_toggles": [
+    "hud_visible"
+  ],
+  "performance_data": {
+    "fps": 72.0,
+    "frame_time_ms": 13.88888888888889,
+    "triangle_count": 100000,
+    "draw_calls": 20,
+    "memory_usage_mb": 80.0,
+    "camera_distance": 5000,
+    "performance_rating": "Excellent",
+    "active_chunks": 10,
+    "visible_chunks": 7,
+    "vram_usage_mb": 120.0,
+    "lod_distribution": {
+      "LOD_4": 4,
+      "LOD_5": 8,
+      "LOD_6": 12,
+      "LOD_7": 8,
+      "LOD_8": 3
+    },
+    "culling_efficiency": 0.75,
+    "gpu_utilization": 0.2,
+    "budget_usage": {
+      "triangles_percent": 20.0,
+      "memory_percent": 15.625,
+      "draw_calls_percent": 13.333333333333334
+    }
+  },
+  "tags": [
+    "performance",
+    "long_distance",
+    "distance_5000"
+  ],
+  "timestamp": 1755662893.5248592,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

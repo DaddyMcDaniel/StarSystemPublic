@@ -1,0 +1,35 @@
+{
+  "filename": "hero_world_seed31415926_1755662861_cam776576_chunk_ids_dbg2798.png",
+  "description": "Debug mode - chunk_ids",
+  "camera_position": [
+    1200,
+    600,
+    1000
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "chunk_ids",
+  "debug_toggles": [
+    "chunk_ids"
+  ],
+  "performance_data": {
+    "fps": 58.0,
+    "frame_time_ms": 17.24137931034483,
+    "triangle_count": 416666,
+    "draw_calls": 83,
+    "memory_usage_mb": 333.3328,
+    "camera_distance": 1200,
+    "performance_rating": "Good"
+  },
+  "tags": [
+    "debug_modes",
+    "chunk_ids"
+  ],
+  "timestamp": 1755662861.1406674,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

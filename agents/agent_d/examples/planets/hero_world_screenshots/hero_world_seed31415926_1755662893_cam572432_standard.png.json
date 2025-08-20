@@ -1,0 +1,33 @@
+{
+  "filename": "hero_world_seed31415926_1755662893_cam572432_standard.png",
+  "description": "Terrain feature - Equatorial island chains",
+  "camera_position": [
+    1000,
+    200,
+    500
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 45.0,
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "performance_data": {
+    "fps": 58.0,
+    "frame_time_ms": 17.24137931034483,
+    "triangle_count": 500000,
+    "draw_calls": 100,
+    "memory_usage_mb": 400.0,
+    "camera_distance": 1000,
+    "performance_rating": "Good"
+  },
+  "tags": [
+    "terrain_features",
+    "equatorial_archipelago"
+  ],
+  "timestamp": 1755662893.5227556,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

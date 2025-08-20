@@ -45,11 +45,16 @@ except ImportError:
 class ChunkVAO:
     """OpenGL VAO data for a chunk"""
     vao_id: int
-    vertex_count: int
-    triangle_count: int
-    memory_usage: int  # Estimated GPU memory in bytes
-    load_time: float   # Time when loaded
-    last_used: float   # Last access time
+    pos_buffer: int = 0
+    norm_buffer: int = 0
+    uv_buffer: int = 0
+    tan_buffer: int = 0
+    index_buffer: int = 0
+    vertex_count: int = 0
+    triangle_count: int = 0
+    memory_usage: int = 0  # Estimated GPU memory in bytes
+    load_time: float = 0.0   # Time when loaded
+    last_used: float = 0.0   # Last access time
 
 
 @dataclass
@@ -179,6 +184,12 @@ class ChunkStreamer:
             vao = glGenVertexArrays(1)
             glBindVertexArray(vao)
             
+            # Initialize buffer IDs
+            pos_buffer = 0
+            norm_buffer = 0
+            uv_buffer = 0
+            tan_buffer = 0
+            
             # Position buffer (attribute 0)
             if positions.size > 0:
                 pos_buffer = glGenBuffers(1)
@@ -229,6 +240,11 @@ class ChunkStreamer:
             
             return ChunkVAO(
                 vao_id=vao,
+                pos_buffer=pos_buffer,
+                norm_buffer=norm_buffer,
+                uv_buffer=uv_buffer,
+                tan_buffer=tan_buffer,
+                index_buffer=index_buffer,
                 vertex_count=vertex_count,
                 triangle_count=triangle_count,
                 memory_usage=memory_usage,
@@ -252,6 +268,22 @@ class ChunkStreamer:
         
         try:
             start_time = time.time()
+            
+            # Delete individual buffers
+            buffer_ids = []
+            if chunk_vao.pos_buffer > 0:
+                buffer_ids.append(chunk_vao.pos_buffer)
+            if chunk_vao.norm_buffer > 0:
+                buffer_ids.append(chunk_vao.norm_buffer)
+            if chunk_vao.uv_buffer > 0:
+                buffer_ids.append(chunk_vao.uv_buffer)
+            if chunk_vao.tan_buffer > 0:
+                buffer_ids.append(chunk_vao.tan_buffer)
+            if chunk_vao.index_buffer > 0:
+                buffer_ids.append(chunk_vao.index_buffer)
+            
+            if buffer_ids:
+                glDeleteBuffers(len(buffer_ids), buffer_ids)
             
             # Delete VAO
             if glIsVertexArray(chunk_vao.vao_id):

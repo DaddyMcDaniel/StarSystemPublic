@@ -1,0 +1,359 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "hero_world",
+    "description": "Showcase planet featuring ridged mountains, warped dunes, equatorial archipelago, and gyroidal cave systems",
+    "author": "PCC T17 Pipeline",
+    "creation_date": "2025-08-19",
+    "target_performance": "60+ fps on mid-tier GPU",
+    "inspiration": "No Man's Sky / Astroneer aesthetic",
+    "seed": 31415926,
+    "planet_radius": 2000.0,
+    "chunk_size": 64.0,
+    "max_lod_depth": 8
+  },
+  "nodes": [
+    {
+      "id": "base_sphere",
+      "type": "CubeSphere",
+      "parameters": {
+        "radius": 2000.0,
+        "subdivision_level": 32,
+        "edge_length_target": 64.0,
+        "smooth_normals": true
+      },
+      "outputs": ["surface_mesh"]
+    },
+    {
+      "id": "global_elevation_base",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 31415926,
+        "frequency": 0.0008,
+        "octaves": 6,
+        "amplitude": 800.0,
+        "lacunarity": 2.1,
+        "persistence": 0.55,
+        "units": "world_space"
+      },
+      "outputs": ["elevation_base"]
+    },
+    {
+      "id": "mountain_macro",
+      "type": "RidgedMF",
+      "parameters": {
+        "seed": 27182818,
+        "frequency": 0.0015,
+        "octaves": 5,
+        "amplitude": 1200.0,
+        "lacunarity": 2.3,
+        "persistence": 0.7,
+        "ridge_sharpness": 1.8,
+        "units": "world_space"
+      },
+      "outputs": ["mountain_ridges"]
+    },
+    {
+      "id": "mountain_mask",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 16180339,
+        "frequency": 0.0005,
+        "octaves": 3,
+        "amplitude": 1.0,
+        "lacunarity": 2.0,
+        "persistence": 0.6,
+        "units": "world_space"
+      },
+      "outputs": ["mountain_distribution"]
+    },
+    {
+      "id": "equatorial_band",
+      "type": "DomainWarp",
+      "parameters": {
+        "seed": 14142135,
+        "warp_strength": 300.0,
+        "warp_frequency": 0.002,
+        "target_latitude_band": [-0.3, 0.3],
+        "band_falloff": 0.8
+      },
+      "inputs": ["elevation_base"],
+      "outputs": ["warped_equator"]
+    },
+    {
+      "id": "archipelago_islands",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 22360679,
+        "frequency": 0.003,
+        "octaves": 4,
+        "amplitude": 600.0,
+        "lacunarity": 1.9,
+        "persistence": 0.45,
+        "units": "world_space"
+      },
+      "outputs": ["island_heights"]
+    },
+    {
+      "id": "dune_micro_detail",
+      "type": "DomainWarp",
+      "parameters": {
+        "seed": 23606797,
+        "warp_strength": 120.0,
+        "warp_frequency": 0.008,
+        "secondary_warp": true,
+        "secondary_strength": 60.0,
+        "secondary_frequency": 0.025
+      },
+      "inputs": ["elevation_base"],
+      "outputs": ["warped_dunes"]
+    },
+    {
+      "id": "surface_displacement",
+      "type": "Displace",
+      "parameters": {
+        "displacement_layers": [
+          {
+            "source": "elevation_base",
+            "strength": 1.0,
+            "blend_mode": "add"
+          },
+          {
+            "source": "mountain_ridges",
+            "strength": 0.8,
+            "blend_mode": "multiply_mask",
+            "mask": "mountain_distribution",
+            "mask_threshold": 0.4
+          },
+          {
+            "source": "warped_equator",
+            "strength": 0.6,
+            "blend_mode": "add",
+            "latitude_mask": [-0.4, 0.4]
+          },
+          {
+            "source": "island_heights",
+            "strength": 0.7,
+            "blend_mode": "add",
+            "latitude_mask": [-0.35, 0.35],
+            "mask_threshold": 0.3
+          },
+          {
+            "source": "warped_dunes",
+            "strength": 0.15,
+            "blend_mode": "add"
+          }
+        ],
+        "normal_smoothing": 0.2
+      },
+      "inputs": ["surface_mesh", "elevation_base", "mountain_ridges", "mountain_distribution", "warped_equator", "island_heights", "warped_dunes"],
+      "outputs": ["displaced_surface"]
+    },
+    {
+      "id": "cave_gyroid_primary",
+      "type": "SDFGyroid",
+      "parameters": {
+        "seed": 30000001,
+        "frequency": 0.012,
+        "thickness": 0.15,
+        "amplitude": 1.0,
+        "phase_shift": [0.0, 0.5, 1.0],
+        "units": "world_space"
+      },
+      "outputs": ["gyroid_caves_primary"]
+    },
+    {
+      "id": "cave_gyroid_secondary",
+      "type": "SDFGyroid",
+      "parameters": {
+        "seed": 30000002,
+        "frequency": 0.008,
+        "thickness": 0.25,
+        "amplitude": 0.8,
+        "phase_shift": [0.3, 0.8, 0.1],
+        "units": "world_space"
+      },
+      "outputs": ["gyroid_caves_secondary"]
+    },
+    {
+      "id": "cave_spheres_large",
+      "type": "SDFSphere",
+      "parameters": {
+        "seed": 30000003,
+        "sphere_radius": 80.0,
+        "density": 0.0002,
+        "radius_variation": 0.4,
+        "distribution_noise": {
+          "frequency": 0.005,
+          "threshold": 0.6
+        },
+        "units": "world_space"
+      },
+      "outputs": ["sphere_caves_large"]
+    },
+    {
+      "id": "cave_spheres_small",
+      "type": "SDFSphere",
+      "parameters": {
+        "seed": 30000004,
+        "sphere_radius": 25.0,
+        "density": 0.001,
+        "radius_variation": 0.6,
+        "distribution_noise": {
+          "frequency": 0.015,
+          "threshold": 0.4
+        },
+        "units": "world_space"
+      },
+      "outputs": ["sphere_caves_small"]
+    },
+    {
+      "id": "cave_distribution_mask",
+      "type": "NoiseFBM",
+      "parameters": {
+        "seed": 30000005,
+        "frequency": 0.001,
+        "octaves": 3,
+        "amplitude": 1.0,
+        "lacunarity": 2.0,
+        "persistence": 0.5,
+        "units": "world_space"
+      },
+      "outputs": ["cave_mask"]
+    },
+    {
+      "id": "cave_system_composite",
+      "type": "SDFUnion",
+      "parameters": {
+        "blend_operations": [
+          {
+            "input": "gyroid_caves_primary",
+            "operation": "smooth_union",
+            "blend_radius": 15.0,
+            "mask": "cave_mask",
+            "mask_threshold": 0.3
+          },
+          {
+            "input": "gyroid_caves_secondary",
+            "operation": "smooth_union",
+            "blend_radius": 20.0,
+            "mask": "cave_mask",
+            "mask_threshold": 0.2
+          },
+          {
+            "input": "sphere_caves_large",
+            "operation": "smooth_union",
+            "blend_radius": 25.0,
+            "mask": "cave_mask",
+            "mask_threshold": 0.4
+          },
+          {
+            "input": "sphere_caves_small",
+            "operation": "smooth_union",
+            "blend_radius": 10.0,
+            "mask": "cave_mask",
+            "mask_threshold": 0.5
+          }
+        ],
+        "global_cave_density": 0.7
+      },
+      "inputs": ["gyroid_caves_primary", "gyroid_caves_secondary", "sphere_caves_large", "sphere_caves_small", "cave_mask"],
+      "outputs": ["composite_caves"]
+    },
+    {
+      "id": "marching_cubes_caves",
+      "type": "MarchingCubes",
+      "parameters": {
+        "iso_surface": 0.0,
+        "resolution": 32,
+        "smoothing": true,
+        "adaptive_resolution": true,
+        "resolution_scale_factor": 1.5,
+        "normal_calculation": "analytical"
+      },
+      "inputs": ["composite_caves"],
+      "outputs": ["cave_mesh"]
+    },
+    {
+      "id": "lod_management",
+      "type": "QuadtreeLOD",
+      "parameters": {
+        "base_chunk_size": 64.0,
+        "max_depth": 8,
+        "lod_distances": [128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0, 8192.0, 16384.0],
+        "chunk_transition_zones": [32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0],
+        "performance_targets": {
+          "target_fps": 60,
+          "max_triangles_per_frame": 500000,
+          "memory_budget_mb": 512,
+          "draw_call_budget": 150
+        },
+        "adaptive_quality": {
+          "enable_dynamic_lod": true,
+          "performance_scaling": true,
+          "quality_fallback_factor": 0.8
+        }
+      },
+      "inputs": ["displaced_surface", "cave_mesh"],
+      "outputs": ["lod_terrain"]
+    }
+  ],
+  "rendering": {
+    "material_assignments": {
+      "surface": {
+        "rock_material": {
+          "elevation_range": [0.3, 1.0],
+          "slope_threshold": 0.7,
+          "base_color": [0.6, 0.5, 0.4],
+          "roughness": 0.8,
+          "metallic": 0.1
+        },
+        "sand_material": {
+          "elevation_range": [0.0, 0.4],
+          "slope_threshold": 0.3,
+          "base_color": [0.9, 0.8, 0.6],
+          "roughness": 0.6,
+          "metallic": 0.0
+        },
+        "grass_material": {
+          "elevation_range": [0.1, 0.6],
+          "slope_threshold": 0.4,
+          "latitude_range": [-0.8, 0.8],
+          "base_color": [0.3, 0.6, 0.2],
+          "roughness": 0.9,
+          "metallic": 0.0
+        }
+      },
+      "caves": {
+        "cave_walls": {
+          "base_color": [0.3, 0.25, 0.2],
+          "roughness": 0.9,
+          "metallic": 0.0,
+          "emission": [0.0, 0.0, 0.0]
+        }
+      }
+    },
+    "lighting": {
+      "sun_direction": [-0.3, 0.8, 0.5],
+      "sun_color": [1.0, 0.95, 0.8],
+      "sky_color": [0.5, 0.7, 1.0],
+      "ambient_strength": 0.15,
+      "cave_ambient": [0.1, 0.08, 0.12]
+    }
+  },
+  "baking_settings": {
+    "deterministic_seed": 31415926,
+    "parallel_chunks": 8,
+    "memory_budget_mb": 1024,
+    "compression": {
+      "vertex_compression": true,
+      "texture_compression": "BC7",
+      "mesh_optimization": true
+    },
+    "validation": {
+      "hash_verification": true,
+      "geometric_validation": true,
+      "performance_profiling": true
+    }
+  }
+}

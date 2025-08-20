@@ -1,0 +1,33 @@
+{
+  "filename": "hero_world_seed31415926_1755662861_cam488900_standard.png",
+  "description": "Terrain feature - Polar terrain variation",
+  "camera_position": [
+    600,
+    -1200,
+    400
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 45.0,
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "performance_data": {
+    "fps": 58.0,
+    "frame_time_ms": 17.24137931034483,
+    "triangle_count": 500000,
+    "draw_calls": 100,
+    "memory_usage_mb": 400.0,
+    "camera_distance": 1000,
+    "performance_rating": "Good"
+  },
+  "tags": [
+    "terrain_features",
+    "polar_regions"
+  ],
+  "timestamp": 1755662861.1393328,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

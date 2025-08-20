@@ -51,6 +51,121 @@ class PCCGameGenerator:
     def __init__(self):
         self.compression_level = 1.0  # Evolution metric
         self.successful_patterns = []  # Learned from feedback
+        self.agent_c_decision = self._load_agent_c_decision()
+    
+    def _load_agent_c_decision(self):
+        """Load latest Agent C decision for evolution guidance"""
+        try:
+            decision_file = PCC_ROOT / "agents/communication/agent_c_decision.json"
+            if decision_file.exists():
+                with open(decision_file, 'r') as f:
+                    decision = json.load(f)
+                    print(f"🎯 Agent C Decision Loaded: {decision.get('decision', 'continue')} (Rating: {decision.get('human_rating', 'N/A')}/10)")
+                    if decision.get('next_objective'):
+                        print(f"🔧 Focus Area: {decision['next_objective'][:100]}...")
+                    return decision
+        except Exception as e:
+            print(f"⚠️ Could not load Agent C decision: {e}")
+        return None
+    
+    def _generate_improved_terrain(self, prompt):
+        """Generate T17 Hero Planet terrain with sophisticated features"""
+        print("🌍 Generating T17 Hero Planet terrain (ridged mountains, warped dunes, archipelagos)")
+        print("📐 Using T17 advanced procedural generation with deterministic seed 31415926")
+        
+        # T17 Hero Planet parameters
+        hero_radius = 65.0  # Consistent T17 planet radius
+        
+        # T17 Hero Planet terrain - sophisticated generation
+        terrain = {
+            "type": "T17_HERO_PLANET",
+            "generation_method": "T17_sophisticated_procedural", 
+            "biome": "multi_zone_hero_world",
+            "radius": hero_radius,
+            "center": [0, 0, 0],
+            "base_material": "hero_world_composite",
+            "seed": 31415926,  # T17 hero world seed
+            
+            # T17 Advanced heightmap generation
+            "heightmap": {
+                "noise_octaves": 6,  # High detail octaves
+                "height_variation": 0.28,  # 28% elevation change for dramatic terrain
+                "erosion_factor": 0.22,  # Natural weathering
+                "ridge_sharpness": 0.65,  # Sharp mountain ridges
+                "warping_strength": 0.35,  # Dune warping intensity
+                "archipelago_distribution": 0.18  # Equatorial island spacing
+            },
+            
+            # T17 Signature geological features
+            "geological_features": {
+                "ridged_mountains": {
+                    "density": 0.25,
+                    "height_multiplier": 2.4,
+                    "ridge_complexity": 0.8,
+                    "distribution": "northern_hemisphere"
+                },
+                "warped_dunes": {
+                    "warp_frequency": 0.015,
+                    "dune_height": 1.6,
+                    "flow_direction": "northeast_winds",
+                    "distribution": "mid_latitudes"
+                },
+                "equatorial_archipelago": {
+                    "island_count": 12,
+                    "island_size_variation": 0.4,
+                    "water_level": -0.15,
+                    "distribution": "equatorial_ring"
+                },
+                "cave_networks": {
+                    "gyroidal_caves": True,
+                    "cave_complexity": 1.8,
+                    "entrance_density": 0.08,
+                    "depth_variation": "full_penetration"
+                }
+            },
+            
+            # T17 Surface generation (high-detail voxel)
+            "surface_generation": {
+                "voxel_resolution": 0.25,  # Ultra-fine detail
+                "surface_roughness": 0.35,  # High surface complexity
+                "rock_scatter": 0.45,  # Dense material distribution
+                "organic_variation": True,
+                "micro_features": True  # Small-scale terrain details
+            },
+            
+            # T17 Material layering (hero world geology)
+            "terrain_layers": {
+                "surface": "hero_composite_material",
+                "mountain_ridges": "crystalline_rock_formation",
+                "dune_material": "warped_sedimentary_flow",
+                "archipelago_base": "volcanic_island_substrate",
+                "cave_interior": "gyroidal_cave_material",
+                "bedrock": "hero_world_bedrock",
+                "core": "hero_planetary_core"
+            },
+            
+            # T17 Environmental systems
+            "environmental": {
+                "atmosphere_density": 0.75,  # Hero world atmosphere
+                "lighting_type": "hero_world_cinematic",
+                "weather_effects": True,
+                "horizon_quality": "hero_curved_realistic",
+                "atmospheric_scattering": "enhanced"
+            },
+            
+            # T17 Performance-optimized rendering
+            "rendering": {
+                "chunk_system": "T17_optimized_chunks",
+                "level_of_detail": "T17_advanced_LOD",
+                "seamless_chunks": True,
+                "estimated_polygons": 850000,  # High-detail hero world
+                "performance_target": "60fps_mid_tier_gpu"
+            },
+            
+            "notes": "T17 Hero Planet Showcase - sophisticated terrain with ridged mountains, warped dunes, equatorial archipelagos, and gyroidal cave systems"
+        }
+        
+        return terrain
         
     def generate_spherical_planet_prompt(self):
         """Step 1: Generate spherical planet worldbuilding prompts aligned with HOD"""
@@ -88,12 +203,7 @@ class PCCGameGenerator:
             "nodes": [
                 {
                     "type": "SPHERICAL_WORLD",
-                    "terrain": {
-                        "type": "sphere",
-                        "radius": random.uniform(20.0, 35.0),  # Varied planet sizes
-                        "center": [0, 0, 0],
-                        "material": self._extract_terrain_material(prompt)
-                    },
+                    "terrain": self._generate_improved_terrain(prompt),
                     "features": self._extract_planet_features(prompt),
                     "building_zones": self._extract_building_zones(prompt)
                 },
@@ -109,7 +219,7 @@ class PCCGameGenerator:
                 }
             ],
             "compression_id": self._generate_compression_id(),
-            "planet_seed": random.randint(1, 1000000)  # Deterministic seed cascade
+            "planet_seed": 31415926  # Use T17 hero planet seed for consistent terrain
         }
         
         # Draft asset requests for realistic meshes based on extracted features

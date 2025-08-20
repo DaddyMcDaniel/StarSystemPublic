@@ -16,14 +16,26 @@ import struct
 import base64
 from collections import deque
 from pathlib import Path
+from typing import Tuple, Optional, Dict, List
 
 try:
     from OpenGL.GL import *
     from OpenGL.GLU import *
     from OpenGL.GLUT import *
+    import numpy as np
 except ImportError:
     print("❌ OpenGL not available")
     sys.exit(1)
+
+# Import T08 runtime LOD system
+sys.path.append(str(Path(__file__).parent.parent / "agents" / "agent_d" / "mesh"))
+try:
+    from runtime_lod import RuntimeLODManager, create_view_matrix, create_projection_matrix
+    from chunk_streamer import ChunkStreamer
+    RUNTIME_LOD_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Runtime LOD system not available: {e}")
+    RUNTIME_LOD_AVAILABLE = False
 
 # Global variables
 scene_data = None
@@ -80,6 +92,28 @@ per_run_budget_bytes = 200 * 1024 * 1024
 _active_flush_thread: threading.Thread | None = None
 last_screenshot_b64 = ""
 last_screenshot_ms = 0
+
+# Mesh rendering state
+mesh_cache = {}  # Cache for loaded meshes
+chunk_cache = {}  # Cache for chunked planet data
+debug_wireframe = False
+debug_aabb = False
+debug_normals = False
+debug_chunk_aabb = False
+debug_crack_lines = False
+debug_runtime_lod = False
+debug_show_hud = True
+
+# T08 Runtime LOD system
+runtime_lod_manager = None
+chunk_streamer = None
+lod_stats = {
+    'frame_time_ms': 0.0,
+    'active_chunks': 0,
+    'culled_chunks': 0,
+    'lod_levels': {},
+    'gpu_memory_mb': 0.0
+}
 
 def _estimate_captures_dir_bytes() -> int:
     try:
@@ -169,8 +203,809 @@ def _keycode_from_name(name: str) -> int:
     }
     return mapping.get(name.upper(), 0)
 
+def LoadMeshFromManifest(json_path: str) -> dict:
+    """Load mesh data from manifest into VAO/VBO/EBO"""
+    try:
+        manifest_path = Path(json_path)
+        manifest_dir = manifest_path.parent
+        
+        with open(json_path, 'r') as f:
+            manifest = json.load(f)
+        
+        mesh_data = manifest.get("mesh", {})
+        if not mesh_data:
+            return {}
+            
+        # Load binary buffers
+        positions = _load_buffer(mesh_data.get("positions", ""), str(manifest_dir))
+        normals = _load_buffer(mesh_data.get("normals", ""), str(manifest_dir))
+        tangents = _load_buffer(mesh_data.get("tangents", ""), str(manifest_dir))
+        uv0 = _load_buffer(mesh_data.get("uv0", ""), str(manifest_dir))
+        indices = _load_buffer(mesh_data.get("indices", ""), str(manifest_dir), dtype=np.uint32)
+        
+        if positions is None or indices is None:
+            return {}
+            
+        # Create VAO
+        vao = glGenVertexArrays(1)
+        glBindVertexArray(vao)
+        
+        # Create VBOs
+        position_vbo = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, position_vbo)
+        glBufferData(GL_ARRAY_BUFFER, positions.nbytes, positions, GL_STATIC_DRAW)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        glEnableVertexAttribArray(0)
+        
+        normal_vbo = 0
+        if normals is not None:
+            normal_vbo = glGenBuffers(1)
+            glBindBuffer(GL_ARRAY_BUFFER, normal_vbo)
+            glBufferData(GL_ARRAY_BUFFER, normals.nbytes, normals, GL_STATIC_DRAW)
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
+            glEnableVertexAttribArray(1)
+            
+        tangent_vbo = 0
+        if tangents is not None:
+            tangent_vbo = glGenBuffers(1)
+            glBindBuffer(GL_ARRAY_BUFFER, tangent_vbo)
+            glBufferData(GL_ARRAY_BUFFER, tangents.nbytes, tangents, GL_STATIC_DRAW)
+            glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, None)
+            glEnableVertexAttribArray(2)
+            
+        uv_vbo = 0
+        if uv0 is not None:
+            uv_vbo = glGenBuffers(1)
+            glBindBuffer(GL_ARRAY_BUFFER, uv_vbo)
+            glBufferData(GL_ARRAY_BUFFER, uv0.nbytes, uv0, GL_STATIC_DRAW)
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, None)
+            glEnableVertexAttribArray(3)
+        
+        # Create EBO
+        ebo = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
+        
+        glBindVertexArray(0)
+        
+        # Calculate bounds
+        bounds = mesh_data.get("bounds", {})
+        if not bounds and positions is not None:
+            bounds = _calculate_bounds(positions)
+            
+        return {
+            "vao": vao,
+            "index_count": len(indices),
+            "bounds": bounds,
+            "buffers": [position_vbo, normal_vbo, tangent_vbo, uv_vbo, ebo],
+            "vertex_count": len(positions) // 3,
+            "has_normals": normals is not None,
+            "has_tangents": tangents is not None
+        }
+        
+    except Exception as e:
+        print(f"❌ Failed to load mesh from {json_path}: {e}")
+        return {}
+
+def _load_buffer(buffer_path: str, manifest_dir: str, dtype=np.float32):
+    """Load binary buffer from file path"""
+    if not buffer_path or not buffer_path.startswith("buffer://"):
+        return None
+        
+    filename = buffer_path.replace("buffer://", "")
+    # Resolve relative to manifest directory
+    file_path = Path(manifest_dir) / filename
+    try:
+        return np.fromfile(str(file_path), dtype=dtype)
+    except Exception as e:
+        print(f"❌ Failed to load buffer {file_path}: {e}")
+        return None
+
+def _calculate_bounds(positions):
+    """Calculate AABB bounds from position data"""
+    if len(positions) < 3:
+        return {"center": [0, 0, 0], "radius": 1}
+        
+    pos_3d = positions.reshape(-1, 3)
+    min_vals = np.min(pos_3d, axis=0)
+    max_vals = np.max(pos_3d, axis=0)
+    center = (min_vals + max_vals) * 0.5
+    radius = np.linalg.norm(max_vals - min_vals) * 0.5
+    
+    return {
+        "center": center.tolist(),
+        "radius": float(radius)
+    }
+
+def RenderMeshVAO(vao: int, index_count: int):
+    """Render mesh using VAO with glDrawElements"""
+    if vao == 0 or index_count == 0:
+        return
+        
+    glBindVertexArray(vao)
+    
+    if debug_wireframe:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    else:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        
+    glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, None)
+    
+    glBindVertexArray(0)
+
+def DrawAABB(bounds: dict):
+    """Draw AABB wireframe for debugging"""
+    if not bounds:
+        return
+        
+    center = bounds.get("center", [0, 0, 0])
+    radius = bounds.get("radius", 1)
+    
+    # Simple sphere approximation for now
+    glPushMatrix()
+    glTranslatef(center[0], center[1], center[2])
+    glColor3f(1, 1, 0)  # Yellow wireframe
+    glutWireSphere(radius, 8, 8)
+    glPopMatrix()
+
+def DrawNormals(manifest_path: str, scale: float = 0.1):
+    """Draw normal vectors for debugging"""
+    if not manifest_path:
+        return
+        
+    try:
+        manifest_path_obj = Path(manifest_path)
+        manifest_dir = manifest_path_obj.parent
+        
+        with open(manifest_path, 'r') as f:
+            manifest = json.load(f)
+        
+        mesh_data = manifest.get("mesh", {})
+        if not mesh_data:
+            return
+            
+        # Load positions and normals
+        positions = _load_buffer(mesh_data.get("positions", ""), str(manifest_dir))
+        normals = _load_buffer(mesh_data.get("normals", ""), str(manifest_dir))
+        
+        if positions is None or normals is None:
+            return
+            
+        # Reshape to vertex arrays
+        pos_vertices = positions.reshape(-1, 3)
+        norm_vertices = normals.reshape(-1, 3)
+        
+        # Draw normal lines
+        glDisable(GL_LIGHTING)
+        glLineWidth(1.0)
+        glColor3f(0, 1, 1)  # Cyan for normals
+        
+        glBegin(GL_LINES)
+        for i in range(min(len(pos_vertices), 500)):  # Limit to avoid clutter
+            pos = pos_vertices[i]
+            norm = norm_vertices[i]
+            end_pos = pos + norm * scale
+            
+            glVertex3f(pos[0], pos[1], pos[2])
+            glVertex3f(end_pos[0], end_pos[1], end_pos[2])
+        glEnd()
+        
+        glEnable(GL_LIGHTING)
+        glLineWidth(1.0)
+        
+    except Exception as e:
+        print(f"❌ Failed to draw normals: {e}")
+
+def DrawChunkEdges(chunk: dict, color: Tuple[float, float, float] = (1.0, 0.0, 1.0)):
+    """Draw chunk edge lines for crack detection visualization"""
+    try:
+        chunk_info = chunk.get("chunk_info", {})
+        resolution = chunk_info.get("resolution", 16)
+        positions = chunk.get("positions", np.array([]))
+        
+        if positions.size == 0:
+            return
+        
+        # Reshape positions to grid for edge extraction
+        pos_grid = positions.reshape(resolution, resolution, 3)
+        
+        glDisable(GL_LIGHTING)
+        glLineWidth(2.0)
+        glColor3f(*color)
+        
+        glBegin(GL_LINES)
+        
+        # Draw north edge (top)
+        for i in range(resolution - 1):
+            p1 = pos_grid[resolution-1, i, :]
+            p2 = pos_grid[resolution-1, i+1, :]
+            glVertex3f(p1[0], p1[1], p1[2])
+            glVertex3f(p2[0], p2[1], p2[2])
+        
+        # Draw south edge (bottom)
+        for i in range(resolution - 1):
+            p1 = pos_grid[0, i, :]
+            p2 = pos_grid[0, i+1, :]
+            glVertex3f(p1[0], p1[1], p1[2])
+            glVertex3f(p2[0], p2[1], p2[2])
+        
+        # Draw east edge (right)
+        for j in range(resolution - 1):
+            p1 = pos_grid[j, resolution-1, :]
+            p2 = pos_grid[j+1, resolution-1, :]
+            glVertex3f(p1[0], p1[1], p1[2])
+            glVertex3f(p2[0], p2[1], p2[2])
+        
+        # Draw west edge (left)
+        for j in range(resolution - 1):
+            p1 = pos_grid[j, 0, :]
+            p2 = pos_grid[j+1, 0, :]
+            glVertex3f(p1[0], p1[1], p1[2])
+            glVertex3f(p2[0], p2[1], p2[2])
+        
+        glEnd()
+        
+        glEnable(GL_LIGHTING)
+        glLineWidth(1.0)
+        
+    except Exception as e:
+        print(f"❌ Failed to draw chunk edges: {e}")
+
+def DetectAndDrawCrackLines(chunked_planet: dict):
+    """Detect and visualize potential crack lines between chunks"""
+    if not chunked_planet or chunked_planet.get("type") != "chunked_planet":
+        return
+    
+    try:
+        # Import crack prevention module
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'agents', 'agent_d', 'mesh'))
+        from crack_prevention import LODCrackPrevention
+        
+        chunks = chunked_planet.get("chunks", [])
+        if not chunks:
+            return
+        
+        # Initialize crack detection
+        crack_detector = LODCrackPrevention()
+        
+        # Detect cracks
+        crack_detections = crack_detector.detect_cracks(chunks)
+        
+        # Visualize crack lines
+        glDisable(GL_LIGHTING)
+        glLineWidth(3.0)
+        glColor3f(1.0, 0.0, 0.0)  # Red for potential crack lines
+        
+        # For each potential crack, draw a line between chunk centers
+        glBegin(GL_LINES)
+        
+        drawn_lines = set()  # Avoid duplicate lines
+        
+        for crack_info in crack_detections:
+            chunk_id = crack_info.get("chunk_id", "")
+            neighbor_id = crack_info.get("neighbor_id", "")
+            
+            # Create unique line identifier
+            line_id = tuple(sorted([chunk_id, neighbor_id]))
+            if line_id in drawn_lines:
+                continue
+            drawn_lines.add(line_id)
+            
+            # Find the chunks
+            chunk1 = None
+            chunk2 = None
+            
+            for chunk in chunks:
+                chunk_info = chunk.get("chunk_info", {})
+                if chunk_info.get("chunk_id") == chunk_id:
+                    chunk1 = chunk
+                elif chunk_info.get("chunk_id") == neighbor_id:
+                    chunk2 = chunk
+            
+            if chunk1 and chunk2:
+                # Get chunk centers from AABB
+                aabb1 = chunk1.get("chunk_info", {}).get("aabb", {})
+                aabb2 = chunk2.get("chunk_info", {}).get("aabb", {})
+                
+                center1 = aabb1.get("center", [0, 0, 0])
+                center2 = aabb2.get("center", [0, 0, 0])
+                
+                # Draw line between centers
+                glVertex3f(center1[0], center1[1], center1[2])
+                glVertex3f(center2[0], center2[1], center2[2])
+        
+        glEnd()
+        
+        glEnable(GL_LIGHTING)
+        glLineWidth(1.0)
+        
+        # Print crack detection summary
+        if crack_detections:
+            transition_counts = {}
+            for crack in crack_detections:
+                transition = crack.get("transition_type", "unknown")
+                transition_counts[transition] = transition_counts.get(transition, 0) + 1
+            
+            print(f"🔍 Crack Detection: {len(crack_detections)} potential cracks")
+            for transition, count in transition_counts.items():
+                print(f"   {transition}: {count}")
+        
+    except ImportError:
+        print("⚠️ Crack detection module not available")
+    except Exception as e:
+        print(f"❌ Failed to detect crack lines: {e}")
+
+def LoadChunkedPlanet(planet_manifest_path: str) -> dict:
+    """Load chunked planet from master manifest"""
+    try:
+        manifest_path = Path(planet_manifest_path)
+        manifest_dir = manifest_path.parent
+        
+        with open(planet_manifest_path, 'r') as f:
+            planet_manifest = json.load(f)
+        
+        planet_data = planet_manifest.get("planet", {})
+        if planet_data.get("type") != "chunked_quadtree":
+            print(f"❌ Not a chunked planet: {planet_manifest_path}")
+            return {}
+        
+        chunk_files = planet_manifest.get("chunks", [])
+        loaded_chunks = []
+        
+        print(f"🔧 Loading {len(chunk_files)} chunks...")
+        
+        for chunk_file in chunk_files:
+            chunk_path = manifest_dir / chunk_file
+            chunk_data = LoadMeshFromManifest(str(chunk_path))
+            
+            if chunk_data:
+                # Load chunk metadata
+                with open(chunk_path, 'r') as f:
+                    chunk_manifest = json.load(f)
+                
+                chunk_info = chunk_manifest.get("chunk", {})
+                chunk_data["chunk_info"] = chunk_info
+                chunk_data["manifest_path"] = str(chunk_path)
+                loaded_chunks.append(chunk_data)
+        
+        print(f"✅ Loaded {len(loaded_chunks)} chunks successfully")
+        
+        return {
+            "type": "chunked_planet",
+            "planet_info": planet_data,
+            "chunks": loaded_chunks,
+            "statistics": planet_manifest.get("statistics", {}),
+            "total_vertices": sum(chunk.get("vertex_count", 0) for chunk in loaded_chunks),
+            "total_triangles": sum(chunk.get("index_count", 0) // 3 for chunk in loaded_chunks)
+        }
+        
+    except Exception as e:
+        print(f"❌ Failed to load chunked planet from {planet_manifest_path}: {e}")
+        return {}
+
+def InitializeRuntimeLOD():
+    """Initialize runtime LOD system"""
+    global runtime_lod_manager, chunk_streamer
+    
+    if not RUNTIME_LOD_AVAILABLE:
+        return False
+    
+    try:
+        # Initialize LOD manager
+        runtime_lod_manager = RuntimeLODManager(
+            lod_distance_bands=[3.0, 8.0, 20.0, 50.0],
+            screen_error_thresholds=[0.5, 2.0, 8.0, 32.0],
+            max_chunks_per_frame=80
+        )
+        
+        # Initialize chunk streamer
+        chunk_streamer = ChunkStreamer(
+            max_memory_mb=128.0,
+            max_active_chunks=100,
+            load_budget_ms=3.0
+        )
+        
+        print("✅ Runtime LOD system initialized")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Failed to initialize runtime LOD system: {e}")
+        return False
+
+
+def RenderChunkedPlanetWithLOD(chunked_planet: dict):
+    """Render chunked planet with runtime LOD selection"""
+    global lod_stats
+    
+    import time
+    frame_start = time.time()
+    
+    # Fall back to basic rendering if LOD system not available
+    if not runtime_lod_manager or not chunk_streamer:
+        RenderChunkedPlanet(chunked_planet)
+        return
+    
+    try:
+        # Get camera parameters
+        camera_pos = np.array([camera_x, camera_y, camera_z])
+        
+        # Calculate camera target
+        forward, _, _ = get_camera_vectors()
+        camera_target = camera_pos + forward
+        
+        # Create view and projection matrices  
+        view_matrix = create_view_matrix(camera_pos, camera_target, np.array([0, 1, 0]))
+        proj_matrix = create_projection_matrix(
+            fov_y=math.radians(60), 
+            aspect=window_width/window_height, 
+            near=0.1, 
+            far=100.0
+        )
+        
+        # Get all chunks
+        all_chunks = chunked_planet.get("chunks", [])
+        
+        # Select LOD chunks
+        selected_chunks = runtime_lod_manager.select_active_chunks(
+            all_chunks, camera_pos, view_matrix, proj_matrix,
+            fov_y=math.radians(60), screen_height=window_height
+        )
+        
+        # Update streaming
+        load_queue = [chunk.chunk_id for chunk in selected_chunks if chunk.should_load]
+        unload_queue = [chunk_id for chunk_id in chunk_streamer.loaded_chunks 
+                       if chunk_id not in {c.chunk_id for c in selected_chunks}]
+        
+        def chunk_data_provider(chunk_id):
+            # Find chunk data by ID
+            for chunk in all_chunks:
+                if chunk.get("chunk_info", {}).get("chunk_id") == chunk_id:
+                    return chunk
+            return None
+        
+        chunk_streamer.update_streaming(load_queue, unload_queue, chunk_data_provider)
+        
+        # Render selected chunks
+        glEnable(GL_DEPTH_TEST)
+        
+        if debug_wireframe:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        else:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        
+        chunks_rendered = 0
+        for chunk_lod_info in selected_chunks:
+            if not chunk_lod_info.is_visible:
+                continue
+                
+            vao_id = chunk_streamer.get_chunk_vao(chunk_lod_info.chunk_id)
+            if vao_id is None:
+                continue
+            
+            # Set LOD-based color tinting
+            lod_colors = [
+                (1.0, 0.8, 0.8),  # LOD0: Light red (highest detail)
+                (0.8, 1.0, 0.8),  # LOD1: Light green
+                (0.8, 0.8, 1.0),  # LOD2: Light blue  
+                (1.0, 1.0, 0.8)   # LOD3: Light yellow (lowest detail)
+            ]
+            
+            if debug_runtime_lod and chunk_lod_info.lod_level.value < len(lod_colors):
+                color = lod_colors[chunk_lod_info.lod_level.value]
+                glColor3f(*color)
+            else:
+                glColor3f(1.0, 1.0, 1.0)  # Default white
+            
+            # Bind and render VAO
+            glBindVertexArray(vao_id)
+            
+            # Find original chunk for index count
+            chunk_data = None
+            for chunk in all_chunks:
+                if chunk.get("chunk_info", {}).get("chunk_id") == chunk_lod_info.chunk_id:
+                    chunk_data = chunk
+                    break
+                    
+            if chunk_data:
+                indices = chunk_data.get("indices", np.array([]))
+                if indices.size > 0:
+                    glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
+                    chunks_rendered += 1
+            
+            glBindVertexArray(0)
+        
+        # Update statistics
+        lod_stats_data = runtime_lod_manager.get_lod_statistics()
+        streaming_stats = chunk_streamer.get_streaming_stats()
+        
+        frame_time = (time.time() - frame_start) * 1000
+        lod_stats.update({
+            'frame_time_ms': frame_time,
+            'active_chunks': chunks_rendered,
+            'culled_chunks': lod_stats_data.get('culled_chunks', 0),
+            'lod_levels': {f"LOD{k.value if hasattr(k, 'value') else k}": v 
+                          for k, v in lod_stats_data.get('active_lod_levels', {}).items()},
+            'gpu_memory_mb': chunk_streamer.get_memory_usage_mb()
+        })
+        
+        # Debug visualizations
+        if debug_chunk_aabb:
+            for chunk_lod_info in selected_chunks[:20]:  # Limit for performance
+                # Find original chunk for AABB data
+                for chunk in all_chunks:
+                    if chunk.get("chunk_info", {}).get("chunk_id") == chunk_lod_info.chunk_id:
+                        DrawChunkAABB(chunk)
+                        break
+        
+    except Exception as e:
+        print(f"❌ Runtime LOD rendering error: {e}")
+        # Fall back to basic rendering
+        RenderChunkedPlanet(chunked_planet)
+
+
+def RenderChunkedPlanet(chunked_planet: dict):
+    """Render all chunks of a chunked planet"""
+    if not chunked_planet or chunked_planet.get("type") != "chunked_planet":
+        return
+    
+    chunks = chunked_planet.get("chunks", [])
+    
+    for chunk in chunks:
+        if chunk.get("vao"):
+            # Render the chunk mesh
+            RenderMeshVAO(chunk)
+            
+            # Debug visualizations
+            if debug_chunk_aabb:
+                DrawChunkAABB(chunk)
+            
+            # Draw chunk edges for crack detection
+            if debug_crack_lines:
+                DrawChunkEdges(chunk, color=(0.0, 1.0, 1.0))  # Cyan for chunk edges
+    
+    # Draw crack lines between chunks
+    if debug_crack_lines:
+        DetectAndDrawCrackLines(chunked_planet)
+
+
+def DrawRuntimeLODHUD():
+    """Draw runtime LOD performance HUD"""
+    if not debug_show_hud:
+        return
+    
+    # Switch to orthographic projection for HUD
+    glMatrixMode(GL_PROJECTION)
+    glPushMatrix()
+    glLoadIdentity()
+    glOrtho(0, window_width, 0, window_height, -1, 1)
+    
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
+    
+    # Disable depth testing for HUD
+    glDisable(GL_DEPTH_TEST)
+    
+    # Semi-transparent background
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    
+    # HUD background
+    hud_width = 280
+    hud_height = 160
+    hud_x = 10
+    hud_y = window_height - hud_height - 10
+    
+    glColor4f(0.0, 0.0, 0.0, 0.7)  # Semi-transparent black
+    glBegin(GL_QUADS)
+    glVertex2f(hud_x, hud_y)
+    glVertex2f(hud_x + hud_width, hud_y)
+    glVertex2f(hud_x + hud_width, hud_y + hud_height)
+    glVertex2f(hud_x, hud_y + hud_height)
+    glEnd()
+    
+    # HUD border
+    glColor3f(0.5, 0.8, 1.0)  # Light blue
+    glLineWidth(2.0)
+    glBegin(GL_LINE_LOOP)
+    glVertex2f(hud_x, hud_y)
+    glVertex2f(hud_x + hud_width, hud_y)
+    glVertex2f(hud_x + hud_width, hud_y + hud_height)
+    glVertex2f(hud_x, hud_y + hud_height)
+    glEnd()
+    
+    # HUD text (simplified - just draw colored rectangles for now)
+    text_y = hud_y + hud_height - 20
+    line_height = 18
+    
+    # Frame time indicator
+    frame_color = (0.0, 1.0, 0.0) if lod_stats['frame_time_ms'] < 16.7 else (1.0, 1.0, 0.0) if lod_stats['frame_time_ms'] < 33.3 else (1.0, 0.0, 0.0)
+    frame_bar_width = min(200, lod_stats['frame_time_ms'] * 6)  # Scale for visualization
+    
+    glColor3f(*frame_color)
+    glBegin(GL_QUADS)
+    glVertex2f(hud_x + 80, text_y - 5)
+    glVertex2f(hud_x + 80 + frame_bar_width, text_y - 5)
+    glVertex2f(hud_x + 80 + frame_bar_width, text_y + 10)
+    glVertex2f(hud_x + 80, text_y + 10)
+    glEnd()
+    
+    # Active chunks indicator  
+    text_y -= line_height
+    chunk_color = (0.0, 1.0, 0.0) if lod_stats['active_chunks'] < 50 else (1.0, 1.0, 0.0) if lod_stats['active_chunks'] < 100 else (1.0, 0.0, 0.0)
+    chunk_bar_width = min(200, lod_stats['active_chunks'] * 2)  # Scale for visualization
+    
+    glColor3f(*chunk_color)
+    glBegin(GL_QUADS)
+    glVertex2f(hud_x + 80, text_y - 5)
+    glVertex2f(hud_x + 80 + chunk_bar_width, text_y - 5)
+    glVertex2f(hud_x + 80 + chunk_bar_width, text_y + 10)
+    glVertex2f(hud_x + 80, text_y + 10)
+    glEnd()
+    
+    # LOD level indicators (colored bars for each level)
+    text_y -= line_height
+    lod_colors = [(1.0, 0.0, 0.0), (1.0, 0.5, 0.0), (0.0, 1.0, 0.0), (0.0, 0.5, 1.0)]  # Red, Orange, Green, Blue
+    bar_x = hud_x + 80
+    
+    for i, (lod_level, count) in enumerate(lod_stats.get('lod_levels', {}).items()):
+        if i < len(lod_colors):
+            bar_width = min(40, count * 2)
+            glColor3f(*lod_colors[i])
+            glBegin(GL_QUADS)
+            glVertex2f(bar_x, text_y - 5)
+            glVertex2f(bar_x + bar_width, text_y - 5)
+            glVertex2f(bar_x + bar_width, text_y + 10)
+            glVertex2f(bar_x, text_y + 10)
+            glEnd()
+            bar_x += 45
+    
+    # Memory usage indicator
+    text_y -= line_height
+    memory_color = (0.0, 1.0, 0.0) if lod_stats['gpu_memory_mb'] < 64 else (1.0, 1.0, 0.0) if lod_stats['gpu_memory_mb'] < 128 else (1.0, 0.0, 0.0)
+    memory_bar_width = min(200, lod_stats['gpu_memory_mb'] * 1.5)  # Scale for visualization
+    
+    glColor3f(*memory_color)
+    glBegin(GL_QUADS)
+    glVertex2f(hud_x + 80, text_y - 5)
+    glVertex2f(hud_x + 80 + memory_bar_width, text_y - 5)
+    glVertex2f(hud_x + 80 + memory_bar_width, text_y + 10)
+    glVertex2f(hud_x + 80, text_y + 10)
+    glEnd()
+    
+    # Restore OpenGL state
+    glDisable(GL_BLEND)
+    glEnable(GL_DEPTH_TEST)
+    
+    glPopMatrix()
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+    glMatrixMode(GL_MODELVIEW)
+
+
+def DrawChunkAABB(chunk: dict):
+    """Draw AABB wireframe for a single chunk"""
+    chunk_info = chunk.get("chunk_info", {})
+    aabb = chunk_info.get("aabb", {})
+    
+    if not aabb:
+        return
+    
+    aabb_min = aabb.get("min", [0, 0, 0])
+    aabb_max = aabb.get("max", [0, 0, 0])
+    
+    # Draw wireframe box
+    glDisable(GL_LIGHTING)
+    glLineWidth(1.0)
+    glColor3f(1, 0, 0)  # Red for chunk AABBs
+    
+    # Draw the 12 edges of the box
+    glBegin(GL_LINES)
+    
+    # Bottom face edges
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_min[2])
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_min[2])
+    
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_min[2])
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_max[2])
+    
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_max[2])
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_max[2])
+    
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_max[2])
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_min[2])
+    
+    # Top face edges
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_min[2])
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_min[2])
+    
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_min[2])
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_max[2])
+    
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_max[2])
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_max[2])
+    
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_max[2])
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_min[2])
+    
+    # Vertical edges
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_min[2])
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_min[2])
+    
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_min[2])
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_min[2])
+    
+    glVertex3f(aabb_max[0], aabb_min[1], aabb_max[2])
+    glVertex3f(aabb_max[0], aabb_max[1], aabb_max[2])
+    
+    glVertex3f(aabb_min[0], aabb_min[1], aabb_max[2])
+    glVertex3f(aabb_min[0], aabb_max[1], aabb_max[2])
+    
+    glEnd()
+    
+    glEnable(GL_LIGHTING)
+    glLineWidth(1.0)
+
+def GenerateTestGridMesh() -> dict:
+    """Generate a simple grid mesh for testing"""
+    # Create a simple 2x2 grid
+    positions = np.array([
+        -1.0, 0.0, -1.0,  # 0
+         1.0, 0.0, -1.0,  # 1
+         1.0, 0.0,  1.0,  # 2
+        -1.0, 0.0,  1.0,  # 3
+    ], dtype=np.float32)
+    
+    normals = np.array([
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+    ], dtype=np.float32)
+    
+    indices = np.array([
+        0, 1, 2,  # First triangle
+        0, 2, 3,  # Second triangle
+    ], dtype=np.uint32)
+    
+    # Create VAO
+    vao = glGenVertexArrays(1)
+    glBindVertexArray(vao)
+    
+    # Position VBO
+    position_vbo = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, position_vbo)
+    glBufferData(GL_ARRAY_BUFFER, positions.nbytes, positions, GL_STATIC_DRAW)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+    glEnableVertexAttribArray(0)
+    
+    # Normal VBO
+    normal_vbo = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, normal_vbo)
+    glBufferData(GL_ARRAY_BUFFER, normals.nbytes, normals, GL_STATIC_DRAW)
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, None)
+    glEnableVertexAttribArray(1)
+    
+    # EBO
+    ebo = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
+    
+    glBindVertexArray(0)
+    
+    return {
+        "vao": vao,
+        "index_count": len(indices),
+        "bounds": {"center": [0, 0, 0], "radius": 1.4},
+        "buffers": [position_vbo, normal_vbo, 0, 0, ebo]
+    }
+
 def init_gl():
     """Initialize OpenGL settings"""
+    global mesh_cache
+    
     glClearColor(0.2, 0.4, 0.8, 1.0)  # Nice sky blue background
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_LIGHTING)
@@ -185,6 +1020,9 @@ def init_gl():
     # Material properties
     glEnable(GL_COLOR_MATERIAL)
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+    
+    # Initialize test mesh for replacing spheres
+    mesh_cache["test_grid"] = GenerateTestGridMesh()
 
 def get_camera_vectors():
     """Get camera forward, right, and up vectors"""
@@ -291,8 +1129,12 @@ def display():
 
     # Remove hardcoded walls; rely solely on scene_data
 
+    # Draw chunked planet if loaded
+    if "current_planet" in chunk_cache:
+        RenderChunkedPlanetWithLOD(chunk_cache["current_planet"])
+    
     # Draw objects from scene data
-    if scene_data:
+    elif scene_data:
         for obj in scene_data.get("objects", []):
             obj_type = obj.get("type", "")
             pos = obj.get("pos", [0, 0, 0])
@@ -301,7 +1143,30 @@ def display():
             glPushMatrix()
             glTranslatef(pos[0], pos[1], pos[2])
 
-            if obj_type == "CUBE":
+            if obj_type == "MESH":
+                # Load and render mesh from manifest
+                manifest_path = obj.get("manifest", "")
+                if manifest_path:
+                    mesh_key = f"manifest_{manifest_path}"
+                    if mesh_key not in mesh_cache:
+                        mesh_cache[mesh_key] = LoadMeshFromManifest(manifest_path)
+                    
+                    mesh_data = mesh_cache[mesh_key]
+                    if mesh_data:
+                        if material == "terrain":
+                            glColor3f(0.6, 0.4, 0.2)  # Brown terrain
+                        elif material == "reference":
+                            glColor3f(0.8, 0.8, 0.8)  # Light gray
+                        else:
+                            glColor3f(1.0, 1.0, 1.0)  # White default
+                        
+                        RenderMeshVAO(mesh_data["vao"], mesh_data["index_count"])
+                        if debug_aabb:
+                            DrawAABB(mesh_data["bounds"])
+                        if debug_normals:
+                            DrawNormals(manifest_path, scale=0.1)
+                
+            elif obj_type == "CUBE":
                 size = obj.get("size", [1, 1, 1])
                 if material == "boss":
                     glColor3f(1.0, 0.0, 0.0)  # Bright red for boss
@@ -319,7 +1184,17 @@ def display():
                     glColor3f(0.0, 1.0, 0.0)  # Bright green for player
                 else:
                     glColor3f(1.0, 1.0, 1.0)  # White for other spheres
-                glutSolidSphere(radius, 16, 16)
+                
+                # Use mesh rendering instead of glutSolidSphere
+                glScalef(radius, radius, radius)
+                test_mesh = mesh_cache.get("test_grid")
+                if test_mesh:
+                    RenderMeshVAO(test_mesh["vao"], test_mesh["index_count"])
+                    if debug_aabb:
+                        DrawAABB(test_mesh["bounds"])
+                else:
+                    # Fallback to wireframe if mesh not available
+                    glutWireSphere(radius, 8, 8)
 
             glPopMatrix()
 
@@ -363,6 +1238,9 @@ def display():
         except Exception:
             pass
 
+    # Draw runtime LOD HUD
+    DrawRuntimeLODHUD()
+
     glutSwapBuffers()
 
 def reshape(width, height):
@@ -380,7 +1258,7 @@ def reshape(width, height):
 
 def keyboard(key, x, y):
     """Handle key press"""
-    global movement_speed, mouse_captured, camera_x, camera_y, camera_z
+    global movement_speed, mouse_captured, camera_x, camera_y, camera_z, debug_wireframe, debug_aabb, debug_normals, debug_chunk_aabb, debug_crack_lines, debug_runtime_lod, debug_show_hud
     
     key_code = ord(key) if isinstance(key, bytes) else key
     keys_pressed.add(key_code)
@@ -408,6 +1286,27 @@ def keyboard(key, x, y):
         camera_x, camera_y, camera_z = 0.0, 3.0, 5.0
         camera_pitch, camera_yaw = -20.0, 0.0
         print(f"🔄 Camera reset to start position")
+    elif key == b'f' or key == b'F':  # Toggle wireframe
+        debug_wireframe = not debug_wireframe
+        print(f"🔧 Wireframe mode: {'ON' if debug_wireframe else 'OFF'}")
+    elif key == b'b' or key == b'B':  # Toggle AABB debug
+        debug_aabb = not debug_aabb
+        print(f"🔧 AABB debug: {'ON' if debug_aabb else 'OFF'}")
+    elif key == b'n' or key == b'N':  # Toggle normal visualization
+        debug_normals = not debug_normals
+        print(f"🔧 Normal debug: {'ON' if debug_normals else 'OFF'}")
+    elif key == b'x' or key == b'X':  # Toggle chunk AABB debug (changed from C to avoid conflict)
+        debug_chunk_aabb = not debug_chunk_aabb
+        print(f"🔧 Chunk AABB debug: {'ON' if debug_chunk_aabb else 'OFF'}")
+    elif key == b'z' or key == b'Z':  # Toggle crack line visualization
+        debug_crack_lines = not debug_crack_lines
+        print(f"🔧 Crack line debug: {'ON' if debug_crack_lines else 'OFF'}")
+    elif key == b'l' or key == b'L':  # Toggle runtime LOD debug
+        debug_runtime_lod = not debug_runtime_lod
+        print(f"🔧 Runtime LOD debug: {'ON' if debug_runtime_lod else 'OFF'}")
+    elif key == b'h' or key == b'H':  # Toggle HUD
+        debug_show_hud = not debug_show_hud
+        print(f"🔧 HUD display: {'ON' if debug_show_hud else 'OFF'}")
 
 def keyboard_up(key, x, y):
     """Handle key release"""
@@ -499,11 +1398,25 @@ def render_pcc_game_interactive(scene_file):
     global scene_data, window_title
     
     try:
-        # Load scene data
+        # Load scene data - check if it's a chunked planet
         with open(scene_file, 'r') as f:
             scene_data = json.load(f)
 
-        window_title = f"PCC Game - {Path(scene_file).name}"
+        # Check if this is a chunked planet manifest
+        if scene_data.get("planet", {}).get("type") == "chunked_quadtree":
+            print(f"🪐 Loading chunked planet: {scene_file}")
+            chunked_planet = LoadChunkedPlanet(scene_file)
+            if chunked_planet:
+                chunk_cache["current_planet"] = chunked_planet
+                window_title = f"Chunked Planet - {Path(scene_file).name}"
+                
+                # Initialize runtime LOD system for chunked planets
+                InitializeRuntimeLOD()
+            else:
+                print(f"❌ Failed to load chunked planet")
+                return False
+        else:
+            window_title = f"PCC Game - {Path(scene_file).name}"
         
         print(f"🎮 Opening PCC game: {scene_file}")
         print(f"📊 Scene objects: {len(scene_data.get('objects', []))}")
@@ -516,6 +1429,13 @@ def render_pcc_game_interactive(scene_file):
         print("   C - Move down") 
         print("   +/- - Change movement speed")
         print("   R - Reset camera position")
+        print("   F - Toggle wireframe mode")
+        print("   B - Toggle AABB debug")
+        print("   N - Toggle normal visualization")
+        print("   X - Toggle chunk AABB debug")
+        print("   Z - Toggle crack line debug")
+        print("   L - Toggle runtime LOD debug coloring")
+        print("   H - Toggle performance HUD")
         print("   ESC - Quit")
         print()
         print("🎲 OBJECTIVE: Navigate to the blue target cube!")

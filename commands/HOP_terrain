@@ -1,0 +1,5 @@
+#!/bin/bash
+# Terrain Pipeline High Order Prompt - Convenience Command
+cat /home/colling/PCC-LanguageV2/agents/prompting/high_order_terrain_pipeline.md
+
+

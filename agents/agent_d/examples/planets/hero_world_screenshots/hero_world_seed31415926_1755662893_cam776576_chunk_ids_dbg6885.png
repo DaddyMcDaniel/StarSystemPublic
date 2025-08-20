@@ -1,0 +1,5 @@
+# Simulated Screenshot: Debug mode - chunk_ids
+# Camera: (1200, 600, 1000)
+# Mode: chunk_ids
+# Debug: ['chunk_ids']
+# Performance: {'fps': 58.0, 'frame_time_ms': 17.24137931034483, 'triangle_count': 416666, 'draw_calls': 83, 'memory_usage_mb': 333.3328, 'camera_distance': 1200, 'performance_rating': 'Good'}

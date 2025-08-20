@@ -1,0 +1,5 @@
+#!/bin/bash
+# Low Order Prompt - Viewer T01 (GLUT sphere → VAO/VBO/EBO ingestion)
+cat /home/colling/PCC-LanguageV2/agents/prompting/low_order/main_low_order_prompt_viewer_t01.md
+
+

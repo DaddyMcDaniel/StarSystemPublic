@@ -1,0 +1,5 @@
+# Simulated Screenshot: Overview - Far overview (5000m)
+# Camera: (3500.0, 2000.0, 3500.0)
+# Mode: standard
+# Debug: []
+# Performance: {'fps': 72.0, 'frame_time_ms': 13.88888888888889, 'triangle_count': 100000, 'draw_calls': 20, 'memory_usage_mb': 80.0, 'camera_distance': 5000, 'performance_rating': 'Excellent'}

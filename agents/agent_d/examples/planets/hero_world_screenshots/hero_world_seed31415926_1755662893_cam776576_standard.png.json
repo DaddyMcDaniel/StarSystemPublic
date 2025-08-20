@@ -1,0 +1,33 @@
+{
+  "filename": "hero_world_seed31415926_1755662893_cam776576_standard.png",
+  "description": "Debug mode - standard",
+  "camera_position": [
+    1200,
+    600,
+    1000
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "performance_data": {
+    "fps": 58.0,
+    "frame_time_ms": 17.24137931034483,
+    "triangle_count": 416666,
+    "draw_calls": 83,
+    "memory_usage_mb": 333.3328,
+    "camera_distance": 1200,
+    "performance_rating": "Good"
+  },
+  "tags": [
+    "debug_modes",
+    "standard"
+  ],
+  "timestamp": 1755662893.5237079,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

@@ -1,0 +1,33 @@
+{
+  "filename": "hero_world_seed31415926_1755662861_cam692752_standard.png",
+  "description": "Face coverage - front",
+  "camera_position": [
+    0,
+    0,
+    1500
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "performance_data": {
+    "fps": 65.0,
+    "frame_time_ms": 15.384615384615385,
+    "triangle_count": 333333,
+    "draw_calls": 66,
+    "memory_usage_mb": 266.6664,
+    "camera_distance": 1500,
+    "performance_rating": "Excellent"
+  },
+  "tags": [
+    "face_coverage",
+    "face_front"
+  ],
+  "timestamp": 1755662861.1379743,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

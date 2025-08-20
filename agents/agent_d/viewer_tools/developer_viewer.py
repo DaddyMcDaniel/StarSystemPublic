@@ -15,8 +15,6 @@ Features:
 - Workflow automation for common tasks
 
 Usage:
-    from viewer_tools.developer_viewer import DeveloperViewer
-    
     viewer = DeveloperViewer()
     viewer.load_pcc_file("examples/hero_planet.pcc")
     viewer.run_debug_session()
@@ -32,11 +30,10 @@ import sys
 import os
 
 # Import T16 components
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from hud.diagnostics_hud import DiagnosticsHUD
-from debug_ui.debug_toggles import DebugToggles, ToggleType, CaptureMode
-from camera_tools.debug_camera import DebugCamera, CubeFace
-from viewer_tools.screenshot_tool import ScreenshotTool
+from ..hud.diagnostics_hud import DiagnosticsHUD
+from ..debug_ui.debug_toggles import DebugToggles, ToggleType
+from ..camera_tools.debug_camera import DebugCamera, CubeFace
+from .screenshot_tool import ScreenshotTool, CaptureMode
 
 
 class ViewerMode(Enum):

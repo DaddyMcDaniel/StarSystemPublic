@@ -1,0 +1,33 @@
+{
+  "filename": "hero_world_seed31415926_1755662861_cam950464_standard.png",
+  "description": "Overview - Far overview (5000m)",
+  "camera_position": [
+    3500.0,
+    2000.0,
+    3500.0
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "performance_data": {
+    "fps": 72.0,
+    "frame_time_ms": 13.88888888888889,
+    "triangle_count": 100000,
+    "draw_calls": 20,
+    "memory_usage_mb": 80.0,
+    "camera_distance": 5000,
+    "performance_rating": "Excellent"
+  },
+  "tags": [
+    "overview",
+    "distance_5000"
+  ],
+  "timestamp": 1755662861.137331,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

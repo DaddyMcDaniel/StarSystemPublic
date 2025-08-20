@@ -107,6 +107,9 @@ class SphericalPlanetViewer:
         
         # Player position on sphere surface (start at equator to avoid north pole beacon)
         self.surface_height_offset = 2.5  # Player height above surface (increased)
+        
+        # Render state tracking
+        self.terrain_zones_logged = False
         # Start at equator position to avoid spawning inside north pole beacon
         self.player_sphere_pos = Vector3(self.planet_radius, 0, 0)  # Equator (east)
         surface_normal = self.get_surface_normal(self.player_sphere_pos)
@@ -320,33 +323,183 @@ class SphericalPlanetViewer:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
     def draw_planet_surface(self):
-        """Draw detailed planet surface with curvature"""
+        """Draw detailed planet surface with T17 hero planet terrain"""
         glPushMatrix()
         glTranslatef(*self.planet_center.to_list())
         
-        # Draw main planet surface with texture-like appearance
-        glColor3f(0.4, 0.25, 0.15)  # Rich brown soil
+        # Get terrain data from Agent D
+        terrain_data = self.scene_data.get('terrain', {})
+        height_map = terrain_data.get('height_map', [])
+        biome = terrain_data.get('biome', 'temperate')
         
-        # High-detail sphere for close viewing
+        # Draw base planet surface
+        self._set_biome_color(biome)
         glEnable(GL_LIGHTING)
-        glutSolidSphere(self.planet_radius - 0.1, 32, 32)
         
-        # Draw surface details in concentric rings for curvature effect
-        for ring in range(3):
-            radius = self.planet_radius + ring * 0.05
-            alpha = 0.6 - ring * 0.2
+        if height_map and len(height_map) > 0:
+            # T17 Enhanced: Draw heightfield sphere with terrain data
+            if not self.terrain_zones_logged:
+                print(f"🎨 Rendering {len(height_map)} terrain zones from Agent D")
+                self.terrain_zones_logged = True
             
-            if ring == 0:
-                glColor4f(0.5, 0.3, 0.2, alpha)  # Surface layer
-            elif ring == 1:
-                glColor4f(0.3, 0.5, 0.3, alpha)  # Grass patches
-            else:
-                glColor4f(0.2, 0.3, 0.2, alpha)  # Vegetation
+            # Draw heightfield sphere using T17 terrain data
+            self._draw_heightfield_sphere(height_map)
             
-            # Wire sphere to show surface detail
-            glutWireSphere(radius, 24, 24)
+            # Draw additional terrain features on top
+            self._draw_hero_terrain_zones(height_map)
+            
+        else:
+            # Fallback: Basic sphere
+            glutSolidSphere(self.planet_radius - 0.1, 32, 32)
+        
+        # Draw surface atmosphere effect
+        self._draw_surface_atmosphere(biome)
         
         glPopMatrix()
+    
+    def _set_biome_color(self, biome: str):
+        """Set planet surface color based on biome"""
+        biome_colors = {
+            'lush': (0.2, 0.6, 0.2),      # Green
+            'toxic': (0.6, 0.4, 0.1),     # Toxic yellow-brown
+            'volcanic': (0.5, 0.2, 0.1),  # Dark red
+            'frozen': (0.7, 0.8, 0.9),    # Icy blue
+            'desert': (0.8, 0.7, 0.4),    # Sandy
+            'exotic': (0.4, 0.1, 0.6),    # Purple
+            'temperate': (0.4, 0.5, 0.3), # Earthly brown-green
+        }
+        color = biome_colors.get(biome, (0.4, 0.25, 0.15))
+        glColor3f(*color)
+    
+    def _draw_hero_terrain_zones(self, height_map: List[Dict]):
+        """Draw T17 hero planet terrain zones with proper elevation and features"""
+        for zone in height_map:
+            zone_type = zone.get('type', 'flat')
+            theta = zone.get('theta', 0)
+            phi = zone.get('phi', 0)
+            intensity = zone.get('intensity', 1.0)
+            radius = zone.get('influence_radius', self.planet_radius * 0.1)
+            hero_feature = zone.get('hero_feature', None)
+            
+            # Calculate world position from spherical coordinates
+            x = self.planet_radius * math.sin(phi) * math.cos(theta)
+            y = self.planet_radius * math.cos(phi) 
+            z = self.planet_radius * math.sin(phi) * math.sin(theta)
+            
+            glPushMatrix()
+            glTranslatef(x, y, z)
+            
+            # Draw terrain features based on T17 types
+            if zone_type == 'ridged_mountains' and hero_feature == 'RidgedMF':
+                self._draw_ridged_mountain(intensity, radius)
+            elif zone_type == 'warped_dunes' and hero_feature == 'DomainWarp':
+                self._draw_warped_dunes(intensity, radius)
+            elif zone_type == 'archipelago' and hero_feature == 'LatitudeMask':
+                self._draw_archipelago(intensity, radius)
+            elif zone_type == 'cave_system' and hero_feature == 'GyroidalSDF':
+                self._draw_cave_entrance(intensity, radius)
+            else:
+                # Fallback: Basic elevation change
+                self._draw_basic_terrain(zone_type, intensity, radius)
+            
+            glPopMatrix()
+    
+    def _draw_ridged_mountain(self, intensity: float, radius: float):
+        """Draw T17 ridged mountain feature"""
+        height = intensity * 3.0
+        glColor3f(0.6, 0.5, 0.4)  # Rocky mountain color
+        
+        # Draw jagged mountain peak
+        glBegin(GL_TRIANGLES)
+        for i in range(8):
+            angle = i * math.pi / 4
+            x1 = radius * 0.3 * math.cos(angle)
+            z1 = radius * 0.3 * math.sin(angle)
+            x2 = radius * 0.3 * math.cos(angle + math.pi/4)
+            z2 = radius * 0.3 * math.sin(angle + math.pi/4)
+            
+            # Sharp peak triangles
+            glVertex3f(x1, 0, z1)
+            glVertex3f(0, height, 0)  
+            glVertex3f(x2, 0, z2)
+        glEnd()
+    
+    def _draw_warped_dunes(self, intensity: float, radius: float):
+        """Draw T17 warped dune feature"""
+        height = intensity * 1.0
+        glColor3f(0.8, 0.7, 0.4)  # Sandy dune color
+        
+        # Draw undulating dune surface
+        for i in range(6):
+            angle = i * math.pi / 3
+            x = radius * 0.4 * math.cos(angle)
+            z = radius * 0.4 * math.sin(angle)
+            wave_height = height * (0.5 + 0.5 * math.sin(angle * 2))
+            
+            glPushMatrix()
+            glTranslatef(x, wave_height, z)
+            glutSolidSphere(radius * 0.2, 8, 8)
+            glPopMatrix()
+    
+    def _draw_archipelago(self, intensity: float, radius: float):
+        """Draw T17 equatorial archipelago feature"""
+        glColor3f(0.3, 0.7, 0.8)  # Water/island color
+        
+        # Draw island chain
+        for i in range(4):
+            angle = i * math.pi / 2
+            island_x = radius * 0.6 * math.cos(angle)
+            island_z = radius * 0.6 * math.sin(angle)
+            island_height = intensity * 0.8 * (1 + i * 0.3)
+            
+            glPushMatrix()
+            glTranslatef(island_x, island_height, island_z)
+            glColor3f(0.2, 0.6, 0.2)  # Island green
+            glutSolidSphere(radius * 0.15, 8, 8)
+            glPopMatrix()
+    
+    def _draw_cave_entrance(self, intensity: float, radius: float):
+        """Draw T17 gyroidal cave entrance"""
+        glColor3f(0.1, 0.1, 0.1)  # Dark cave entrance
+        
+        # Draw cave opening
+        glPushMatrix()
+        glTranslatef(0, -intensity * 0.5, 0)
+        glScalef(1.0, 0.3, 1.0)  # Flatten for cave entrance
+        glutSolidSphere(radius * 0.3, 12, 12)
+        glPopMatrix()
+    
+    def _draw_basic_terrain(self, zone_type: str, intensity: float, radius: float):
+        """Draw basic terrain elevation"""
+        height_mult = {
+            'mountainous': 2.5, 'cliff': 2.0, 'rolling': 1.0, 
+            'valley': -0.5, 'crater': -1.0, 'flat': 0.1
+        }.get(zone_type, 1.0)
+        
+        elevation = intensity * height_mult
+        
+        glPushMatrix() 
+        glTranslatef(0, elevation, 0)
+        glScalef(1.0, abs(height_mult), 1.0)
+        glutSolidSphere(radius * 0.2, 8, 8)
+        glPopMatrix()
+    
+    def _draw_surface_atmosphere(self, biome: str):
+        """Draw subtle atmospheric effects"""
+        # Draw surface details in concentric rings for curvature effect
+        for ring in range(2):
+            radius = self.planet_radius + ring * 0.08
+            alpha = 0.3 - ring * 0.15
+            
+            if biome == 'toxic':
+                glColor4f(0.6, 0.5, 0.1, alpha)  # Toxic haze
+            elif biome == 'lush':
+                glColor4f(0.2, 0.6, 0.2, alpha)  # Green vegetation
+            else:
+                glColor4f(0.5, 0.4, 0.3, alpha)  # General atmosphere
+            
+            # Wire sphere to show surface detail
+            glutWireSphere(radius, 16, 16)
     
     def draw_horizon_atmosphere(self):
         """Draw atmospheric effects showing planet curvature"""
@@ -453,6 +606,151 @@ class SphericalPlanetViewer:
         # Fallback: lift up slightly if all equator spots are blocked
         nrm = self.get_surface_normal(self.player_sphere_pos)
         self.player_world_pos = self.planet_center + self.player_sphere_pos + nrm * (self.surface_height_offset + 1.0)
+    
+    def _draw_heightfield_sphere(self, height_map: List[Dict]):
+        """Draw sphere with actual height variations based on Agent D terrain data"""
+        # Create sphere resolution
+        rings = 32
+        sectors = 32
+        
+        # Build heightfield based on terrain zones
+        glBegin(GL_TRIANGLES)
+        
+        for ring in range(rings):
+            for sector in range(sectors):
+                # Calculate sphere coordinates
+                theta1 = ring * math.pi / rings
+                theta2 = (ring + 1) * math.pi / rings
+                phi1 = sector * 2.0 * math.pi / sectors
+                phi2 = (sector + 1) * 2.0 * math.pi / sectors
+                
+                # Get height adjustments for each corner
+                height1 = self._get_terrain_height_at_coords(theta1, phi1, height_map)
+                height2 = self._get_terrain_height_at_coords(theta1, phi2, height_map)
+                height3 = self._get_terrain_height_at_coords(theta2, phi1, height_map)
+                height4 = self._get_terrain_height_at_coords(theta2, phi2, height_map)
+                
+                # Calculate actual positions with height displacement
+                r1 = self.planet_radius + height1
+                r2 = self.planet_radius + height2
+                r3 = self.planet_radius + height3
+                r4 = self.planet_radius + height4
+                
+                # Convert to cartesian coordinates
+                x1 = r1 * math.sin(theta1) * math.cos(phi1)
+                y1 = r1 * math.cos(theta1)
+                z1 = r1 * math.sin(theta1) * math.sin(phi1)
+                
+                x2 = r2 * math.sin(theta1) * math.cos(phi2)
+                y2 = r2 * math.cos(theta1)
+                z2 = r2 * math.sin(theta1) * math.sin(phi2)
+                
+                x3 = r3 * math.sin(theta2) * math.cos(phi1)
+                y3 = r3 * math.cos(theta2)
+                z3 = r3 * math.sin(theta2) * math.sin(phi1)
+                
+                x4 = r4 * math.sin(theta2) * math.cos(phi2)
+                y4 = r4 * math.cos(theta2)
+                z4 = r4 * math.sin(theta2) * math.sin(phi2)
+                
+                # Set color based on terrain type at this location
+                terrain_type = self._get_terrain_type_at_coords(theta1, phi1, height_map)
+                self._set_terrain_zone_color(terrain_type)
+                
+                # Draw two triangles for this quad
+                # Triangle 1
+                glVertex3f(x1, y1, z1)
+                glVertex3f(x2, y2, z2)
+                glVertex3f(x3, y3, z3)
+                
+                # Triangle 2
+                glVertex3f(x2, y2, z2)
+                glVertex3f(x4, y4, z4)
+                glVertex3f(x3, y3, z3)
+        
+        glEnd()
+    
+    def _get_terrain_height_at_coords(self, theta: float, phi: float, height_map: List[Dict]) -> float:
+        """Get terrain height at spherical coordinates based on Agent D terrain zones"""
+        # Convert sphere coordinates to match Agent D's theta/phi system
+        max_height = 0.0
+        
+        for zone in height_map:
+            zone_theta = zone.get('theta', 0)
+            zone_phi = zone.get('phi', 0)
+            influence_radius = zone.get('influence_radius', 1.0)
+            zone_type = zone.get('type', 'flat')
+            
+            # Calculate distance to this zone (angular distance on sphere)
+            dtheta = abs(theta - zone_theta)
+            dphi = abs(phi - zone_phi)
+            distance = math.sqrt(dtheta*dtheta + dphi*dphi)
+            
+            # Apply influence if within radius
+            if distance < influence_radius / self.planet_radius:
+                # Get height range for this terrain type
+                height_ranges = {
+                    'flat': 0.0,
+                    'rolling': 1.0,
+                    'mountainous': 3.0,
+                    'valley': -1.0,
+                    'cliff': 4.0,
+                    'crater': -0.5,
+                    # T17 terrain types with dramatic heights
+                    'ridged_mountains': 8.0,     # Dramatic mountain peaks
+                    'warped_dunes': 2.0,         # Rolling sand dunes
+                    'archipelago': 1.0,          # Island elevation
+                    'cave_system': -2.0          # Underground depressions
+                }
+                
+                base_height = height_ranges.get(zone_type, 0.0)
+                # Apply falloff based on distance
+                falloff = max(0.0, 1.0 - (distance / (influence_radius / self.planet_radius)))
+                height_contribution = base_height * falloff
+                
+                # Use maximum height (for overlapping zones)
+                max_height = max(max_height, height_contribution)
+        
+        return max_height
+    
+    def _get_terrain_type_at_coords(self, theta: float, phi: float, height_map: List[Dict]) -> str:
+        """Get dominant terrain type at spherical coordinates"""
+        closest_zone = None
+        closest_distance = float('inf')
+        
+        for zone in height_map:
+            zone_theta = zone.get('theta', 0)
+            zone_phi = zone.get('phi', 0)
+            
+            # Calculate distance to this zone
+            dtheta = abs(theta - zone_theta)
+            dphi = abs(phi - zone_phi)
+            distance = math.sqrt(dtheta*dtheta + dphi*dphi)
+            
+            if distance < closest_distance:
+                closest_distance = distance
+                closest_zone = zone
+        
+        return closest_zone.get('type', 'flat') if closest_zone else 'flat'
+    
+    def _set_terrain_zone_color(self, terrain_type: str):
+        """Set color based on terrain zone type"""
+        zone_colors = {
+            'flat': (0.4, 0.6, 0.2),           # Grassy green
+            'rolling': (0.5, 0.5, 0.3),        # Rolling hills
+            'mountainous': (0.6, 0.5, 0.4),    # Rocky brown
+            'valley': (0.2, 0.4, 0.1),         # Dark green
+            'cliff': (0.7, 0.6, 0.5),          # Light rock
+            'crater': (0.3, 0.2, 0.2),         # Dark crater
+            # T17 terrain zone colors
+            'ridged_mountains': (0.7, 0.6, 0.5),  # Light rocky peaks
+            'warped_dunes': (0.9, 0.8, 0.6),      # Sandy yellow
+            'archipelago': (0.4, 0.7, 0.9),       # Ocean blue-green
+            'cave_system': (0.2, 0.2, 0.3),       # Dark cave entrances
+        }
+        
+        color = zone_colors.get(terrain_type, (0.5, 0.5, 0.5))
+        glColor3f(*color)
 
     def draw_enhanced_objects(self):
         """Draw scene objects with enhanced Valheim-style materials"""

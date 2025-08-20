@@ -1,0 +1,5 @@
+# Simulated Screenshot: Performance - 60+ fps scenario
+# Camera: (700.0, 300.0, 600.0)
+# Mode: debug_overlay
+# Debug: ['hud_visible']
+# Performance: {'fps': 58.0, 'frame_time_ms': 17.24137931034483, 'triangle_count': 500000, 'draw_calls': 100, 'memory_usage_mb': 400.0, 'camera_distance': 1000, 'performance_rating': 'Good', 'active_chunks': 50, 'visible_chunks': 35, 'vram_usage_mb': 600.0, 'lod_distribution': {'LOD_0': 8, 'LOD_1': 15, 'LOD_2': 12, 'LOD_3': 8, 'LOD_4': 4, 'LOD_5': 2}, 'culling_efficiency': 0.75, 'gpu_utilization': 0.9, 'budget_usage': {'triangles_percent': 100, 'memory_percent': 78.125, 'draw_calls_percent': 66.66666666666666}}

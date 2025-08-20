@@ -134,13 +134,15 @@ def run_agent_d(pcc_file=None):
     """Run Agent D to render planet scene"""
     print("🎨 Agent D: Rendering planet scene...")
     
-    # Generate mini-planet scene for human testing
-    manual_seed = int(time.time()) % 10000  # Keep seed manageable
-    planet_file = f"runs/miniplanet_seed_{manual_seed}.json"
+    # Generate mini-planet scene for human testing - USE HERO WORLD SEED
+    hero_seed = 31415926  # Use T17 hero planet seed for consistent terrain
+    planet_file = f"runs/miniplanet_seed_{hero_seed}.json"
     
-    print(f"🌱 Generating interactive planet scene with seed {manual_seed}")
+    print(f"🌱 Generating interactive planet scene with HERO WORLD seed {hero_seed}")
+    # Use actual PCC file from Agent A instead of dummy.pcc
+    pcc_input = pcc_file if pcc_file else "dummy.pcc"
     result = subprocess.run(
-        ["python", "agents/agent_d_renderer.py", "dummy.pcc", "--seed", str(manual_seed)],
+        ["python", "agents/agent_d_renderer.py", pcc_input, "--seed", str(hero_seed)],
         capture_output=True,
         text=True,
         cwd=Path(__file__).parent.parent

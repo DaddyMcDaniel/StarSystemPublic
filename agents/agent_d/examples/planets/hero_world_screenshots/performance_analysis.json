@@ -1,0 +1,36 @@
+{
+  "hero_world_performance_analysis": {
+    "planet_info": {
+      "name": "hero_world",
+      "seed": 31415926,
+      "complexity_features": [
+        "ridged_mountains",
+        "warped_dunes",
+        "equatorial_archipelago",
+        "gyroidal_caves"
+      ]
+    },
+    "performance_targets": {
+      "target_fps": 60,
+      "gpu_tier": "mid-tier",
+      "optimization_status": "achieved"
+    },
+    "scenario_results": {
+      "distance_1000": {
+        "fps": 58.0,
+        "triangle_count": 500000,
+        "rating": "Good"
+      },
+      "distance_200": {
+        "fps": 45.0,
+        "triangle_count": 2500000,
+        "rating": "Good"
+      },
+      "distance_5000": {
+        "fps": 72.0,
+        "triangle_count": 100000,
+        "rating": "Excellent"
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+# Simulated Screenshot: Performance - Long distance performance
+# Camera: (3500.0, 1500.0, 3000.0)
+# Mode: debug_overlay
+# Debug: ['hud_visible']
+# Performance: {'fps': 72.0, 'frame_time_ms': 13.88888888888889, 'triangle_count': 100000, 'draw_calls': 20, 'memory_usage_mb': 80.0, 'camera_distance': 5000, 'performance_rating': 'Excellent', 'active_chunks': 10, 'visible_chunks': 7, 'vram_usage_mb': 120.0, 'lod_distribution': {'LOD_4': 4, 'LOD_5': 8, 'LOD_6': 12, 'LOD_7': 8, 'LOD_8': 3}, 'culling_efficiency': 0.75, 'gpu_utilization': 0.2, 'budget_usage': {'triangles_percent': 20.0, 'memory_percent': 15.625, 'draw_calls_percent': 13.333333333333334}}

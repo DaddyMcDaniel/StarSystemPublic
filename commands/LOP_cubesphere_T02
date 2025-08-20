@@ -1,0 +1,5 @@
+#!/bin/bash
+# Low Order Prompt - Agent D T02 (Cube-sphere primitive)
+cat /home/colling/PCC-LanguageV2/agents/prompting/low_order/main_low_order_prompt_cubesphere_t02.md
+
+

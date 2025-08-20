@@ -1,0 +1,53 @@
+{
+  "filename": "hero_world_seed31415926_1755662861_cam933662_debug_overlay_dbg8312.png",
+  "description": "Performance - High detail stress test",
+  "camera_position": [
+    140.0,
+    60.0,
+    120.0
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 60.0,
+  "capture_mode": "debug_overlay",
+  "debug_toggles": [
+    "hud_visible"
+  ],
+  "performance_data": {
+    "fps": 45.0,
+    "frame_time_ms": 22.22222222222222,
+    "triangle_count": 2500000,
+    "draw_calls": 150,
+    "memory_usage_mb": 2000.0,
+    "camera_distance": 200,
+    "performance_rating": "Good",
+    "active_chunks": 64,
+    "visible_chunks": 44,
+    "vram_usage_mb": 3000.0,
+    "lod_distribution": {
+      "LOD_0": 15,
+      "LOD_1": 12,
+      "LOD_2": 8,
+      "LOD_3": 4,
+      "LOD_4": 2
+    },
+    "culling_efficiency": 0.75,
+    "gpu_utilization": 0.9,
+    "budget_usage": {
+      "triangles_percent": 100,
+      "memory_percent": 100,
+      "draw_calls_percent": 100
+    }
+  },
+  "tags": [
+    "performance",
+    "stress_test",
+    "distance_200"
+  ],
+  "timestamp": 1755662861.1411371,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

@@ -1,0 +1,36 @@
+{
+  "filename": "hero_world_seed31415926_1755662893_cam726816_standard_dbg2816.png",
+  "description": "Cave system interior view 3",
+  "camera_position": [
+    200,
+    -100,
+    -600
+  ],
+  "camera_target": [
+    0,
+    0,
+    0
+  ],
+  "camera_fov": 75.0,
+  "capture_mode": "standard",
+  "debug_toggles": [
+    "cave_only"
+  ],
+  "performance_data": {
+    "fps": 45.0,
+    "frame_time_ms": 22.22222222222222,
+    "triangle_count": 833333,
+    "draw_calls": 150,
+    "memory_usage_mb": 666.6664000000001,
+    "camera_distance": 600,
+    "performance_rating": "Good"
+  },
+  "tags": [
+    "cave_system",
+    "interior",
+    "position_3"
+  ],
+  "timestamp": 1755662893.5233264,
+  "pcc_name": "hero_world",
+  "seed": 31415926
+}

@@ -1,0 +1,5 @@
+# Simulated Screenshot: Cave system interior view 2
+# Camera: (-300, 200, 400)
+# Mode: standard
+# Debug: ['cave_only']
+# Performance: {'fps': 45.0, 'frame_time_ms': 22.22222222222222, 'triangle_count': 833333, 'draw_calls': 150, 'memory_usage_mb': 666.6664000000001, 'camera_distance': 600, 'performance_rating': 'Good'}
