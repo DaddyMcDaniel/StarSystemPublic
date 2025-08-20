@@ -1,0 +1,63 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "sphere",
+        "radius": 27.11784903986556,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "ice_crystal"
+      },
+      "features": [
+        {
+          "type": "ANCIENT_STRUCTURE",
+          "style": "temple",
+          "material": "structure_temple"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "BEACON_NETWORK",
+          "range": "global",
+          "material": "beacon_minor"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "CREATE_NETWORK",
+        "target": "beacon_grid",
+        "global_visibility": true
+      }
+    }
+  ],
+  "compression_id": "C8425",
+  "planet_seed": 930061,
+  "assets": [
+    "ruin_temple_column_v1",
+    "ruin_arch_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "pcc_name": "miniplanet_t17_enhanced",
+  "pcc_file_path": "",
+  "seed": 4734,
+  "camera_position": [
+    0.0,
+    0.0,
+    100.0
+  ],
+  "camera_target": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera_fov": 60.0,
+  "timestamp": 1755664771.422238,
+  "human_timestamp": "2025-08-20T00:39:31.422238",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "capture_mode": "standard",
+  "debug_toggles": [],
+  "render_settings": {},
+  "performance_stats": {},
+  "description": "Debug session screenshot - content_review",
+  "tags": []
+}

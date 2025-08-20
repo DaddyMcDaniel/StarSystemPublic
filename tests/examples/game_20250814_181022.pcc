@@ -1,0 +1,109 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "realistic_miniplanet",
+        "generation_method": "nms_inspired_procedural",
+        "biome": "swamp",
+        "radius": 76.49258958772491,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "ice_crystal",
+        "heightmap": {
+          "noise_octaves": 7,
+          "height_variation": 0.2761221245840112,
+          "erosion_factor": 0.14930512232840676,
+          "ridge_sharpness": 0.21528957498964887
+        },
+        "geological_features": {
+          "crater_density": 0.10735177959753109,
+          "mountain_ranges": 3,
+          "valley_systems": 6,
+          "cliff_formations": true,
+          "cave_networks": false,
+          "natural_arches": true
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.32411536976882027,
+          "surface_roughness": 0.12240710683274107,
+          "rock_scatter": 0.41233413190867185,
+          "organic_variation": true
+        },
+        "terrain_layers": {
+          "surface": "ice_crystal",
+          "weathered_layer": "weathered_swamp",
+          "bedrock": "granite",
+          "subsurface": "underground_water",
+          "core": "dense_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.9296718504609189,
+          "lighting_type": "harsh",
+          "weather_effects": true,
+          "horizon_quality": "curved_realistic"
+        },
+        "rendering": {
+          "chunk_system": true,
+          "level_of_detail": true,
+          "seamless_chunks": true,
+          "estimated_polygons": 14023086
+        },
+        "notes": "Realistic swamp mini-planet with No Man's Sky inspired terrain generation"
+      },
+      "features": [
+        {
+          "type": "RESOURCE_NODES",
+          "material": "resource_ore",
+          "density": "medium"
+        },
+        {
+          "type": "CAVE_SYSTEMS",
+          "material": "cave_entrance",
+          "depth": "surface"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "EXTRACTION_ZONE",
+          "resource_type": "ore",
+          "efficiency": "standard"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "ESTABLISH_MINING",
+        "target": "resource_network",
+        "planet_coverage": 0.3
+      }
+    }
+  ],
+  "compression_id": "C3327",
+  "planet_seed": 497997,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

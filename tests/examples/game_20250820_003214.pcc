@@ -1,0 +1,108 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "realistic_miniplanet",
+        "generation_method": "nms_inspired_procedural",
+        "biome": "temperate",
+        "radius": 70.32158842935826,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "bio_soil",
+        "heightmap": {
+          "noise_octaves": 7,
+          "height_variation": 0.23268357960413275,
+          "erosion_factor": 0.2933150084400259,
+          "ridge_sharpness": 0.5396471016446088
+        },
+        "geological_features": {
+          "crater_density": 0.10361076611834782,
+          "mountain_ranges": 1,
+          "valley_systems": 3,
+          "cliff_formations": true,
+          "cave_networks": false,
+          "natural_arches": true
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.6221806103827876,
+          "surface_roughness": 0.38805592256235955,
+          "rock_scatter": 0.25128368247345784,
+          "organic_variation": true
+        },
+        "terrain_layers": {
+          "surface": "bio_soil",
+          "weathered_layer": "weathered_temperate",
+          "bedrock": "basalt",
+          "subsurface": "cave_systems",
+          "core": "dense_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.9299515866947732,
+          "lighting_type": "filtered",
+          "weather_effects": true,
+          "horizon_quality": "curved_realistic"
+        },
+        "rendering": {
+          "chunk_system": true,
+          "level_of_detail": true,
+          "seamless_chunks": true,
+          "estimated_polygons": 5021769
+        },
+        "notes": "Realistic temperate mini-planet with No Man's Sky inspired terrain generation"
+      },
+      "features": [
+        {
+          "type": "ANCIENT_STRUCTURE",
+          "style": "temple",
+          "material": "structure_temple"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "BEACON_NETWORK",
+          "range": "global",
+          "material": "beacon_minor"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "CREATE_NETWORK",
+        "target": "beacon_grid",
+        "global_visibility": true
+      }
+    }
+  ],
+  "compression_id": "C8382",
+  "planet_seed": 471111,
+  "assets": [
+    "foliage_grass_clump_v1",
+    "foliage_shrub_v1",
+    "ruin_temple_column_v1",
+    "ruin_arch_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

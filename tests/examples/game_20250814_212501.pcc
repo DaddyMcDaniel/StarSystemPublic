@@ -1,0 +1,107 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "realistic_miniplanet",
+        "generation_method": "nms_inspired_procedural",
+        "biome": "volcanic",
+        "radius": 51.61133623230464,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "bio_soil",
+        "heightmap": {
+          "noise_octaves": 7,
+          "height_variation": 0.257141189425826,
+          "erosion_factor": 0.17149138889143486,
+          "ridge_sharpness": 0.5662550088680354
+        },
+        "geological_features": {
+          "crater_density": 0.1062998486595434,
+          "mountain_ranges": 3,
+          "valley_systems": 6,
+          "cliff_formations": true,
+          "cave_networks": true,
+          "natural_arches": true
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.5907876778277171,
+          "surface_roughness": 0.3041285611604753,
+          "rock_scatter": 0.335831278134444,
+          "organic_variation": true
+        },
+        "terrain_layers": {
+          "surface": "bio_soil",
+          "weathered_layer": "weathered_volcanic",
+          "bedrock": "limestone",
+          "subsurface": "cave_systems",
+          "core": "dense_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.7163850548299824,
+          "lighting_type": "harsh",
+          "weather_effects": true,
+          "horizon_quality": "curved_realistic"
+        },
+        "rendering": {
+          "chunk_system": true,
+          "level_of_detail": true,
+          "seamless_chunks": true,
+          "estimated_polygons": 7628177
+        },
+        "notes": "Realistic volcanic mini-planet with No Man's Sky inspired terrain generation"
+      },
+      "features": [
+        {
+          "type": "CRYSTAL_FORMATION",
+          "distribution": "scattered",
+          "material": "resource_crystal"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "TRANSPORT_HUB",
+          "capacity": "multi_player",
+          "material": "structure_hub"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "CONNECT_ZONES",
+        "target": "transport_system",
+        "efficiency": "optimal"
+      }
+    }
+  ],
+  "compression_id": "C4942",
+  "planet_seed": 291906,
+  "assets": [
+    "foliage_grass_clump_v1",
+    "foliage_shrub_v1",
+    "crystal_cluster_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

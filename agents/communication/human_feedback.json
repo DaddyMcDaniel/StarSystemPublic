@@ -1,23 +1,23 @@
 {
-  "timestamp": "2025-08-14T01:07:36.281746",
+  "timestamp": "2025-08-20T00:53:01.933476",
   "tester": "human",
   "session_type": "manual_evolution",
   "spherical_mechanics": {
-    "surface_walking": "excellent",
+    "surface_walking": "good",
     "horizon_curvature": "yes",
     "circumnavigation": "yes"
   },
   "visual_quality": {
-    "planet_size": "too_small",
-    "terrain_variety": "nes a new terrain randomization system. Assets dont work, we need a way to provide the actual floor with lows and highs. right now t earth is only a sphere from afar. up close the planet should have iffs like earth. Using assets and meshes will not work for anything other than trees and rocks. Also, add labels over the objects so I can tell what they are, all meshes are just ",
-    "lighting": "too_bright"
+    "planet_size": "perfect",
+    "terrain_variety": "still pretty bad",
+    "lighting": "good"
   },
   "building_potential": {
-    "suitable_zones": "none",
-    "resource_visibility": "no idea"
+    "suitable_zones": "few",
+    "resource_visibility": ""
   },
-  "overall_rating": 3,
-  "top_issue": "the terrain generation. Asset building will take a lot of time and may require cloud retirevaHowever, terrain can be edited as a whole (procedural generation), using more/smaller cubes or triangles as the planet floor.",
-  "best_feature": "the camera. It properly walks along the surface like you are walking on a mini-moon, huge success!",
-  "next_improvement": "The terrain and world size. Along with how the world is generated, it should be a \"sphere\" made from hundreds/thousands of tiny squares/triangles. Not a sold sphere mesh\u001b[D\u001b"
+  "overall_rating": 2,
+  "top_issue": "terrain",
+  "best_feature": "the navigation",
+  "next_improvement": "the terrain"
 }

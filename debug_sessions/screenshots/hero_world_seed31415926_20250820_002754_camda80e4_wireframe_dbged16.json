@@ -1,0 +1,31 @@
+{
+  "pcc_name": "hero_world",
+  "pcc_file_path": "",
+  "seed": 31415926,
+  "camera_position": [
+    0.0,
+    1500.0,
+    0.0
+  ],
+  "camera_target": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera_fov": 60.0,
+  "timestamp": 1755664074.5025928,
+  "human_timestamp": "2025-08-20T00:27:54.502593",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "capture_mode": "wireframe",
+  "debug_toggles": [
+    "wireframe",
+    "lod_heatmap"
+  ],
+  "render_settings": {},
+  "performance_stats": {},
+  "description": "Debug session screenshot - content_review",
+  "tags": []
+}

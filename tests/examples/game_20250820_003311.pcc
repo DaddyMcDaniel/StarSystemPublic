@@ -1,0 +1,112 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "realistic_miniplanet",
+        "generation_method": "nms_inspired_procedural",
+        "biome": "lush",
+        "radius": 58.86360036197172,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "bio_soil",
+        "heightmap": {
+          "noise_octaves": 5,
+          "height_variation": 0.1721396058370108,
+          "erosion_factor": 0.13356482131079206,
+          "ridge_sharpness": 0.7309757034277156
+        },
+        "geological_features": {
+          "crater_density": 0.14917467486249425,
+          "mountain_ranges": 1,
+          "valley_systems": 3,
+          "cliff_formations": true,
+          "cave_networks": true,
+          "natural_arches": false
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.39577263514743904,
+          "surface_roughness": 0.26043328351783424,
+          "rock_scatter": 0.5678106206374474,
+          "organic_variation": true
+        },
+        "terrain_layers": {
+          "surface": "bio_soil",
+          "weathered_layer": "weathered_lush",
+          "bedrock": "sandstone",
+          "subsurface": "cave_systems",
+          "core": "dense_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.7985429006758628,
+          "lighting_type": "natural",
+          "weather_effects": true,
+          "horizon_quality": "curved_realistic"
+        },
+        "rendering": {
+          "chunk_system": true,
+          "level_of_detail": true,
+          "seamless_chunks": true,
+          "estimated_polygons": 4816576
+        },
+        "notes": "Realistic lush mini-planet with No Man's Sky inspired terrain generation"
+      },
+      "features": [
+        {
+          "type": "CRYSTAL_FORMATION",
+          "distribution": "scattered",
+          "material": "resource_crystal"
+        },
+        {
+          "type": "RESOURCE_NODES",
+          "material": "resource_ore",
+          "density": "medium"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "EXTRACTION_ZONE",
+          "resource_type": "ore",
+          "efficiency": "standard"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "ESTABLISH_MINING",
+        "target": "resource_network",
+        "planet_coverage": 0.3
+      }
+    }
+  ],
+  "compression_id": "C1421",
+  "planet_seed": 981040,
+  "assets": [
+    "foliage_grass_clump_v1",
+    "foliage_shrub_v1",
+    "crystal_cluster_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

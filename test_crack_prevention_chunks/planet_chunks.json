@@ -1,0 +1,29 @@
+{
+  "planet": {
+    "type": "chunked_quadtree",
+    "max_depth": 2,
+    "chunk_resolution": 16,
+    "total_chunks": 18,
+    "has_crack_prevention": true
+  },
+  "chunks": [
+    "test_chunk_0.json",
+    "test_chunk_1.json",
+    "test_chunk_2.json",
+    "test_chunk_3.json",
+    "test_chunk_4.json",
+    "test_chunk_5.json",
+    "test_chunk_6.json",
+    "test_chunk_7.json",
+    "test_chunk_8.json",
+    "test_chunk_9.json",
+    "test_chunk_10.json",
+    "test_chunk_11.json",
+    "test_chunk_12.json",
+    "test_chunk_13.json",
+    "test_chunk_14.json",
+    "test_chunk_15.json",
+    "test_chunk_16.json",
+    "test_chunk_17.json"
+  ]
+}

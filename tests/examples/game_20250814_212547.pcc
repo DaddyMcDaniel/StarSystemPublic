@@ -1,0 +1,104 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "realistic_miniplanet",
+        "generation_method": "nms_inspired_procedural",
+        "biome": "mountainous",
+        "radius": 54.40307664006593,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "glow_earth",
+        "heightmap": {
+          "noise_octaves": 7,
+          "height_variation": 0.2257723567190113,
+          "erosion_factor": 0.2759417417879543,
+          "ridge_sharpness": 0.799796212403912
+        },
+        "geological_features": {
+          "crater_density": 0.11347244631140362,
+          "mountain_ranges": 4,
+          "valley_systems": 3,
+          "cliff_formations": false,
+          "cave_networks": true,
+          "natural_arches": false
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.401652247964286,
+          "surface_roughness": 0.36553092762931716,
+          "rock_scatter": 0.41995779379223497,
+          "organic_variation": true
+        },
+        "terrain_layers": {
+          "surface": "glow_earth",
+          "weathered_layer": "weathered_mountainous",
+          "bedrock": "limestone",
+          "subsurface": "underground_water",
+          "core": "dense_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.9356967525983801,
+          "lighting_type": "harsh",
+          "weather_effects": false,
+          "horizon_quality": "curved_realistic"
+        },
+        "rendering": {
+          "chunk_system": true,
+          "level_of_detail": true,
+          "seamless_chunks": true,
+          "estimated_polygons": 5371803
+        },
+        "notes": "Realistic mountainous mini-planet with No Man's Sky inspired terrain generation"
+      },
+      "features": [
+        {
+          "type": "ATMOSPHERIC_EFFECT",
+          "style": "orbital_rings",
+          "visibility": "high"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "PLATFORM_ZONE",
+          "size": "medium",
+          "material": "structure_platform"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "BUILD_STRUCTURE",
+        "target": "platform_base",
+        "circumnavigation_required": true
+      }
+    }
+  ],
+  "compression_id": "C6071",
+  "planet_seed": 868332,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}

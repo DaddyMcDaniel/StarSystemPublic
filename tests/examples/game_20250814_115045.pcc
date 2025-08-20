@@ -1,0 +1,80 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "voxel_sphere",
+        "generation_method": "procedural_cubes",
+        "radius": 44.091497993277656,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "material": "bio_soil",
+        "voxel_resolution": 0.7398517005459494,
+        "surface_detail": "high",
+        "chunk_system": true,
+        "estimated_voxels": 851077,
+        "terrain_layers": {
+          "surface": "bio_soil",
+          "subsurface": "rock",
+          "core": "dense_rock"
+        },
+        "building_foundation": "voxel_aligned",
+        "notes": "Procedural generation using thousands of tiny cubes instead of solid sphere mesh"
+      },
+      "features": [
+        {
+          "type": "RESOURCE_NODES",
+          "material": "resource_ore",
+          "density": "medium"
+        },
+        {
+          "type": "CAVE_SYSTEMS",
+          "material": "cave_entrance",
+          "depth": "surface"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "EXTRACTION_ZONE",
+          "resource_type": "ore",
+          "efficiency": "standard"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "ESTABLISH_MINING",
+        "target": "resource_network",
+        "planet_coverage": 0.3
+      }
+    }
+  ],
+  "compression_id": "C8771",
+  "planet_seed": 612820,
+  "assets": [
+    "foliage_grass_clump_v1",
+    "foliage_shrub_v1",
+    "rock_boulder_v1",
+    "ground_patch_v1"
+  ]
+}

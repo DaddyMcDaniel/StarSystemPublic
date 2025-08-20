@@ -56,17 +56,9 @@ Enhanced Contracts (Reference Only - Agent A Focus Areas)
 - Schematic Cards: Design self-contained build components for player sharing
 - Deterministic Seeds: All generated code must follow seed cascade patterns
 - Building Systems: Create grid-based placement and validation logic inspired by Terraria/Eco hammer-style block configuration
-- Planet Generation: Generate spherical mini-planets with true surface-walking mechanics, curved horizons, and circumnavigation capability. Focus on building-ready zones and resource placement for creative construction workflows
+- Planet Generation: Generate a layered, navigatable, alien-like mini-planet with creative sandbox building potential
 
 Agent A must ensure all generated code includes proper seed_used outputs and follows the global seed cascade. Focus on creative building tools that allow unlimited time for player expression, similar to Halo Forge mode.
-
-SPHERICAL PLANET BENCHMARKS:
-- Generated planets must have radius 20-35 units for optimal exploration time
-- Player spawn position must be at equator to avoid north pole beacon collision
-- All prompts must focus on spherical worldbuilding, not flat 2D game concepts
-- AST structure must use SPHERICAL_WORLD type with proper terrain/features/building_zones
-- Deterministic planet_seed must be included for reproducible generation
-- Features must include navigation beacons, resource nodes, and building-ready zones
 <!-- HOP:CONTRACTS v1 END -->
 
 Deliverable
