@@ -1178,35 +1178,39 @@ def handle_movement():
     # Current camera position
     camera_pos = np.array([camera_x, camera_y, camera_z])
     
-    # Calculate spherical navigation vectors
-    # up = normalize(camera_pos - center)
+    # Calculate player's local coordinate system
+    # Player local "up" = radial direction away from planet center
     up_vec = camera_pos - planet_center
     up_length = np.linalg.norm(up_vec)
     if up_length > 0:
-        up = up_vec / up_length
+        local_up = up_vec / up_length
     else:
-        up = np.array([0.0, 1.0, 0.0])
+        local_up = np.array([0.0, 1.0, 0.0])
     
-    # reference_axis = (0,0,1) unless nearly parallel to up, else (1,0,0)
-    reference_axis = np.array([0.0, 0.0, 1.0])
-    if abs(np.dot(up, reference_axis)) > 0.9:  # Nearly parallel
-        reference_axis = np.array([1.0, 0.0, 0.0])
+    # Get camera's current forward direction from camera orientation
+    camera_forward, camera_right, _ = get_camera_vectors()
     
-    # right = normalize(cross(up, reference_axis))
-    right = np.cross(up, reference_axis)
-    right_length = np.linalg.norm(right)
-    if right_length > 0:
-        right = right / right_length
+    # Project camera forward onto the tangent plane (remove radial component)
+    # This gives us the player's surface-relative forward direction
+    forward_projected = camera_forward - np.dot(camera_forward, local_up) * local_up
+    forward_length = np.linalg.norm(forward_projected)
+    if forward_length > 0.01:  # Valid projection
+        local_forward = forward_projected / forward_length
     else:
-        right = np.array([1.0, 0.0, 0.0])
+        # Camera pointing straight up/down - use arbitrary tangent direction
+        if abs(local_up[0]) < 0.9:
+            local_forward = np.cross(local_up, np.array([1.0, 0.0, 0.0]))
+        else:
+            local_forward = np.cross(local_up, np.array([0.0, 1.0, 0.0]))
+        local_forward = local_forward / np.linalg.norm(local_forward)
     
-    # forward = normalize(cross(right, up))
-    forward = np.cross(right, up)
-    forward_length = np.linalg.norm(forward)
-    if forward_length > 0:
-        forward = forward / forward_length
-    else:
-        forward = np.array([0.0, 0.0, 1.0])
+    # Calculate right vector perpendicular to both up and forward
+    local_right = np.cross(local_forward, local_up)
+    local_right = local_right / np.linalg.norm(local_right)
+    
+    # Use local coordinate system for movement
+    forward = local_forward
+    right = local_right
 
     # Tangential movement
     movement_delta = np.array([0.0, 0.0, 0.0])
@@ -1274,18 +1278,20 @@ def display():
     look_y = camera_y + forward[1] 
     look_z = camera_z + forward[2]
 
-    # Set up camera
-    gluLookAt(camera_x, camera_y, camera_z, look_x, look_y, look_z, 0, 1, 0)
+    # Calculate spherical "up" vector (away from planet center)
+    planet_center = np.array([0.0, 0.0, 0.0])
+    camera_pos = np.array([camera_x, camera_y, camera_z])
+    up_vec = camera_pos - planet_center
+    up_length = np.linalg.norm(up_vec)
+    if up_length > 0:
+        up = up_vec / up_length
+    else:
+        up = np.array([0.0, 1.0, 0.0])  # Fallback
 
-    # Draw large ground plane
-    glColor3f(0.3, 0.7, 0.3)  # Nice green
-    glBegin(GL_QUADS)
-    glNormal3f(0, 1, 0)
-    glVertex3f(-50, 0, -50)
-    glVertex3f(-50, 0, 50)
-    glVertex3f(50, 0, 50)
-    glVertex3f(50, 0, -50)
-    glEnd()
+    # Set up camera with spherical orientation
+    gluLookAt(camera_x, camera_y, camera_z, look_x, look_y, look_z, up[0], up[1], up[2])
+
+    # Ground plane removed - using spherical planet surface instead
 
     # Draw grid lines for reference
     glColor3f(0.2, 0.5, 0.2)

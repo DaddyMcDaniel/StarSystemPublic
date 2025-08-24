@@ -42,8 +42,9 @@ OUTPUT_FILE="generated_planets/miniplanet_seed_${SEED_VALUE}_${TIMESTAMP}.json"
 
 echo "🌍 Generating mini-planet with seed: $SEED_VALUE"
 
-# Use Agent D (the working system) instead of broken create_mini_planet.py
-$PYTHON agents/agent_d_renderer.py --seed "$SEED_VALUE" --output "$OUTPUT_FILE"
+# Use unified system (replaces Agent D and create_mini_planet.py)
+$PYTHON unified_miniplanet.py --seed "$SEED_VALUE"
+OUTPUT_FILE="unified_planet_seed_${SEED_VALUE}.json"
 
 if [[ -n "$VIEW" ]]; then
   echo "🎮 Launching viewer..."

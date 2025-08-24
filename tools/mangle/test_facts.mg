@@ -1,0 +1,2 @@
+fact("test").
+fact("hello").

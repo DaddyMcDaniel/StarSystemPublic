@@ -1,0 +1,14 @@
+# PCC-LanguageV2 AI Tools Dependencies  
+# Include core dependencies
+-r requirements.txt
+
+# === REINFORCEMENT LEARNING ===
+stable-baselines3>=2.0.0,<3.0.0
+gymnasium>=0.28.0,<1.0.0
+# For: Agent B RL training (optional)
+
+# === WEB AUTOMATION ===
+selenium>=4.0.0,<5.0.0
+# For: Web-based testing, research automation
+
+# Note: Playwright is managed separately in automation/playwright/package.json

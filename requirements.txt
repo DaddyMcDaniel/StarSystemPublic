@@ -1,0 +1,43 @@
+# PCC-LanguageV2 Core Dependencies
+# Generated: 2025-08-24
+# Critical dependencies identified from Stage-1 cleanup analysis
+
+# === CORE NUMERICAL & SCIENTIFIC ===
+numpy>=1.24.0,<2.0.0
+# Used in: 30+ files including unified_miniplanet.py, renderer/pcc_game_viewer.py
+# Critical for: Terrain generation, mesh processing, mathematical operations
+
+# === 3D GRAPHICS & RENDERING ===
+PyOpenGL>=3.1.6,<4.0.0
+PyOpenGL-accelerate>=3.1.6,<4.0.0
+# Used in: All renderer/* files, agents/agent_d/lighting/, cave_viewer_extension.py
+# Critical for: 3D visualization, OpenGL rendering, shader management
+
+# === IMAGE PROCESSING ===
+Pillow>=9.0.0,<11.0.0
+# Used in: renderer/pcc_game_viewer.py, agents/agent_b_tester.py, forge/core/capabilities.py
+# Critical for: Screenshot capture, image manipulation, texture processing
+
+# === OPTIONAL PLOTTING ===
+matplotlib>=3.5.0,<4.0.0
+# Used in: forge/core/capabilities.py
+# Optional for: Data visualization, debug plots
+
+# === NETWORK REQUESTS ===
+requests>=2.28.0,<3.0.0
+# Used in: crew/agents_local.py
+# Optional for: Web research, API calls
+
+# === DEVELOPMENT DEPENDENCIES ===
+# (Consider moving these to requirements-dev.txt later)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=4.0.0
+
+# === NOTES ===
+# Version ranges chosen for:
+# - numpy: 1.24+ has important fixes, <2.0 for compatibility
+# - PyOpenGL: Stable 3.1.6+ series, avoid 4.0 breaking changes
+# - Pillow: 9.0+ for security fixes, <11.0 for stability
+# - matplotlib: 3.5+ has good feature set, <4.0 for compatibility
+# - requests: 2.28+ is stable, <3.0 avoids breaking changes

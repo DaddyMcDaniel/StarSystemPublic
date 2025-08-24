@@ -92,10 +92,8 @@ python test_3d_viewer.py
 ./commands/LOP_miniplanet --seed 42 --view   # Generate and launch viewer
 ./commands/LOP_miniplanet --quick --view     # Quick mode for testing
 
-# Unified planet generation system
-python unified_miniplanet.py --seed 12345    # Advanced planet generation
-python create_mini_planet.py                 # Alternative planet creation
-python generate_miniplanet.py                # Direct generation script
+# Unified planet generation system (primary)
+python unified_miniplanet.py --seed 12345    # Main planet generation system
 
 # Visual demonstration and testing
 python terrain_visual_demo.py                # Terrain improvements demo
@@ -111,7 +109,7 @@ python test_ai_tools.py
 python test_vm_execution.py
 python test_integration.py
 python test_forge_quick.py
-python test_chunk_streaming.py              # Test T19+ streaming system
+# Note: test_chunk_streaming.py was removed - functionality integrated into unified_miniplanet.py
 
 # Test evolved games
 python test_best_100gen_game.py

@@ -1,0 +1,41 @@
+{
+  "python_entrypoints": {
+    "count": 104,
+    "critical_paths": {
+      "unified_miniplanet.py": "line 670 - Main planet generator",
+      "renderer/pcc_game_viewer.py": "line 1791 - Primary 3D viewer", 
+      "agents/agent_d_renderer.py": "line 748 - Agent D terrain system",
+      "create_mini_planet.py": "line 676 - Alternative planet creator",
+      "run_auto_loop.py": "line 30 - Evolution automation",
+      "run_manual_loop.py": "line 30 - Manual evolution loop"
+    },
+    "agent_system": {
+      "agents/agent_a_generator.py": "line 393 - Game generator agent",
+      "agents/agent_b_tester.py": "line 622 - Game testing agent", 
+      "agents/agent_c_supervisor.py": "line 184 - Evolution supervisor",
+      "agents/agent_d_renderer.py": "line 748 - Terrain rendering agent"
+    },
+    "test_validation": {
+      "agents/agent_d/test_t11_core.py": "line 308 - Core T11 tests",
+      "agents/agent_d/test_crack_prevention.py": "line 462 - Crack prevention",
+      "agents/agent_d/test_t14_performance.py": "line 403 - T14 performance",
+      "agents/agent_d/validation/terrain_quality_validator.py": "line 685 - Quality validation"
+    },
+    "tools_utilities": {
+      "scripts/capture_viewer_screenshots.py": "line 89 - Screenshot automation",
+      "terrain_visual_demo.py": "line 123 - Visual demonstration", 
+      "test_chunk_streaming.py": "line 58 - Streaming tests"
+    }
+  },
+  "cpp_entrypoints": {
+    "count": 2,
+    "primary": {
+      "src/pcc_vm_simple.cpp": "line 372 - PCC Virtual Machine main",
+      "agents/agent_d/mesh/cubesphere.cpp": "line 293 - Cubesphere generator main"
+    }
+  },
+  "evidence_files": {
+    "python_list": "/tmp/py_entry.txt",
+    "cpp_list": "/tmp/c_entry.txt"
+  }
+}

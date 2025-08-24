@@ -1,0 +1,50 @@
+{
+  "project_cleanup_phase1": {
+    "timestamp": "2025-08-24",
+    "total_files": 14621,
+    "file_breakdown": {
+      "python": 4398,
+      "compiled_python": 4312, 
+      "binary": 1847,
+      "json": 712,
+      "javascript": 392,
+      "type_stubs": 250,
+      "images": 107,
+      "fortran": 60,
+      "text": 56,
+      "pcc_games": 53,
+      "c_source": 52,
+      "markdown": 51
+    },
+    "dominant_language": "Python",
+    "languages_detected": ["Python", "C/C++", "JavaScript", "Fortran"],
+    "entrypoints": {
+      "python_main_blocks": 104,
+      "cpp_main_functions": 2,
+      "primary_entrypoints": [
+        "unified_miniplanet.py",
+        "renderer/pcc_game_viewer.py", 
+        "agents/agent_d_renderer.py",
+        "create_mini_planet.py",
+        "run_auto_loop.py",
+        "run_manual_loop.py"
+      ],
+      "agent_system": [
+        "agents/agent_a_generator.py",
+        "agents/agent_b_tester.py", 
+        "agents/agent_c_supervisor.py",
+        "agents/agent_d_renderer.py"
+      ],
+      "cpp_binaries": [
+        "src/pcc_vm_simple.cpp",
+        "agents/agent_d/mesh/cubesphere.cpp"
+      ]
+    },
+    "test_footprint": {
+      "test_files": 30,
+      "agent_d_tests": 22,
+      "validation_scripts": 8,
+      "integration_tests": "multiple"
+    }
+  }
+}

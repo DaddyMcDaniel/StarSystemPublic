@@ -1,0 +1,98 @@
+```mermaid
+graph TB
+    %% Legend
+    subgraph Legend[" 🔍 Legend "]
+        L1[Primary Path]:::primary
+        L2[Secondary Path]:::secondary  
+        L3[High Risk]:::risk
+        L4[Schema Drift]:::schema
+        L5[Deprecated]:::deprecated
+    end
+
+    %% User Entry Points
+    User[👤 User Command] --> CLI{Entry Point Choice}
+    
+    %% PRIMARY PATH - Unified Mini-Planet System
+    subgraph Primary[" 🚀 PRIMARY: Unified Mini-Planet Pipeline "]
+        CLI -->|./commands/LOP_miniplanet --seed 42 --view| LOP[LOP_miniplanet]
+        CLI -->|python unified_miniplanet.py --seed N| UMP[unified_miniplanet.py:670]
+        
+        UMP --> S2T[seed_to_terrain_params]
+        S2T --> HF[generate_height_field]  
+        HF --> M2M[height_field_to_mesh]
+        M2M --> OBJ[place_objects_on_terrain]
+        OBJ --> EXP[export_scene]
+        EXP -->|unified_planet_seed_N.json| JSON1[Unified Schema JSON]
+    end
+    
+    %% SECONDARY PATH - Agent Evolution System  
+    subgraph Secondary[" 🤖 SECONDARY: Agent D Pipeline "]
+        CLI -->|python run_auto_loop.py| AUTO[run_auto_loop.py:30]
+        AUTO --> AGEN[agents/agent_a_generator.py:393]
+        AGEN -->|game.pcc AST| PCC[PCC Game File]
+        PCC --> AGD[agents/agent_d_renderer.py:748]
+        AGD --> T17[T17 Hero Planet System]
+        T17 --> MESH[agents/agent_d/mesh/]
+        MESH -->|scene.json T17 format| JSON2[T17 Schema JSON]
+    end
+    
+    %% DEPRECATED PATH
+    subgraph Deprecated[" ⚠️ DEPRECATED: Alternative Generators "]
+        CLI -.->|python create_mini_planet.py| CMP[create_mini_planet.py:676]:::deprecated
+        CMP -.->|Falls back to flat noise| FLAT[Flat Terrain - BROKEN]:::deprecated
+    end
+    
+    %% SCHEMA VALIDATION GATE (NEW)
+    JSON1 --> VALIDATOR{🛡️ Schema Validator}
+    JSON2 --> VALIDATOR
+    VALIDATOR -->|Validated JSON| VIEWER
+    VALIDATOR -->|Schema Mismatch| ERROR[❌ Format Error]
+    
+    %% RENDERER SUBSYSTEM
+    subgraph Renderer[" 🎮 Renderer & Navigation "]
+        VIEWER[pcc_game_viewer.py:1791]
+        VIEWER --> OGL[OpenGL Rendering]
+        VIEWER --> LOD[Runtime LOD Manager]
+        VIEWER --> CHUNK[Chunk Streamer]  
+        VIEWER --> HUD[Debug HUD]
+        
+        %% Navigation & Physics
+        OGL --> CAM[Camera System]
+        CAM --> GRAV[Spherical Gravity]
+        CAM --> INPUT[Mouse/Keyboard Controls]
+    end
+    
+    %% TESTING INFRASTRUCTURE
+    subgraph Testing[" 🧪 Testing & Validation "]
+        VIEWER -.-> TESTS[30+ Test Files]
+        TESTS --> VALIDATE[agents/agent_d/validate_*]
+        TESTS --> AGTEST[agents/agent_d/test_*]
+        JSON2 --> AGENTB[agents/agent_b_tester.py:622]
+        AGENTB -->|Quality Feedback| AGENTC[agents/agent_c_supervisor.py:184]
+        AGENTC -->|Pattern Evolution| AGEN
+    end
+    
+    %% UNMANAGED DEPENDENCIES (HIGH RISK)
+    subgraph Dependencies[" ⚠️ Critical Dependencies (UNMANAGED) "]
+        VIEWER -.->|import numpy| NPY[numpy - NO VERSION PIN]:::risk
+        VIEWER -.->|from OpenGL.GL| GL[PyOpenGL - NO VERSION PIN]:::risk
+        VIEWER -.->|from PIL| PIL[PIL/Pillow - NO VERSION PIN]:::risk
+    end
+    
+    %% C++ COMPONENTS (OPTIONAL)
+    PCC -.->|optional| VM[src/pcc_vm_simple.cpp:372]
+    MESH -.->|optional| CUBE[agents/agent_d/mesh/cubesphere.cpp:293]
+    
+    %% Styling
+    classDef primary fill:#99ff99,stroke:#00aa00,stroke-width:2px
+    classDef secondary fill:#99ccff,stroke:#0066cc,stroke-width:2px
+    classDef risk fill:#ff9999,stroke:#cc0000,stroke-width:2px
+    classDef schema fill:#ffcc99,stroke:#ff9900,stroke-width:2px
+    classDef deprecated fill:#cccccc,stroke:#666666,stroke-width:2px,stroke-dasharray: 5 5
+    
+    %% Apply styling
+    class UMP,LOP,JSON1,VIEWER primary
+    class AUTO,AGD,T17,JSON2,AGEN secondary
+    class JSON1,JSON2 schema
+    class NPY,GL,PIL,ERROR risk
+```

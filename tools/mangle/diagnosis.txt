@@ -1,0 +1,1 @@
+=== Diagnosis === export PATH=/bin: mg -root tools/mangle -exec $(cat tools/mangle/diagnose_unified_vs_manual.mg)

@@ -9,13 +9,13 @@ ROLE & RESPONSIBILITIES:
 - Parse Agent A's PCC game AST files into 3D scenes
 - Generate sophisticated terrain using T17 hero planet system
 - Create ridged mountains, warped dunes, equatorial archipelagos
-- Generate gyroidal cave networks with SDF primitives
+- Generate diverse landscape terrain with hills, mountains, and plains
 - Accept evolution feedback from Agent C to improve generation algorithms
 - Maintain deterministic seed-based generation for reproducible testing
 
 KEY CAPABILITIES (T17 ENHANCED):
 - Hero Planet Generation: Ridged mountains, warped dunes, equatorial archipelagos
-- Advanced Cave Systems: Gyroidal SDF tunnels + distributed sphere cavities
+- Simplified Terrain System: Focus on core landscape types - plains, hills, mountains
 - Performance Optimization: LOD tuning for 60+ fps on mid-tier GPUs
 - Deterministic Baking: T13 seed threading with hash verification
 - Screenshot Documentation: T16 viewer integration
@@ -120,33 +120,25 @@ class TerrainRenderer:
     def load_prompt_patterns(self):
         """Extract terrain generation patterns from prompt file"""
         self.patterns = {
-            "height_zones": ["flat", "rolling", "mountainous", "valley", "cliff", "crater", 
-                           "ridged_mountains", "warped_dunes", "archipelago", "cave_system"],
+            "height_zones": ["plains", "hills", "mountains", "valley", "cliff", 
+                           "ridged_mountains"],
             "biome_materials": {
-                "flat": ["grass", "sand", "metal"],
-                "rolling": ["rock", "grass", "crystal"], 
-                "mountainous": ["rock", "crystal", "metal"],
+                "plains": ["grass", "soil", "vegetation"],
+                "hills": ["grass", "rock", "vegetation"], 
+                "mountains": ["rock", "stone", "crystal"],
                 "valley": ["grass", "water", "soil"],
                 "cliff": ["rock", "stone", "metal"],
-                "crater": ["rock", "ash", "glass"],
-                # T17 Hero Planet terrain types
-                "ridged_mountains": ["rock", "crystal", "metal", "volcanic_rock"],
-                "warped_dunes": ["sand", "dust", "weathered_rock", "crystal"],
-                "archipelago": ["rock", "coral", "sand", "grass"],
-                "cave_system": ["stone", "crystal", "mineral", "dark_rock"]
+                # Enhanced mountain types
+                "ridged_mountains": ["rock", "crystal", "metal", "volcanic_rock"]
             },
             "height_ranges": {
-                "flat": (0.1, 0.5),
-                "rolling": (0.5, 2.0),
-                "mountainous": (2.0, 5.0),
+                "plains": (0.1, 0.5),
+                "hills": (0.5, 2.0),
+                "mountains": (2.0, 5.0),
                 "valley": (-1.0, 0.2),
                 "cliff": (1.0, 4.0),
-                "crater": (-0.5, 0.3),
-                # T17 Hero Planet height ranges
-                "ridged_mountains": (3.0, 8.0),  # Dramatic peaks
-                "warped_dunes": (0.2, 1.5),     # Undulating surfaces  
-                "archipelago": (-0.5, 2.0),     # Islands and water
-                "cave_system": (-2.0, 0.0)      # Underground caverns
+                # Enhanced mountain types
+                "ridged_mountains": (3.0, 8.0)  # Dramatic peaks
             },
             "object_sizes": {
                 "fine_detail": (0.5, 1.0),
@@ -188,7 +180,7 @@ class TerrainRenderer:
                 0.8,  # ridged_mountains (high weight for hero showcase)
                 0.6,  # warped_dunes (medium-high weight)
                 0.4,  # archipelago (medium weight)
-                0.3   # cave_system (lower weight)
+                0.5   # ridged_mountains (enhanced weight)
             ]
             zone_type = random.choices(self.patterns["height_zones"], weights=zone_weights)[0]
             
@@ -426,16 +418,15 @@ class TerrainRenderer:
                 "hero_feature": "LatitudeMask"
             })
         
-        # Add cave system markers
+        # Add additional mountain variations for landscape diversity
         zones.append({
-            "type": "cave_system",
-            "theta": 0,
-            "phi": 0,
-            "influence_radius": radius,
-            "intensity": 0.7,
+            "type": "mountains",
+            "theta": math.pi / 3,
+            "phi": math.pi / 2,
+            "influence_radius": radius * 0.3,
+            "intensity": 0.8,
             "biome": biome,
-            "hero_feature": "GyroidalSDF",
-            "cave_types": ["gyroidal_tunnels", "distributed_spheres"]
+            "hero_feature": "RuggedPeaks"
         })
         
         print(f"✅ Generated {len(zones)} hero terrain zones")

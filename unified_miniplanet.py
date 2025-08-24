@@ -82,44 +82,35 @@ class MiniPlanetSystem:
         """Convert seed to deterministic terrain parameters with biome system"""
         rng = random.Random(seed)
         
-        # Define biome configurations
+        # Define core biome configurations (simplified to 3 essential types)
         R = self.planet_radius
         biomes = [
             {
                 "id": 0,
-                "name": "ocean",
-                "amplitude": 0.00 * R,
-                "frequency": 0.00 / R,
-                "octaves": 0,
-                "ridged": False,
-                "color_rgb": [0.106, 0.239, 0.373]  # #1b3d5f
-            },
-            {
-                "id": 1,
                 "name": "plains",
                 "amplitude": 0.02 * R,
                 "frequency": 0.60 / R,
                 "octaves": 4,
                 "ridged": False,
-                "color_rgb": [0.431, 0.659, 0.306]  # #6ea84e
+                "color_rgb": [0.431, 0.659, 0.306]  # #6ea84e - Green plains
+            },
+            {
+                "id": 1,
+                "name": "hills",
+                "amplitude": 0.05 * R,
+                "frequency": 0.90 / R,
+                "octaves": 5,
+                "ridged": False,
+                "color_rgb": [0.580, 0.720, 0.420]  # #94b86b - Rolling hills
             },
             {
                 "id": 2,
-                "name": "desert",
-                "amplitude": 0.03 * R,
-                "frequency": 0.80 / R,
-                "octaves": 5,
-                "ridged": False,
-                "color_rgb": [0.847, 0.698, 0.416]  # #d8b26a
-            },
-            {
-                "id": 3,
-                "name": "mountain",
-                "amplitude": 0.10 * R,
-                "frequency": 1.40 / R,
+                "name": "mountains",
+                "amplitude": 0.12 * R,
+                "frequency": 1.20 / R,
                 "octaves": 6,
                 "ridged": True,
-                "color_rgb": [0.557, 0.557, 0.557]  # #8e8e8e
+                "color_rgb": [0.557, 0.557, 0.557]  # #8e8e8e - Rocky mountains
             }
         ]
         
@@ -140,7 +131,7 @@ class MiniPlanetSystem:
                 "amplitude": 0.1,
                 "frequency": 0.5 / R
             },
-            "enable_caves": rng.random() < 0.3,  # 30% chance
+            "enable_caves": False,  # Caves removed per user request
             "building_density": rng.uniform(0.1, 0.3),  # Buildings per unit area
             "ore_density": rng.uniform(0.05, 0.15)  # Ore deposits per unit area
         }
@@ -336,8 +327,8 @@ class MiniPlanetSystem:
                         elif theta == math.pi:
                             theta = math.pi - 0.001
                         
-                        # Height displacement from noise
-                        height_offset = height_field[i, j] / self.height_scale
+                        # Height displacement from noise - FIXED terrain deformation
+                        height_offset = height_field[i, j] * self.height_scale
                         radius = self.planet_radius + height_offset
                         
                         # Convert to Cartesian coordinates
@@ -430,13 +421,88 @@ class MiniPlanetSystem:
             "total_triangles": total_triangles,
             "chunks_per_side": chunks_per_side,
             "chunk_resolution": chunk_resolution,
-            "radius": self.planet_radius
+            "radius": self.planet_radius,
+            "navigation": self.generate_spherical_navigation_mesh(chunks),
+            "physics_mesh": self.generate_physics_collision_mesh(chunks)
         }
         
         if self.debug:
             self.log(f"Total: {total_vertices} vertices, {total_triangles} triangles in {len(chunks)} chunks")
         
         return mesh_data
+    
+    def generate_spherical_navigation_mesh(self, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Generate navigation data for proper sphere walking (not flat grid walking)"""
+        tangent_vectors = []
+        connectivity = []
+        
+        # Calculate tangent vectors for each vertex to enable proper sphere movement
+        for chunk in chunks:
+            positions = np.array(chunk["positions"])
+            normals = np.array(chunk["normals"])
+            
+            for i, (pos, normal) in enumerate(zip(positions, normals)):
+                # Calculate tangent space: two perpendicular vectors on sphere surface
+                # This enables proper "forward/right" movement on curved surface
+                pos_normalized = pos / np.linalg.norm(pos)
+                
+                # Generate arbitrary tangent vector perpendicular to normal
+                if abs(normal[0]) < 0.9:
+                    tangent1 = np.cross(normal, [1, 0, 0])
+                else:
+                    tangent1 = np.cross(normal, [0, 1, 0])
+                
+                tangent1 = tangent1 / np.linalg.norm(tangent1)
+                tangent2 = np.cross(normal, tangent1)
+                
+                tangent_vectors.append({
+                    "vertex_index": len(tangent_vectors),
+                    "position": pos.tolist(),
+                    "normal": normal.tolist(),
+                    "tangent_u": tangent1.tolist(),  # "Right" direction on sphere
+                    "tangent_v": tangent2.tolist()   # "Forward" direction on sphere
+                })
+        
+        return {
+            "type": "spherical_navigation",
+            "tangent_vectors": tangent_vectors,
+            "movement_type": "spherical_surface",
+            "gravity_direction": "radial_inward"  # Gravity points toward planet center
+        }
+    
+    def generate_physics_collision_mesh(self, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Generate physics collision mesh that matches visual deformed terrain"""
+        collision_vertices = []
+        collision_triangles = []
+        vertex_offset = 0
+        
+        # Copy exact vertex positions and triangles from visual mesh to collision mesh
+        # This ensures physics collision matches visual terrain perfectly
+        for chunk in chunks:
+            # Copy exact vertex positions from visual mesh
+            chunk_positions = chunk["positions"]
+            collision_vertices.extend(chunk_positions)
+            
+            # Copy triangle indices, offset by current vertex count
+            chunk_indices = chunk["indices"]
+            for i in range(0, len(chunk_indices), 3):
+                triangle = [
+                    chunk_indices[i] + vertex_offset,
+                    chunk_indices[i + 1] + vertex_offset,
+                    chunk_indices[i + 2] + vertex_offset
+                ]
+                collision_triangles.append(triangle)
+            
+            vertex_offset += len(chunk_positions)
+            
+        return {
+            "type": "deformed_collision_mesh",
+            "vertices": collision_vertices,    # Exact match to visual vertices
+            "triangles": collision_triangles,  # Same topology as visual mesh
+            "synchronized": True,              # Physics matches visual perfectly
+            "vertex_count": len(collision_vertices),
+            "triangle_count": len(collision_triangles)
+        }
     
     def place_objects_on_terrain(self, mesh_data: Dict[str, Any], terrain_params: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Place buildings and objects ON the terrain surface (not floating)"""
@@ -556,6 +622,16 @@ class MiniPlanetSystem:
             },
             "chunks": self.mesh_data["chunks"],
             "objects": self.objects,
+            "physics": {
+                "type": "spherical_gravity",
+                "planet_center": [0, 0, 0],
+                "planet_radius": self.planet_radius,
+                "gravity_strength": 0.02,
+                "gravity_direction": "radial_inward",
+                "coordinate_system": "spherical",
+                "navigation": self.generate_spherical_navigation_mesh(self.mesh_data["chunks"]),
+                "collision": self.generate_physics_collision_mesh(self.mesh_data["chunks"])
+            },
             "statistics": {
                 "total_vertices": self.mesh_data["total_vertices"],
                 "total_triangles": self.mesh_data["total_triangles"],
