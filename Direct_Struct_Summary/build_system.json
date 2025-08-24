@@ -1,0 +1,24 @@
+{
+  "cpp_build_system": [
+    "CMakeLists.txt",
+    "Makefile",
+    "src/pcc_vm_simple.cpp",
+    "src/pcc_interpreter_standalone.h",
+    "src/pcc_ast_standalone.h"
+  ],
+  "python_environment": [
+    "requirements.txt",
+    "requirements-rl.txt", 
+    "ai_tools_requirements.txt"
+  ],
+  "build_automation": [
+    "run_auto_loop.py",
+    "run_manual_loop.py",
+    "scripts/smoke_test.py"
+  ],
+  "project_configuration": [
+    "CLAUDE.md",
+    "config.json",
+    "env_template"
+  ]
+}

@@ -304,8 +304,8 @@ class TerrainRenderer:
         """Parse Agent A's PCC file to extract realistic terrain data"""
         try:
             if not pcc_file.exists():
-                print(f"⚠️ PCC file {pcc_file} not found, using default terrain")
-                return {"radius": 50.0, "type": "sphere"}
+                print(f"⚠️ PCC file {pcc_file} not found, using realistic miniplanet terrain")
+                return {"radius": 50.0, "type": "realistic_miniplanet", "biome": "lush", "material": "volcanic_rock"}
             
             with open(pcc_file, 'r') as f:
                 pcc_data = json.load(f)

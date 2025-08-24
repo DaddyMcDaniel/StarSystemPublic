@@ -1,0 +1,26 @@
+{
+  "agent_d_terrain_pipeline": [
+    "agents/agent_d_renderer.py",
+    "agents/agent_d/baking/deterministic_baking.py",
+    "agents/agent_d/baking/hero_planet_baker.py",
+    "agents/agent_d/performance/multithreaded_baking.py",
+    "agents/agent_d/performance/profiling_system.py"
+  ],
+  "terrain_validation": [
+    "agents/agent_d/validation/terrain_quality_validator.py",
+    "agents/agent_d/validation/seam_consistency_validator.py",
+    "agents/agent_d/test_crack_prevention.py",
+    "agents/agent_d/test_runtime_lod.py"
+  ],
+  "schema_and_nodes": [
+    "agents/agent_d/schema/pcc_schema_v1.json",
+    "agents/agent_d/schema/pcc_terrain_nodes.py",
+    "agents/agent_d/schema/stochastic_nodes_spec.md"
+  ],
+  "automated_testing": [
+    "agents/agent_d/test_t10_core.py",
+    "agents/agent_d/test_t11_core.py",
+    "agents/agent_d/test_t13_determinism.py",
+    "agents/agent_d/test_t16_viewer_tools.py"
+  ]
+}

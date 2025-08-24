@@ -121,7 +121,7 @@ class QuadtreeChunker:
     
     def __init__(self, max_depth: int = 3, chunk_res: int = 16, 
                  base_radius: float = 1.0, heightfield: Optional[HeightField] = None,
-                 displacement_scale: float = 0.0):
+                 displacement_scale: float = 0.0, enable_vertex_overlap: bool = True):
         """
         Initialize quadtree chunker
         
@@ -131,12 +131,14 @@ class QuadtreeChunker:
             base_radius: Base sphere radius
             heightfield: Optional heightfield for displacement
             displacement_scale: Displacement scaling factor
+            enable_vertex_overlap: Enable one-row vertex overlap for crack prevention
         """
         self.max_depth = max_depth
         self.chunk_res = chunk_res
         self.base_radius = base_radius
         self.heightfield = heightfield
         self.displacement_scale = displacement_scale
+        self.enable_vertex_overlap = enable_vertex_overlap
         self.face_configs = self._get_face_configurations()
         
     def _get_face_configurations(self) -> List[Tuple[Tuple[float, float, float], 
@@ -214,12 +216,13 @@ class QuadtreeChunker:
         
         return leaves
     
-    def generate_chunk_mesh(self, node: QuadtreeNode) -> Dict[str, Any]:
+    def generate_chunk_mesh(self, node: QuadtreeNode, lod_level: int = None) -> Dict[str, Any]:
         """
-        Generate mesh data for a single chunk
+        Generate mesh data for a single chunk with adaptive resolution
         
         Args:
             node: Quadtree leaf node to generate mesh for
+            lod_level: Optional LOD level to determine resolution (None uses default chunk_res)
             
         Returns:
             Dictionary containing mesh data (positions, normals, uvs, indices)
@@ -234,21 +237,42 @@ class QuadtreeChunker:
         uvs = []
         indices = []
         
-        # Generate grid within UV bounds
-        res = self.chunk_res
+        # T19: Determine resolution based on LOD level if provided
+        if lod_level is not None:
+            lod_res_map = {0: 128, 1: 128, 2: 64, 3: 32}  # LOD0/1: high detail, LOD2: medium, LOD3: low
+            res = lod_res_map.get(lod_level, self.chunk_res)
+        else:
+            res = self.chunk_res
+            
         u_min, v_min = node.uv_min
         u_max, v_max = node.uv_max
         
-        # Create vertices
+        # T19: Add vertex overlap for crack prevention
+        if self.enable_vertex_overlap:
+            # Expand UV bounds slightly to create overlap with neighboring chunks
+            uv_width = u_max - u_min
+            uv_height = v_max - v_min
+            overlap_u = uv_width / (res * 2)  # Half a texel overlap
+            overlap_v = uv_height / (res * 2)
+            
+            u_min_overlap = max(0.0, u_min - overlap_u)
+            u_max_overlap = min(1.0, u_max + overlap_u)
+            v_min_overlap = max(0.0, v_min - overlap_v)
+            v_max_overlap = min(1.0, v_max + overlap_v)
+        else:
+            u_min_overlap, u_max_overlap = u_min, u_max
+            v_min_overlap, v_max_overlap = v_min, v_max
+        
+        # Create vertices with optional overlap
         for j in range(res):
             for i in range(res):
                 # Local grid coordinates
                 local_u = i / (res - 1)
                 local_v = j / (res - 1)
                 
-                # Map to chunk UV bounds
-                u = u_min + local_u * (u_max - u_min)
-                v = v_min + local_v * (v_max - v_min)
+                # Map to chunk UV bounds (with overlap if enabled)
+                u = u_min_overlap + local_u * (u_max_overlap - u_min_overlap)
+                v = v_min_overlap + local_v * (v_max_overlap - v_min_overlap)
                 
                 # Convert to [-1,1] cube coordinates
                 cube_u = u * 2 - 1
@@ -308,6 +332,51 @@ class QuadtreeChunker:
             "node": node
         }
     
+    def compute_chunk_aabb_from_node(self, node: QuadtreeNode) -> Dict[str, Any]:
+        """
+        Compute AABB for a chunk node without generating the full mesh
+        
+        Args:
+            node: Quadtree node
+            
+        Returns:
+            Dictionary with center, radius, min, max for bounding box
+        """
+        face_id = node.face_id
+        normal, up, right = self.face_configs[face_id]
+        
+        # Sample corner points to estimate bounding box
+        corners = [
+            (node.uv_min[0], node.uv_min[1]),
+            (node.uv_max[0], node.uv_min[1]),
+            (node.uv_min[0], node.uv_max[1]),
+            (node.uv_max[0], node.uv_max[1])
+        ]
+        
+        positions = []
+        for u, v in corners:
+            # Map UV to cube face
+            cube_pos = np.array(normal) + (u - 0.5) * 2.0 * np.array(right) + (v - 0.5) * 2.0 * np.array(up)
+            
+            # Normalize to sphere
+            sphere_pos = cube_pos / np.linalg.norm(cube_pos) * self.base_radius
+            positions.append(sphere_pos)
+        
+        positions = np.array(positions)
+        
+        # Compute bounding box
+        min_pos = np.min(positions, axis=0)
+        max_pos = np.max(positions, axis=0)
+        center = (min_pos + max_pos) * 0.5
+        radius = np.linalg.norm(max_pos - center)
+        
+        return {
+            "center": center.tolist(),
+            "radius": float(radius),
+            "min": min_pos.tolist(),
+            "max": max_pos.tolist()
+        }
+
     def compute_chunk_aabb(self, mesh_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Compute axis-aligned bounding box for chunk
@@ -367,7 +436,9 @@ class QuadtreeChunker:
                 "size": list(node.uv_size)
             },
             "aabb": aabb,
-            "resolution": self.chunk_res
+            "resolution": self.chunk_res,
+            "vertex_overlap_enabled": self.enable_vertex_overlap,
+            "supports_variable_lod": True
         }
         
         # Update metadata

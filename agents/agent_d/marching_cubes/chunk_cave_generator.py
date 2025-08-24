@@ -42,16 +42,19 @@ class ChunkCaveGenerator:
     Generates cave meshes for terrain chunks using SDF and Marching Cubes
     """
     
-    def __init__(self, resolution: int = 32, cave_material_id: int = 2):
+    def __init__(self, resolution: int = 64, cave_material_id: int = 2, chunk_overlap_voxels: int = 1):
         """
-        Initialize chunk cave generator
+        Initialize chunk cave generator with T20 improvements
         
         Args:
-            resolution: Voxel grid resolution for cave generation
+            resolution: Voxel grid resolution for cave generation (increased to 48-64 for T20)
             cave_material_id: Material ID for cave surfaces
+            chunk_overlap_voxels: Voxel overlap between chunks for seam prevention (T20)
         """
+        # T20: Increase resolution from 32 to 64 for better detail
         self.resolution = resolution
         self.cave_material_id = cave_material_id
+        self.chunk_overlap_voxels = chunk_overlap_voxels
         self.cave_mesh_generator = CaveMeshGenerator(material_id=cave_material_id)
         self.sdf_evaluator = SDFEvaluator()
         
@@ -61,7 +64,10 @@ class ChunkCaveGenerator:
             "caves_generated": 0,
             "total_vertices": 0,
             "total_triangles": 0,
-            "generation_time": 0.0
+            "generation_time": 0.0,
+            "voxel_resolution": self.resolution,
+            "chunk_overlap_voxels": self.chunk_overlap_voxels,
+            "seam_prevention_enabled": True
         }
     
     def generate_cave_chunks(self, terrain_manifest_path: str, output_dir: str, 

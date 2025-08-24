@@ -42,7 +42,7 @@ scene_data = None
 window_title = ""
 
 # Camera and movement variables
-camera_x, camera_y, camera_z = 0.0, 1.6, 5.0
+camera_x, camera_y, camera_z = 0.0, 5.0, 120.0
 camera_pitch, camera_yaw = -10.0, 0.0
 movement_speed = 0.15
 mouse_sensitivity = 0.2
@@ -538,43 +538,72 @@ def DetectAndDrawCrackLines(chunked_planet: dict):
         print(f"❌ Failed to detect crack lines: {e}")
 
 def LoadChunkedPlanet(planet_manifest_path: str) -> dict:
-    """Load chunked planet from master manifest"""
+    """Load chunked planet from manifest - supports both file-based and unified formats"""
     try:
-        manifest_path = Path(planet_manifest_path)
-        manifest_dir = manifest_path.parent
-        
         with open(planet_manifest_path, 'r') as f:
             planet_manifest = json.load(f)
         
-        planet_data = planet_manifest.get("planet", {})
+        planet_data = planet_manifest.get("planet_info", planet_manifest.get("planet", {}))
         if planet_data.get("type") != "chunked_quadtree":
             print(f"❌ Not a chunked planet: {planet_manifest_path}")
             return {}
         
-        chunk_files = planet_manifest.get("chunks", [])
-        loaded_chunks = []
+        chunks_data = planet_manifest.get("chunks", [])
         
-        print(f"🔧 Loading {len(chunk_files)} chunks...")
-        
-        for chunk_file in chunk_files:
-            chunk_path = manifest_dir / chunk_file
-            chunk_data = LoadMeshFromManifest(str(chunk_path))
+        # Check if this is a unified format (chunks are dicts) or file-based format (chunks are filenames)
+        if chunks_data and isinstance(chunks_data[0], dict):
+            # Unified format: chunks are stored directly in the JSON
+            print(f"🔧 Loading {len(chunks_data)} chunks from unified format...")
             
-            if chunk_data:
-                # Load chunk metadata
-                with open(chunk_path, 'r') as f:
-                    chunk_manifest = json.load(f)
+            loaded_chunks = []
+            for chunk_data in chunks_data:
+                # Convert unified chunk format to viewer format
+                chunk = {
+                    "chunk_id": chunk_data.get("chunk_id", "unknown"),
+                    "positions": np.array(chunk_data.get("positions", [])),
+                    "indices": np.array(chunk_data.get("indices", []), dtype=np.uint32),
+                    "normals": np.array(chunk_data.get("normals", [])),
+                    "vertex_count": chunk_data.get("vertex_count", 0),
+                    "index_count": chunk_data.get("index_count", 0),
+                    "aabb": chunk_data.get("aabb", {"min": [0,0,0], "max": [0,0,0]}),
+                    "material": chunk_data.get("material", "terrain"),
+                    "chunk_info": {
+                        "bounds": chunk_data.get("chunk_bounds", {}),
+                        "triangle_count": chunk_data.get("triangle_count", 0)
+                    }
+                }
+                loaded_chunks.append(chunk)
+            
+            print(f"✅ Loaded {len(loaded_chunks)} unified chunks successfully")
+            
+        else:
+            # File-based format: chunks are stored in separate files
+            manifest_path = Path(planet_manifest_path)
+            manifest_dir = manifest_path.parent
+            loaded_chunks = []
+            
+            print(f"🔧 Loading {len(chunks_data)} chunks from file format...")
+            
+            for chunk_file in chunks_data:
+                chunk_path = manifest_dir / chunk_file
+                chunk_data = LoadMeshFromManifest(str(chunk_path))
                 
-                chunk_info = chunk_manifest.get("chunk", {})
-                chunk_data["chunk_info"] = chunk_info
-                chunk_data["manifest_path"] = str(chunk_path)
-                loaded_chunks.append(chunk_data)
-        
-        print(f"✅ Loaded {len(loaded_chunks)} chunks successfully")
+                if chunk_data:
+                    # Load chunk metadata
+                    with open(chunk_path, 'r') as f:
+                        chunk_manifest = json.load(f)
+                    
+                    chunk_info = chunk_manifest.get("chunk", {})
+                    chunk_data["chunk_info"] = chunk_info
+                    chunk_data["manifest_path"] = str(chunk_path)
+                    loaded_chunks.append(chunk_data)
+            
+            print(f"✅ Loaded {len(loaded_chunks)} file-based chunks successfully")
         
         return {
             "type": "chunked_planet",
             "planet_info": planet_data,
+            "terrain_params": planet_manifest.get("terrain_params", {}),
             "chunks": loaded_chunks,
             "statistics": planet_manifest.get("statistics", {}),
             "total_vertices": sum(chunk.get("vertex_count", 0) for chunk in loaded_chunks),
@@ -583,6 +612,8 @@ def LoadChunkedPlanet(planet_manifest_path: str) -> dict:
         
     except Exception as e:
         print(f"❌ Failed to load chunked planet from {planet_manifest_path}: {e}")
+        import traceback
+        traceback.print_exc()
         return {}
 
 def InitializeRuntimeLOD():
@@ -655,17 +686,33 @@ def RenderChunkedPlanetWithLOD(chunked_planet: dict):
         
         # Update streaming
         load_queue = [chunk.chunk_id for chunk in selected_chunks if chunk.should_load]
-        unload_queue = [chunk_id for chunk_id in chunk_streamer.loaded_chunks 
+        unload_queue = [chunk_id for chunk_id in chunk_streamer.get_loaded_chunk_ids() 
                        if chunk_id not in {c.chunk_id for c in selected_chunks}]
         
         def chunk_data_provider(chunk_id):
-            # Find chunk data by ID
+            # Find chunk data by ID - handle both formats
             for chunk in all_chunks:
+                # Unified format: chunk_id directly in chunk
+                if chunk.get("chunk_id") == chunk_id:
+                    return chunk
+                # Legacy format: chunk_id nested in chunk_info
                 if chunk.get("chunk_info", {}).get("chunk_id") == chunk_id:
                     return chunk
             return None
         
+        # Track loaded chunks before and after streaming update for LOD manager sync
+        pre_loaded = chunk_streamer.get_loaded_chunk_ids()
         chunk_streamer.update_streaming(load_queue, unload_queue, chunk_data_provider)
+        post_loaded = chunk_streamer.get_loaded_chunk_ids()
+        
+        # Sync LOD manager with actual loaded chunks
+        newly_loaded = post_loaded - pre_loaded
+        newly_unloaded = pre_loaded - post_loaded
+        
+        for chunk_id in newly_loaded:
+            runtime_lod_manager.mark_chunk_loaded(chunk_id)
+        for chunk_id in newly_unloaded:
+            runtime_lod_manager.mark_chunk_unloaded(chunk_id)
         
         # Render selected chunks
         glEnable(GL_DEPTH_TEST)
@@ -676,6 +723,8 @@ def RenderChunkedPlanetWithLOD(chunked_planet: dict):
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         
         chunks_rendered = 0
+        # Disable lighting for raw mesh draw to avoid black output if normals/state mismatch
+        glDisable(GL_LIGHTING)
         for chunk_lod_info in selected_chunks:
             if not chunk_lod_info.is_visible:
                 continue
@@ -698,23 +747,90 @@ def RenderChunkedPlanetWithLOD(chunked_planet: dict):
             else:
                 glColor3f(1.0, 1.0, 1.0)  # Default white
             
-            # Bind and render VAO
-            glBindVertexArray(vao_id)
-            
-            # Find original chunk for index count
-            chunk_data = None
-            for chunk in all_chunks:
-                if chunk.get("chunk_info", {}).get("chunk_id") == chunk_lod_info.chunk_id:
-                    chunk_data = chunk
-                    break
+            # Acquire streamer record (contains raw buffer IDs and counts)
+            chunk_rec = None
+            try:
+                chunk_rec = chunk_streamer.get_chunk_record(chunk_lod_info.chunk_id)
+            except Exception:
+                chunk_rec = None
+
+            # Fallback path for fixed-function: bind raw buffers with client states
+            if chunk_rec is not None:
+                # Make sure no VAO is capturing our client states
+                glBindVertexArray(0)
+
+                # Positions
+                if chunk_rec.pos_buffer > 0:
+                    glBindBuffer(GL_ARRAY_BUFFER, chunk_rec.pos_buffer)
+                    glEnableClientState(GL_VERTEX_ARRAY)
+                    glVertexPointer(3, GL_FLOAT, 0, None)
+
+                # Normals (optional)
+                if chunk_rec.norm_buffer > 0:
+                    glBindBuffer(GL_ARRAY_BUFFER, chunk_rec.norm_buffer)
+                    glEnableClientState(GL_NORMAL_ARRAY)
+                    glNormalPointer(GL_FLOAT, 0, None)
+
+                # Colors (per-vertex)
+                if chunk_rec.color_buffer > 0:
+                    glBindBuffer(GL_ARRAY_BUFFER, chunk_rec.color_buffer)
+                    glEnableClientState(GL_COLOR_ARRAY)
+                    glColorPointer(3, GL_FLOAT, 0, None)
+                else:
+                    # Use chunk-level biome color as fallback
+                    chunk_data = None
+                    for chunk in all_chunks:
+                        if chunk.get("chunk_id") == chunk_lod_info.chunk_id or chunk.get("chunk_info", {}).get("chunk_id") == chunk_lod_info.chunk_id:
+                            chunk_data = chunk
+                            break
                     
-            if chunk_data:
-                indices = chunk_data.get("indices", np.array([]))
-                if indices.size > 0:
-                    glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
+                    if chunk_data and "biome_id" in chunk_data:
+                        # Get terrain params from cached planet data
+                        terrain_params = chunk_cache.get("current_planet", {}).get("terrain_params", {})
+                        biomes = terrain_params.get("biomes", [])
+                        biome_id = chunk_data["biome_id"]
+                        
+                        if biome_id < len(biomes):
+                            color = biomes[biome_id]["color_rgb"]
+                            glColor3f(color[0], color[1], color[2])
+                        else:
+                            glColor3f(0.431, 0.659, 0.306)  # Default plains color
+                    else:
+                        glColor3f(1.0, 1.0, 1.0)  # Default white
+
+                # Indices and draw
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk_rec.index_buffer)
+                index_count = max(0, int(chunk_rec.triangle_count) * 3)
+                if index_count > 0:
+                    glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, None)
                     chunks_rendered += 1
-            
-            glBindVertexArray(0)
+
+                # Cleanup
+                glDisableClientState(GL_VERTEX_ARRAY)
+                glDisableClientState(GL_NORMAL_ARRAY)
+                glDisableClientState(GL_COLOR_ARRAY)
+                glBindBuffer(GL_ARRAY_BUFFER, 0)
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
+            else:
+                # Existing VAO path (kept for when shader pipeline is added later)
+                glBindVertexArray(vao_id)
+                
+                # Find original chunk for index count
+                chunk_data = None
+                for chunk in all_chunks:
+                    if chunk.get("chunk_id") == chunk_lod_info.chunk_id or chunk.get("chunk_info", {}).get("chunk_id") == chunk_lod_info.chunk_id:
+                        chunk_data = chunk
+                        break
+                        
+                if chunk_data:
+                    indices = chunk_data.get("indices", np.array([]))
+                    if indices.size > 0:
+                        glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
+                        chunks_rendered += 1
+                
+                glBindVertexArray(0)
+        # Re-enable lighting for the rest of the scene
+        glEnable(GL_LIGHTING)
         
         # Update statistics
         lod_stats_data = runtime_lod_manager.get_lod_statistics()
@@ -1011,6 +1127,9 @@ def init_gl():
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     
+    # Disable culling to avoid backface issues during debugging
+    glDisable(GL_CULL_FACE)
+    
     # Better lighting setup
     glLightfv(GL_LIGHT0, GL_POSITION, [5, 10, 5, 1])
     glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
@@ -1041,39 +1160,90 @@ def get_camera_vectors():
     
     return (forward_x, forward_y, forward_z), (right_x, 0, right_z), (0, 1, 0)
 
+def get_planet_radius():
+    """Get planet radius from loaded planet data"""
+    if "current_planet" in chunk_cache:
+        planet_info = chunk_cache["current_planet"].get("planet_info", {})
+        return planet_info.get("radius", 50.0)  # Default radius
+    return 50.0  # Fallback
+
 def handle_movement():
-    """Handle WASD movement with grounded jump/crouch physics"""
+    """Handle WASD movement with spherical tangent navigation"""
     global camera_x, camera_y, camera_z, velocity_y
 
-    forward, right, _ = get_camera_vectors()
-
-    # Horizontal movement
-    if ord('w') in keys_pressed or ord('W') in keys_pressed:
-        camera_x += forward[0] * movement_speed
-        camera_z += forward[2] * movement_speed
-    if ord('s') in keys_pressed or ord('S') in keys_pressed:
-        camera_x -= forward[0] * movement_speed
-        camera_z -= forward[2] * movement_speed
-    if ord('a') in keys_pressed or ord('A') in keys_pressed:
-        camera_x -= right[0] * movement_speed
-        camera_z -= right[2] * movement_speed
-    if ord('d') in keys_pressed or ord('D') in keys_pressed:
-        camera_x += right[0] * movement_speed
-        camera_z += right[2] * movement_speed
-
-    # Grounded physics (jump/crouch)
-    on_ground = camera_y <= base_eye_height + 1e-3
-    if on_ground:
-        camera_y = base_eye_height
-        velocity_y = 0.0
-        if ord(' ') in keys_pressed:  # jump
-            velocity_y = 0.35
-        if ord('c') in keys_pressed or ord('C') in keys_pressed:  # crouch
-            camera_y = base_eye_height * 0.6
+    # Get planet info
+    planet_radius = get_planet_radius()
+    planet_center = np.array([0.0, 0.0, 0.0])
+    
+    # Current camera position
+    camera_pos = np.array([camera_x, camera_y, camera_z])
+    
+    # Calculate spherical navigation vectors
+    # up = normalize(camera_pos - center)
+    up_vec = camera_pos - planet_center
+    up_length = np.linalg.norm(up_vec)
+    if up_length > 0:
+        up = up_vec / up_length
     else:
-        velocity_y += gravity
+        up = np.array([0.0, 1.0, 0.0])
+    
+    # reference_axis = (0,0,1) unless nearly parallel to up, else (1,0,0)
+    reference_axis = np.array([0.0, 0.0, 1.0])
+    if abs(np.dot(up, reference_axis)) > 0.9:  # Nearly parallel
+        reference_axis = np.array([1.0, 0.0, 0.0])
+    
+    # right = normalize(cross(up, reference_axis))
+    right = np.cross(up, reference_axis)
+    right_length = np.linalg.norm(right)
+    if right_length > 0:
+        right = right / right_length
+    else:
+        right = np.array([1.0, 0.0, 0.0])
+    
+    # forward = normalize(cross(right, up))
+    forward = np.cross(right, up)
+    forward_length = np.linalg.norm(forward)
+    if forward_length > 0:
+        forward = forward / forward_length
+    else:
+        forward = np.array([0.0, 0.0, 1.0])
 
-    camera_y += velocity_y
+    # Tangential movement
+    movement_delta = np.array([0.0, 0.0, 0.0])
+    
+    if ord('w') in keys_pressed or ord('W') in keys_pressed:
+        movement_delta += forward * movement_speed
+    if ord('s') in keys_pressed or ord('S') in keys_pressed:
+        movement_delta -= forward * movement_speed
+    if ord('a') in keys_pressed or ord('A') in keys_pressed:
+        movement_delta -= right * movement_speed
+    if ord('d') in keys_pressed or ord('D') in keys_pressed:
+        movement_delta += right * movement_speed
+    
+    # Apply movement
+    new_camera_pos = camera_pos + movement_delta
+    
+    # Reproject to maintain altitude (radius + eye_height)
+    target_altitude = planet_radius + base_eye_height
+    new_distance = np.linalg.norm(new_camera_pos - planet_center)
+    if new_distance > 0:
+        new_camera_pos = planet_center + (new_camera_pos - planet_center) * (target_altitude / new_distance)
+    
+    # Handle vertical movement (jump/crouch) - adjust altitude radially
+    altitude_adjustment = 0.0
+    if ord(' ') in keys_pressed:  # jump
+        altitude_adjustment = 2.0  # Increase altitude
+    if ord('c') in keys_pressed or ord('C') in keys_pressed:  # crouch
+        altitude_adjustment = -1.0  # Decrease altitude
+    
+    if altitude_adjustment != 0:
+        current_altitude = np.linalg.norm(new_camera_pos - planet_center)
+        new_altitude = max(planet_radius + base_eye_height * 0.5, current_altitude + altitude_adjustment)
+        if current_altitude > 0:
+            new_camera_pos = planet_center + (new_camera_pos - planet_center) * (new_altitude / current_altitude)
+    
+    # Update camera position
+    camera_x, camera_y, camera_z = new_camera_pos
 
     # Update stall metric (planar movement only)
     global stall_start_ms, stall_secs, _last_planar_pos
@@ -1403,12 +1573,18 @@ def render_pcc_game_interactive(scene_file):
             scene_data = json.load(f)
 
         # Check if this is a chunked planet manifest
-        if scene_data.get("planet", {}).get("type") == "chunked_quadtree":
+        if scene_data.get("planet_info", {}).get("type") == "chunked_quadtree" or scene_data.get("planet", {}).get("type") == "chunked_quadtree":
             print(f"🪐 Loading chunked planet: {scene_file}")
             chunked_planet = LoadChunkedPlanet(scene_file)
             if chunked_planet:
                 chunk_cache["current_planet"] = chunked_planet
                 window_title = f"Chunked Planet - {Path(scene_file).name}"
+                
+                # Initialize spherical spawn position
+                planet_radius = chunked_planet.get("planet_info", {}).get("radius", 50.0)
+                global camera_x, camera_y, camera_z
+                camera_x, camera_y, camera_z = 0.0, planet_radius + base_eye_height, 0.0
+                print(f"🌍 Spawned on sphere: radius={planet_radius}, position=({camera_x:.1f}, {camera_y:.1f}, {camera_z:.1f})")
                 
                 # Initialize runtime LOD system for chunked planets
                 InitializeRuntimeLOD()

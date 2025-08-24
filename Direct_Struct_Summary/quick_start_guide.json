@@ -1,0 +1,82 @@
+{
+  "FOR_EXTERNAL_PROGRAMMERS": {
+    "quick_diagnosis": {
+      "problem": "Flat terrain instead of spherical mini-planets",
+      "root_cause": "Using wrong terrain generation system (create_mini_planet.py instead of Agent D)",
+      "solution": "Use Agent D directly via LOP_miniplanet command"
+    }
+  },
+  "CORRECT_USAGE_RIGHT_NOW": {
+    "step1_test_working_reference": {
+      "command": "python renderer/pcc_game_viewer.py runs/miniplanet_seed_9999.json",
+      "purpose": "Verify that viewer works with known good spherical planet",
+      "expected_result": "Should show curved mini-planet you can walk around"
+    },
+    "step2_generate_new_planet": { 
+      "command": "./commands/LOP_miniplanet --seed 42 --view",
+      "purpose": "Generate new planet using Agent D system",
+      "expected_result": "Should show new spherical planet with seed 42"
+    },
+    "step3_debug_if_still_flat": {
+      "manual_generation": "python agents/agent_d_renderer.py --seed 42 --output debug.json",
+      "manual_viewing": "python renderer/pcc_game_viewer.py debug.json",
+      "check_output": "cat debug.json | head -50",
+      "purpose": "Debug Agent D output format vs viewer expectations"
+    }
+  },
+  "SYSTEMS_CURRENTLY_WORKING": {
+    "planet_generation": "agents/agent_d_renderer.py - T17 Hero Planet system",
+    "viewer": "renderer/pcc_game_viewer.py - Interactive 3D navigation", 
+    "command_wrapper": "commands/LOP_miniplanet - Fixed to call Agent D",
+    "reference_data": "runs/miniplanet_seed_*.json - Known working planets"
+  },
+  "SYSTEMS_BROKEN_AVOID": {
+    "create_mini_planet.py": "BROKEN - Creates flat terrain, missing dependencies",
+    "test_chunk_streaming.py": "DEBUG ARTIFACT - Not production system",
+    "forge engine": "COMPLEX - Not needed for basic planet generation"
+  },
+  "IMMEDIATE_CLEANUP_ACTIONS": {
+    "delete_confusion_sources": [
+      "rm create_mini_planet.py",
+      "rm test_chunk_streaming.py", 
+      "mkdir archive && mv agents/run_evolution_*.py archive/"
+    ],
+    "verify_production_systems": [
+      "ls agents/agent_d_renderer.py",
+      "ls renderer/pcc_game_viewer.py",
+      "ls commands/LOP_miniplanet",
+      "ls runs/miniplanet_seed_*.json"
+    ]
+  },
+  "IF_STILL_HAVING_ISSUES": {
+    "check_dependencies": [
+      "python -c 'import OpenGL' - Must work for viewer",
+      "ls agents/agent_d/mesh/shading_basis.py - Must exist for Agent D",
+      "python agents/agent_d_renderer.py --help - Should show help without errors"
+    ],
+    "compare_data_formats": {
+      "working_format": "cat runs/miniplanet_seed_9999.json | head -30",
+      "agent_d_format": "python agents/agent_d_renderer.py --seed 42 --output test.json && cat test.json | head -30",
+      "check": "Both should have 'terrain' object with 'type': 'realistic_miniplanet'"
+    },
+    "potential_fixes": [
+      "Agent D may be generating buildings instead of terrain - check building placement code",
+      "Viewer may expect different data format - compare with working reference",
+      "OpenGL environment issues - test viewer with known good data first"
+    ]
+  },
+  "SUCCESS_CRITERIA": {
+    "working_system_produces": [
+      "Spherical mini-planets (not flat planes)",
+      "40+ terrain zones with varied biomes",
+      "Buildings/structures on planet surface", 
+      "Smooth WASD + mouse navigation",
+      "Ability to walk completely around planet"
+    ],
+    "test_seeds": [
+      "42 - Should be consistent each run",
+      "9999 - Reference working seed",
+      "Random - Should generate new planets"
+    ]
+  }
+}

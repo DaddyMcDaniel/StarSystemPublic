@@ -1,0 +1,84 @@
+{
+  "CORRECT_PRODUCTION_WORKFLOW": {
+    "single_command_usage": {
+      "command": "./commands/LOP_miniplanet --seed 1234 --view",
+      "status": "PRODUCTION - MAIN ENTRYPOINT",
+      "what_it_does": "Calls Agent D → generates planet → launches viewer",
+      "result": "Should show spherical mini-planet with proper navigation"
+    },
+    "manual_two_step_usage": {
+      "step1": {
+        "command": "python agents/agent_d_renderer.py --seed 1234 --output planet.json",
+        "status": "PRODUCTION - TERRAIN GENERATION",
+        "result": "Creates JSON with 40+ terrain zones, buildings"
+      },
+      "step2": {
+        "command": "python renderer/pcc_game_viewer.py planet.json", 
+        "status": "PRODUCTION - 3D VIEWER",
+        "result": "Interactive 3D navigation with WASD controls"
+      }
+    },
+    "working_reference_test": {
+      "command": "python renderer/pcc_game_viewer.py runs/miniplanet_seed_9999.json",
+      "status": "REFERENCE - KNOWN WORKING",
+      "purpose": "Test that viewer works with known good planet data"
+    }
+  },
+  "SYSTEMS_TO_AVOID": {
+    "broken_generator": {
+      "script": "create_mini_planet.py",
+      "status": "BROKEN - DO NOT USE",
+      "issue": "Creates flat planes, missing dependencies, fallback code only"
+    },
+    "old_commands": {
+      "scripts": [
+        "run_evolution_*.py in agents/",
+        "launch_manual_test.py", 
+        "quick_world_view.py"
+      ],
+      "status": "DEPRECATED - Use LOP_miniplanet instead"
+    }
+  },
+  "CURRENT_ISSUES_TO_FIX": {
+    "terrain_still_flat": {
+      "problem": "Even with Agent D, planets may still show as flat",
+      "likely_causes": [
+        "Missing OpenGL dependencies in environment",
+        "Agent D generating building objects instead of terrain",
+        "Data format mismatch between Agent D output and viewer"
+      ],
+      "debug_steps": [
+        "1. Check if Agent D output has proper terrain zones",
+        "2. Verify viewer can load reference files (runs/miniplanet_seed_9999.json)",
+        "3. Compare Agent D output format with working reference format"
+      ]
+    },
+    "floating_objects": {
+      "problem": "Random cubes appearing in sphere zones", 
+      "likely_cause": "Agent D building/ore placement system",
+      "investigation": "Check Agent D building generation algorithms"
+    }
+  },
+  "CLEANUP_PRIORITIES": {
+    "high_priority": [
+      "Remove/rename create_mini_planet.py to avoid confusion",
+      "Move deprecated run_evolution_*.py to archive folder",
+      "Fix Agent D → viewer data format compatibility"
+    ],
+    "medium_priority": [
+      "Clean up test_*.py files in root directory",
+      "Organize debug/development scripts into subfolder",
+      "Update documentation to point to correct systems"
+    ]
+  },
+  "SUCCESS_CRITERIA": {
+    "working_system_should": [
+      "Show spherical mini-planets (not flat planes)",
+      "Allow walking completely around planet surface", 
+      "Have smooth WASD + mouse navigation",
+      "Generate different terrain for different seeds",
+      "Load quickly with Agent D's terrain zones"
+    ],
+    "test_command": "./commands/LOP_miniplanet --seed 42 --view"
+  }
+}

@@ -1,0 +1,78 @@
+
+# PCC Planet Definition
+# Generated: 2025-08-21T21:27:52.164841
+
+planet "MiniWorld" {
+    radius: 50.0
+    seed: 31415926
+    
+    terrain {
+        # Base terrain layer - rolling hills
+        layer "base" {
+            type: "fbm"
+            amplitude: 5.0
+            frequency: 0.3
+            octaves: 5
+            lacunarity: 2.0
+            persistence: 0.5
+        }
+        
+        # Mountain layer - sharp peaks
+        layer "mountains" {
+            type: "ridged"
+            amplitude: 15.0
+            frequency: 0.1
+            octaves: 4
+            mask: "height_gradient"
+            blend_mode: "multiply"
+        }
+        
+        # Detail layer - surface roughness
+        layer "detail" {
+            type: "turbulence"
+            amplitude: 0.5
+            frequency: 2.0
+            octaves: 3
+            blend_mode: "add"
+        }
+        
+        # Optional cave system
+        caves {
+            enabled: false
+            density: 0.3
+            min_depth: 5.0
+            max_depth: 20.0
+        }
+    }
+    
+    materials {
+        # Define material zones based on height and slope
+        zone "grass" {
+            height_range: [0.0, 0.3]
+            slope_range: [0.0, 30.0]
+            color: [0.3, 0.6, 0.2]
+            roughness: 0.8
+        }
+        
+        zone "rock" {
+            height_range: [0.3, 0.7]
+            slope_range: [30.0, 90.0]
+            color: [0.5, 0.45, 0.4]
+            roughness: 0.9
+        }
+        
+        zone "snow" {
+            height_range: [0.7, 1.0]
+            slope_range: [0.0, 90.0]
+            color: [0.95, 0.95, 1.0]
+            roughness: 0.3
+        }
+    }
+    
+    lod {
+        levels: 1
+        base_chunk_size: 16
+        distance_multiplier: 2.0
+        transition_range: 10.0
+    }
+}

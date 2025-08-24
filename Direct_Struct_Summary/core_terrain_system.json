@@ -1,0 +1,69 @@
+{
+  "PRODUCTION_SYSTEMS": {
+    "primary_planet_generator": {
+      "script": "agents/agent_d_renderer.py",
+      "status": "WORKING - USE THIS",
+      "purpose": "Main terrain generation system with T17 Hero Planet",
+      "usage": "python agents/agent_d_renderer.py --seed 1234 --output planet.json",
+      "output_format": "JSON with terrain zones, buildings, realistic miniplanet"
+    },
+    "primary_viewer": {
+      "script": "renderer/pcc_game_viewer.py", 
+      "status": "WORKING - USE THIS",
+      "purpose": "Interactive 3D navigation with proper controls",
+      "usage": "python renderer/pcc_game_viewer.py planet.json",
+      "features": "Mouse capture, WASD movement, smooth physics"
+    },
+    "production_entrypoint": {
+      "script": "commands/LOP_miniplanet",
+      "status": "FIXED - USE THIS", 
+      "purpose": "Main user command that calls Agent D + viewer",
+      "usage": "./commands/LOP_miniplanet --seed 1234 --view"
+    }
+  },
+  "REFERENCE_DATA": {
+    "working_examples": [
+      "runs/miniplanet_seed_9999.json",
+      "runs/miniplanet_seed_31415926.json"
+    ],
+    "status": "WORKING REFERENCE - These show proper spherical planets"
+  },
+  "AGENT_D_CORE_MODULES": {
+    "terrain_generation": [
+      "agents/agent_d/terrain/heightfield.py",
+      "agents/agent_d/terrain/noise_nodes.py"
+    ],
+    "mesh_generation": [
+      "agents/agent_d/mesh/cubesphere.py",
+      "agents/agent_d/mesh/quadtree_chunking.py",
+      "agents/agent_d/mesh/runtime_lod.py",
+      "agents/agent_d/mesh/shading_basis.py"
+    ],
+    "deterministic_systems": [
+      "agents/agent_d/determinism/seed_threading.py",
+      "agents/agent_d/baking/deterministic_baking.py"
+    ],
+    "status": "CORE DEPENDENCIES - Required by Agent D"
+  },
+  "BROKEN_DO_NOT_USE": {
+    "broken_generator": {
+      "script": "create_mini_planet.py",
+      "status": "BROKEN - DO NOT USE",
+      "issue": "Falls back to flat procedural noise, missing shading_basis module",
+      "result": "Creates flat planes instead of spherical planets"
+    }
+  },
+  "TEST_DEVELOPMENT_ONLY": {
+    "test_files": [
+      "agents/agent_d/terrain/test_heightfield.py",
+      "test_chunks_depth1/planet_chunks.json",
+      "test_chunks_depth2/planet_chunks.json"
+    ],
+    "alternative_viewers": [
+      "renderer/pcc_fixed_viewer.py",
+      "renderer/pcc_simple_viewer.py", 
+      "renderer/pcc_spherical_viewer.py"
+    ],
+    "status": "DEVELOPMENT/TESTING - Not for production use"
+  }
+}

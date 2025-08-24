@@ -1,0 +1,83 @@
+{
+  "config": {
+    "planet": {
+      "name": "MiniWorld",
+      "radius": 50.0,
+      "seed": 31415926,
+      "resolution": 32
+    },
+    "terrain": {
+      "base_layer": {
+        "type": "fbm",
+        "amplitude": 5.0,
+        "frequency": 0.3,
+        "octaves": 5,
+        "lacunarity": 2.0,
+        "persistence": 0.5
+      },
+      "mountain_layer": {
+        "type": "ridged",
+        "amplitude": 15.0,
+        "frequency": 0.1,
+        "octaves": 4,
+        "sharpness": 0.9
+      },
+      "detail_layer": {
+        "type": "turbulence",
+        "amplitude": 0.5,
+        "frequency": 2.0,
+        "octaves": 3
+      },
+      "enable_caves": false,
+      "cave_density": 0.3
+    },
+    "mesh": {
+      "cubesphere_divisions": 4,
+      "lod_levels": 1,
+      "chunk_size": 16,
+      "enable_crack_prevention": true
+    },
+    "rendering": {
+      "enable_shadows": true,
+      "enable_ssao": true,
+      "enable_normal_mapping": true,
+      "shadow_resolution": 2048,
+      "ambient_color": [
+        0.2,
+        0.25,
+        0.3
+      ],
+      "sun_direction": [
+        0.5,
+        -0.7,
+        0.3
+      ],
+      "sun_color": [
+        1.0,
+        0.95,
+        0.8
+      ],
+      "fog_enabled": true,
+      "fog_density": 0.001
+    },
+    "optimization": {
+      "enable_baking": false,
+      "multi_threaded": true,
+      "thread_count": 8,
+      "cache_chunks": true,
+      "stream_distance": 200.0
+    },
+    "output": {
+      "format": "binary",
+      "compress": true,
+      "generate_preview": true,
+      "output_dir": "generated_planets"
+    }
+  },
+  "timestamp": "20250821_212752",
+  "stats": {
+    "vertex_count": 0,
+    "chunk_count": 24,
+    "radius": 50.0
+  }
+}

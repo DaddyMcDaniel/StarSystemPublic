@@ -1,0 +1,17 @@
+{
+  "end_to_end_workflow_docs": [
+    "mini_planet_workflow.md",
+    "docs/mini_planet_core_components.md"
+  ],
+  "unified_entrypoints": [
+    "create_mini_planet.py",
+    "commands/LOP_miniplanet"
+  ],
+  "workflow_integration": [
+    "rules/direct_struct_summary_maintenance.md"
+  ],
+  "project_documentation": [
+    "CLAUDE.md",
+    "docs/pcc_language_spec.md"
+  ]
+}

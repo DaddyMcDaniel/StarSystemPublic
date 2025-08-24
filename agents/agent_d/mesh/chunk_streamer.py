@@ -49,6 +49,7 @@ class ChunkVAO:
     norm_buffer: int = 0
     uv_buffer: int = 0
     tan_buffer: int = 0
+    color_buffer: int = 0  # Per-vertex colors
     index_buffer: int = 0
     vertex_count: int = 0
     triangle_count: int = 0
@@ -163,6 +164,21 @@ class ChunkStreamer:
             indices = chunk_data.get("indices", np.array([]))
             uvs = chunk_data.get("uv0", np.array([]))
             tangents = chunk_data.get("tangents", np.array([]))
+            colors = chunk_data.get("vertex_colors", np.array([]))
+            
+            # Convert nested arrays to flat arrays if needed (unified format)
+            if isinstance(positions, list) and len(positions) > 0 and isinstance(positions[0], list):
+                positions = np.array(positions, dtype=np.float32).flatten()
+            if isinstance(normals, list) and len(normals) > 0 and isinstance(normals[0], list):
+                normals = np.array(normals, dtype=np.float32).flatten()
+            if isinstance(indices, list):
+                indices = np.array(indices, dtype=np.uint32).flatten()
+            if isinstance(uvs, list) and len(uvs) > 0 and isinstance(uvs[0], list):
+                uvs = np.array(uvs, dtype=np.float32).flatten()
+            if isinstance(tangents, list) and len(tangents) > 0 and isinstance(tangents[0], list):
+                tangents = np.array(tangents, dtype=np.float32).flatten()
+            if isinstance(colors, list) and len(colors) > 0 and isinstance(colors[0], list):
+                colors = np.array(colors, dtype=np.float32).flatten()
             
             if positions.size == 0 or indices.size == 0:
                 print(f"⚠️ Chunk {chunk_id} has no geometry data")
@@ -179,6 +195,8 @@ class ChunkStreamer:
                 uvs = uvs.astype(np.float32)
             if hasattr(tangents, 'astype'):
                 tangents = tangents.astype(np.float32)
+            if hasattr(colors, 'astype'):
+                colors = colors.astype(np.float32)
             
             # Generate VAO
             vao = glGenVertexArrays(1)
@@ -189,6 +207,7 @@ class ChunkStreamer:
             norm_buffer = 0
             uv_buffer = 0
             tan_buffer = 0
+            color_buffer = 0
             
             # Position buffer (attribute 0)
             if positions.size > 0:
@@ -222,6 +241,14 @@ class ChunkStreamer:
                 glEnableVertexAttribArray(3)
                 glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, None)
             
+            # Color buffer (attribute 4) - per-vertex colors
+            if colors.size > 0:
+                color_buffer = glGenBuffers(1)
+                glBindBuffer(GL_ARRAY_BUFFER, color_buffer)
+                glBufferData(GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW)
+                glEnableVertexAttribArray(4)
+                glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, None)
+            
             # Index buffer
             index_buffer = glGenBuffers(1)
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer)
@@ -231,9 +258,12 @@ class ChunkStreamer:
             glBindVertexArray(0)
             
             # Calculate metrics
-            vertex_count = len(positions) // 3 if positions.size > 0 else 0
+            # Use total element count to derive vertex count to support (N,3) arrays
+            vertex_count = (positions.size // 3) if positions.size > 0 else 0
             triangle_count = len(indices) // 3 if indices.size > 0 else 0
             memory_usage = self.estimate_chunk_memory_usage(chunk_data)
+            
+            print(f"🔧 Loaded chunk {chunk_id}: {vertex_count} verts, {triangle_count} tris")
             
             load_time = time.time() - start_time
             self.stats.load_time_ms += load_time * 1000
@@ -244,6 +274,7 @@ class ChunkStreamer:
                 norm_buffer=norm_buffer,
                 uv_buffer=uv_buffer,
                 tan_buffer=tan_buffer,
+                color_buffer=color_buffer,
                 index_buffer=index_buffer,
                 vertex_count=vertex_count,
                 triangle_count=triangle_count,
@@ -279,6 +310,8 @@ class ChunkStreamer:
                 buffer_ids.append(chunk_vao.uv_buffer)
             if chunk_vao.tan_buffer > 0:
                 buffer_ids.append(chunk_vao.tan_buffer)
+            if chunk_vao.color_buffer > 0:
+                buffer_ids.append(chunk_vao.color_buffer)
             if chunk_vao.index_buffer > 0:
                 buffer_ids.append(chunk_vao.index_buffer)
             
@@ -541,6 +574,10 @@ class ChunkStreamer:
         """Get current GPU memory usage in MB"""
         return self.stats.gpu_memory_usage / (1024 * 1024)
 
+    def get_loaded_chunk_ids(self) -> Set[str]:
+        """Get set of currently loaded chunk IDs"""
+        return set(self.chunk_vaos.keys())
+
     def cleanup(self):
         """Clean up all VAOs and free resources"""
         chunk_ids = list(self.chunk_vaos.keys())
@@ -549,6 +586,14 @@ class ChunkStreamer:
         
         self.chunk_data_cache.clear()
         self.cache_access_order.clear()
+
+    def get_loaded_chunk_ids(self) -> set[str]:
+        """Return the set of currently loaded chunk IDs (VAOs resident)."""
+        return set(self.chunk_vaos.keys())
+
+    def get_chunk_record(self, chunk_id: str) -> ChunkVAO | None:
+        """Get the ChunkVAO record for a chunk (contains buffer IDs and counts)."""
+        return self.chunk_vaos.get(chunk_id)
 
 
 if __name__ == "__main__":

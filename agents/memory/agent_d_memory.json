@@ -1,5 +1,5 @@
 {
-  "generation_count": 32,
+  "generation_count": 44,
   "successful_patterns": [],
   "failed_patterns": [],
   "terrain_preferences": {
@@ -232,6 +232,90 @@
       "scene_file": "/home/colling/PCC-LanguageV2/runs/miniplanet_seed_31415926.json",
       "terrain_zones": 52,
       "objects_generated": 72
+    },
+    {
+      "timestamp": "2025-08-20T16:42:20.832797",
+      "seed": 31415926,
+      "scene_file": "/home/colling/PCC-LanguageV2/runs/miniplanet_seed_31415926.json",
+      "terrain_zones": 52,
+      "objects_generated": 72
+    },
+    {
+      "timestamp": "2025-08-20T16:44:25.491111",
+      "seed": 2665,
+      "scene_file": "/home/colling/PCC-LanguageV2/runs/miniplanet_seed_2665.json",
+      "terrain_zones": 52,
+      "objects_generated": 72
+    },
+    {
+      "timestamp": "2025-08-21T22:12:09.341227",
+      "seed": 42,
+      "scene_file": "/home/colling/PCC-LanguageV2/generated_planets/test_miniplanet_seed_42.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-21T22:13:14.563914",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250821_221314.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-21T22:13:26.291187",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250821_221326.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-21T22:15:16.063725",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250821_221516.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T10:41:28.182116",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250822_104128.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T10:50:52.269569",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250822_105052.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T10:51:25.522339",
+      "seed": 42,
+      "scene_file": "debug_manual.json",
+      "terrain_zones": 40,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T10:55:24.599443",
+      "seed": 42,
+      "scene_file": "test_fixed.json",
+      "terrain_zones": 19,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T10:55:38.332603",
+      "seed": 42,
+      "scene_file": "generated_planets/miniplanet_seed_42_20250822_105538.json",
+      "terrain_zones": 19,
+      "objects_generated": 57
+    },
+    {
+      "timestamp": "2025-08-22T16:33:35.291248",
+      "seed": 42,
+      "scene_file": "test_seed_42.json",
+      "terrain_zones": 19,
+      "objects_generated": 57
     }
   ],
   "last_feedback": {

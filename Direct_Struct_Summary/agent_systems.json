@@ -1,0 +1,62 @@
+{
+  "PRODUCTION_AGENTS": {
+    "agent_d_renderer": {
+      "script": "agents/agent_d_renderer.py",
+      "status": "PRODUCTION - USE THIS", 
+      "purpose": "Main terrain generation system - converts PCC to 3D scenes",
+      "features": "T17 Hero Planet system, deterministic seeding, 40+ terrain zones",
+      "usage": "python agents/agent_d_renderer.py --seed 1234 --output planet.json"
+    },
+    "agent_a_generator": {
+      "script": "agents/agent_a_generator.py",
+      "status": "PRODUCTION - USE THIS",
+      "purpose": "Generates PCC game code and initial structures",
+      "note": "Works with Agent D in evolution loop"
+    }
+  },
+  "EVOLUTION_LOOP_AGENTS": {
+    "agent_b_manual": {
+      "script": "agents/agent_b_manual.py", 
+      "status": "FUNCTIONAL - Human testing interface",
+      "purpose": "Manual game testing and quality assessment"
+    },
+    "agent_b_tester": {
+      "script": "agents/agent_b_tester.py",
+      "status": "FUNCTIONAL - Automated testing",
+      "purpose": "Automated game quality assessment"
+    },
+    "agent_c_supervisor": {
+      "script": "agents/agent_c_supervisor.py",
+      "status": "FUNCTIONAL - Evolution feedback",
+      "purpose": "Provides evolutionary feedback to improve generation"
+    }
+  },
+  "PRODUCTION_MEMORY_SYSTEMS": {
+    "agent_d_memory": "agents/memory/agent_d_memory.json",
+    "agent_communication": "agents/communication/",
+    "evolution_logs": "agents/logs/",
+    "status": "PRODUCTION - Required for agent memory and learning"
+  },
+  "DEPRECATED_SYSTEMS": {
+    "old_evolution_loops": [
+      "agents/run_evolution_loop.py",
+      "agents/run_evolution_auto.py",
+      "agents/run_evolution_manual.py"
+    ],
+    "status": "DEPRECATED - Use run_auto_loop.py and run_manual_loop.py instead"
+  },
+  "DEVELOPMENT_TESTING": {
+    "legacy_memory": [
+      "agents/memory/agent_b_bb_supertux_memory.json",
+      "agents/memory/agent_b_story_memory.json", 
+      "agents/memory/agent_b_ui_memory.json",
+      "agents/memory/story_memory.py"
+    ],
+    "prompting_tools": [
+      "agents/prompting/",
+      "agents/emit_prompts.py",
+      "agents/prompt_vars.example.json"
+    ],
+    "status": "DEVELOPMENT/TESTING - Not required for basic planet generation"
+  }
+}

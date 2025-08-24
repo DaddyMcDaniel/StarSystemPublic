@@ -1,0 +1,29 @@
+{
+  "chunk_test_data": [
+    "test_chunks_depth1/",
+    "test_chunks_depth2/", 
+    "test_crack_prevention_chunks/",
+    "agents/agent_d/test_chunks_depth1/",
+    "agents/agent_d/test_chunks_depth2/"
+  ],
+  "planet_examples": [
+    "runs/miniplanet_seed_42.json",
+    "runs/miniplanet_seed_1126.json",
+    "runs/miniplanet_seed_2025.json",
+    "runs/miniplanet_seed_31415926.json",
+    "agents/agent_d/examples/hero_planet.pcc",
+    "agents/agent_d/examples/minimal_sphere.pcc"
+  ],
+  "cubesphere_manifests": [
+    "agents/agent_d/mesh/cpp_cubesphere.json",
+    "agents/agent_d/mesh/cubesphere_32.json",
+    "agents/agent_d/mesh/displaced_planet_manifest.json",
+    "agents/agent_d/mesh/mountainous_planet_manifest.json",
+    "agents/agent_d/mesh/rocky_planet_manifest.json"
+  ],
+  "debug_and_validation": [
+    "agents/agent_d/integration_test/",
+    "integration_test/",
+    "debug_sessions/"
+  ]
+}

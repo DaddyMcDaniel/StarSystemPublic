@@ -1,0 +1,93 @@
+{
+  "SAFE_TO_DELETE_IMMEDIATELY": {
+    "broken_main_systems": [
+      "create_mini_planet.py - BROKEN fallback system causing flat terrain bug"
+    ],
+    "unused_ai_tooling": [
+      "automation/ - Playwright automation not used",
+      "crew/ - Agent crew system not used", 
+      "mcp_server/ - MCP protocol server not used"
+    ],
+    "obsolete_configs": [
+      "config/gates.native.yaml",
+      "config/gates.web.yaml", 
+      "planet_configs/ - Replaced by Agent D seeded generation"
+    ],
+    "redundant_commands": [
+      "commands/HOP_main",
+      "commands/HOP_terrain", 
+      "commands/LOP_cubesphere_T02",
+      "commands/LOP_init",
+      "commands/LOP_viewer_T01 - Use LOP_miniplanet instead"
+    ]
+  },
+  "MOVE_TO_ARCHIVE_FOLDER": {
+    "deprecated_evolution_loops": [
+      "agents/run_evolution_loop.py",
+      "agents/run_evolution_auto.py",
+      "agents/run_evolution_auto_proper.py", 
+      "agents/run_evolution_manual.py",
+      "agents/run_evolution_manual_proper.py"
+    ],
+    "test_and_debug_artifacts": [
+      "debug_sessions/",
+      "integration_test/",
+      "test_screenshots_t16/",
+      "test_cubesphere_viewer.py",
+      "test_manual_interactive.py",
+      "test_mesh_viewer.py", 
+      "test_t03_normals.py",
+      "verify_normals.py",
+      "terrain_visual_demo.py"
+    ],
+    "demo_scripts": [
+      "demo_feedback.py",
+      "demo_terrain_improvements.py",
+      "collect_feedback.py",
+      "launch_manual_test.py",
+      "quick_world_view.py"
+    ]
+  },
+  "EVALUATE_FOR_DELETION": {
+    "forge_engine": [
+      "forge/ - Entire modular engine - may be needed for long-term goals",
+      "examples/projects/ - Forge examples"
+    ],
+    "non_essential_schemas": [
+      "schemas/assets_manifest.v1.schema.json",
+      "schemas/blueprint_chip.v1.schema.json",
+      "schemas/building_system.v1.schema.json",
+      "schemas/human_feedback.v1.schema.json",
+      "schemas/ledger.v1.schema.json",
+      "schemas/power_graph.v1.schema.json",
+      "schemas/replay.v1.schema.json", 
+      "schemas/world_hot_swap.v1.schema.json"
+    ],
+    "documentation": [
+      "docs/three_agent_plan.md - May have historical value",
+      "PROJECT_REPORT.txt - May have historical value",
+      "README.md - Update rather than delete"
+    ]
+  },
+  "KEEP_BUT_ORGANIZE": {
+    "current_working_systems": [
+      "run_auto_loop.py - KEEP - Working evolution loop",
+      "run_manual_loop.py - KEEP - Working manual testing"
+    ],
+    "development_data": [
+      "tests/examples/ - KEEP - May contain working PCC examples",
+      "human_feedback/ - KEEP - May be needed for Agent B/C",
+      "agents/communication/ - KEEP - Required for agent memory"
+    ]
+  },
+  "CONFUSION_SOURCES": {
+    "misleading_filenames": [
+      "create_mini_planet.py - Sounds like main system but is broken",
+      "test_chunk_streaming.py - Created during debugging, not core system"
+    ],
+    "multiple_similar_systems": [
+      "Multiple evolution loop scripts with similar names",
+      "Multiple viewer scripts - only pcc_game_viewer.py is production"
+    ]
+  }
+}

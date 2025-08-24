@@ -1,0 +1,26 @@
+{
+  "opengl_viewers": [
+    "renderer/pcc_game_viewer.py",
+    "renderer/pcc_fixed_viewer.py", 
+    "renderer/pcc_simple_viewer.py",
+    "renderer/pcc_spherical_viewer.py"
+  ],
+  "mesh_generation_core": [
+    "agents/agent_d/marching_cubes/marching_cubes.py",
+    "agents/agent_d/marching_cubes/chunk_cave_generator.py",
+    "agents/agent_d/sdf/sdf_evaluator.py",
+    "agents/agent_d/sdf/sdf_primitives.py"
+  ],
+  "lighting_and_materials": [
+    "agents/agent_d/lighting/lighting_system.py",
+    "agents/agent_d/lighting/shadow_mapping.py",
+    "agents/agent_d/lighting/ssao.py",
+    "agents/agent_d/lighting/tone_mapping.py",
+    "agents/agent_d/materials/mikktspace_tangents.py"
+  ],
+  "navigation_controls": [
+    "agents/agent_d/camera_tools/debug_camera.py",
+    "agents/agent_d/hud/lod_statistics_hud.py",
+    "agents/agent_d/debug_ui/debug_toggles.py"
+  ]
+}

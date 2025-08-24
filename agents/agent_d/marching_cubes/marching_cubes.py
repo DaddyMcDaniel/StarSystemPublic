@@ -56,19 +56,21 @@ class MarchingCubes:
     Marching Cubes implementation for SDF polygonization
     """
     
-    def __init__(self, iso_value: float = 0.0):
+    def __init__(self, iso_value: float = 0.0, use_sdf_normals: bool = True):
         """
-        Initialize Marching Cubes
+        Initialize Marching Cubes with T20 improvements
         
         Args:
             iso_value: Surface isosurface value (0.0 for SDF surface)
+            use_sdf_normals: Use SDF gradient for normals (T20 improvement)
         """
         self.iso_value = iso_value
+        self.use_sdf_normals = use_sdf_normals
         self._initialize_lookup_tables()
     
     def _initialize_lookup_tables(self):
         """Initialize Marching Cubes lookup tables"""
-        from mc_tables import EDGE_TABLE, COMPLETE_TRIANGLE_TABLE, EDGE_VERTICES, CUBE_VERTICES
+        from .mc_tables import EDGE_TABLE, COMPLETE_TRIANGLE_TABLE, EDGE_VERTICES, CUBE_VERTICES
         
         # Use complete lookup tables
         self.edge_table = EDGE_TABLE
@@ -161,8 +163,8 @@ class MarchingCubes:
                                 v1_pos, v2_pos, v1_val, v2_val, self.iso_value
                             )
                             
-                            # Compute normal from SDF gradient
-                            normal = self._compute_normal(intersection_pos, sdf_tree, voxel_grid)
+                            # T20: Compute normal from SDF gradient with improved quality
+                            normal = self._compute_normal_improved(intersection_pos, sdf_tree, voxel_grid, scalar_3d)
                             
                             # Create vertex
                             vertex = MarchingCubesVertex(
@@ -191,6 +193,10 @@ class MarchingCubes:
         
         # Convert triangles to numpy array
         triangles_array = np.array(triangles) if triangles else np.empty((0, 3), dtype=np.int32)
+        
+        # T20: Post-process to remove duplicate vertices in overlap regions
+        if len(vertices) > 0:
+            vertices, triangles_array = self._remove_duplicate_vertices(vertices, triangles_array)
         
         return vertices, triangles_array
     
@@ -249,6 +255,128 @@ class MarchingCubes:
             return np.array([0.0, 0.0, 1.0])  # Default up normal
         
         return grad / length
+    
+    def _compute_normal_improved(self, position: np.ndarray, sdf_tree: Optional[SDFNode], 
+                               voxel_grid: VoxelGrid, scalar_field: np.ndarray) -> np.ndarray:
+        """
+        T20: Compute surface normal with improved quality using SDF gradient
+        
+        Args:
+            position: World position to compute normal at
+            sdf_tree: SDF tree for gradient computation
+            voxel_grid: Voxel grid for epsilon and fallback calculation
+            scalar_field: 3D scalar field for fallback estimation
+            
+        Returns:
+            Unit normal vector
+        """
+        if self.use_sdf_normals and sdf_tree is not None:
+            # Use SDF gradient for best quality
+            epsilon = voxel_grid.min_voxel_size * 0.25  # Smaller epsilon for better accuracy
+            grad = sdf_gradient(sdf_tree, position, epsilon)
+            
+            # Normalize to unit vector
+            length = np.linalg.norm(grad)
+            if length > 1e-8:
+                return grad / length
+        
+        # Fallback: estimate from scalar field
+        return self._estimate_normal_from_scalar_field(voxel_grid, position, scalar_field)
+    
+    def _estimate_normal_from_scalar_field(self, voxel_grid: VoxelGrid, 
+                                         world_pos: np.ndarray, 
+                                         scalar_field: np.ndarray) -> np.ndarray:
+        """
+        T20: Estimate normal from scalar field using central differences (fallback)
+        
+        Args:
+            voxel_grid: Voxel grid
+            world_pos: World position
+            scalar_field: 3D scalar field
+            
+        Returns:
+            Estimated normal vector
+        """
+        epsilon = voxel_grid.min_voxel_size
+        
+        # Sample scalar field at neighboring positions
+        def sample_scalar(pos):
+            voxel_pos = (pos - voxel_grid.bounds.min_point) / voxel_grid.min_voxel_size
+            x, y, z = np.clip(voxel_pos.astype(int), 0, voxel_grid.resolution - 1)
+            return scalar_field[x, y, z]
+        
+        # Central differences
+        grad_x = (sample_scalar(world_pos + np.array([epsilon, 0, 0])) - 
+                 sample_scalar(world_pos - np.array([epsilon, 0, 0]))) / (2 * epsilon)
+        grad_y = (sample_scalar(world_pos + np.array([0, epsilon, 0])) - 
+                 sample_scalar(world_pos - np.array([0, epsilon, 0]))) / (2 * epsilon)
+        grad_z = (sample_scalar(world_pos + np.array([0, 0, epsilon])) - 
+                 sample_scalar(world_pos - np.array([0, 0, epsilon]))) / (2 * epsilon)
+        
+        normal = np.array([grad_x, grad_y, grad_z])
+        norm = np.linalg.norm(normal)
+        
+        if norm > 1e-8:
+            return normal / norm
+        else:
+            return np.array([0.0, 0.0, 1.0])  # Default up normal
+    
+    def _remove_duplicate_vertices(self, vertices: List[MarchingCubesVertex], 
+                                 triangles: np.ndarray, tolerance: float = 1e-6) -> Tuple[List[MarchingCubesVertex], np.ndarray]:
+        """
+        T20: Remove duplicate vertices in overlap regions to prevent seams
+        
+        Args:
+            vertices: List of vertices
+            triangles: Triangle index array
+            tolerance: Distance tolerance for considering vertices duplicate
+            
+        Returns:
+            Cleaned vertices and updated triangle indices
+        """
+        if not vertices or len(triangles) == 0:
+            return vertices, triangles
+        
+        # Build spatial hash for efficient duplicate detection
+        unique_vertices = []
+        vertex_map = {}
+        old_to_new_idx = {}
+        
+        for i, vertex in enumerate(vertices):
+            # Create position key for spatial hashing
+            pos_key = tuple(np.round(vertex.position / tolerance).astype(int))
+            
+            # Check if we already have a vertex at this position
+            found_duplicate = False
+            for existing_idx in vertex_map.get(pos_key, []):
+                existing_vertex = unique_vertices[existing_idx]
+                distance = np.linalg.norm(vertex.position - existing_vertex.position)
+                
+                if distance < tolerance:
+                    # Use existing vertex
+                    old_to_new_idx[i] = existing_idx
+                    found_duplicate = True
+                    break
+            
+            if not found_duplicate:
+                # Add new unique vertex
+                new_idx = len(unique_vertices)
+                unique_vertices.append(vertex)
+                vertex_map.setdefault(pos_key, []).append(new_idx)
+                old_to_new_idx[i] = new_idx
+        
+        # Update triangle indices
+        new_triangles = []
+        for triangle in triangles:
+            t0 = old_to_new_idx.get(triangle[0], triangle[0])
+            t1 = old_to_new_idx.get(triangle[1], triangle[1])
+            t2 = old_to_new_idx.get(triangle[2], triangle[2])
+            
+            # Skip degenerate triangles
+            if t0 != t1 and t1 != t2 and t0 != t2:
+                new_triangles.append([t0, t1, t2])
+        
+        return unique_vertices, np.array(new_triangles) if new_triangles else np.empty((0, 3), dtype=np.int32)
 
 
 class CaveMeshGenerator:

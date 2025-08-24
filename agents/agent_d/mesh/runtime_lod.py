@@ -102,7 +102,8 @@ class RuntimeLODManager:
                  lod_distance_bands: List[float] = None,
                  screen_error_thresholds: List[float] = None,
                  max_chunks_per_frame: int = 100,
-                 chunk_load_budget_ms: float = 2.0):
+                 chunk_load_budget_ms: float = 2.0,
+                 chunk_res_per_lod: Dict[LODLevel, int] = None):
         """
         Initialize runtime LOD manager
         
@@ -111,12 +112,21 @@ class RuntimeLODManager:
             screen_error_thresholds: Screen error thresholds for LOD transitions
             max_chunks_per_frame: Maximum chunks to render per frame
             chunk_load_budget_ms: Time budget for chunk loading per frame (ms)
+            chunk_res_per_lod: Resolution per LOD level for mesh density control
         """
-        # Default LOD distance bands (in world units)
-        self.lod_distance_bands = lod_distance_bands or [5.0, 15.0, 40.0, 100.0]
+        # Tighter LOD for nearby-only rendering (R ≈ 50, so 0.7R ≈ 35, 1.5R ≈ 75, 3R ≈ 150)
+        self.lod_distance_bands = lod_distance_bands or [35.0, 75.0, 150.0, 300.0]  # near≈0.7R, mid≈1.5R, far≈3R
         
-        # Default screen error thresholds (in pixels)
-        self.screen_error_thresholds = screen_error_thresholds or [0.5, 2.0, 8.0, 32.0]
+        # Very strict screen error thresholds (≤ 1.5px)
+        self.screen_error_thresholds = screen_error_thresholds or [0.5, 1.0, 1.5, 3.0]  # Tight screen error control
+        
+        # T19: Per-LOD chunk resolution for increased triangle density
+        self.chunk_res_per_lod = chunk_res_per_lod or {
+            LODLevel.LOD0: 128,  # Highest detail: 128x128 grid
+            LODLevel.LOD1: 128,  # Still high detail: 128x128 grid  
+            LODLevel.LOD2: 64,   # Medium detail: 64x64 grid
+            LODLevel.LOD3: 32    # Low detail: 32x32 grid
+        }
         
         self.max_chunks_per_frame = max_chunks_per_frame
         self.chunk_load_budget_ms = chunk_load_budget_ms
@@ -137,7 +147,10 @@ class RuntimeLODManager:
             'active_lod_levels': {},
             'frame_time_ms': 0.0,
             'cull_time_ms': 0.0,
-            'lod_time_ms': 0.0
+            'lod_time_ms': 0.0,
+            'total_triangles': 0,
+            'median_triangle_count': 0,
+            'lod_histogram': {lod: 0 for lod in LODLevel}
         }
 
     def compute_bounding_sphere(self, chunk_data: Dict) -> BoundingSphere:
@@ -338,7 +351,7 @@ class RuntimeLODManager:
 
     def select_lod_level(self, distance: float, screen_error: float) -> LODLevel:
         """
-        Select appropriate LOD level based on distance and screen error
+        Select appropriate LOD level based on distance and screen error with improved thresholds
         
         Args:
             distance: Distance to camera
@@ -347,9 +360,9 @@ class RuntimeLODManager:
         Returns:
             Selected LOD level
         """
-        # Use screen error as primary metric, fall back to distance
+        # T19: Use screen error as primary metric with improved thresholds
+        # Prioritize screen-space error for perceptually-driven LOD selection
         
-        # Screen error based selection (preferred)
         if screen_error > self.screen_error_thresholds[3]:
             return LODLevel.LOD3
         elif screen_error > self.screen_error_thresholds[2]:
@@ -359,7 +372,7 @@ class RuntimeLODManager:
         else:
             return LODLevel.LOD0
         
-        # Distance-based fallback
+        # Distance-based fallback (secondary, with tighter bands)
         if distance > self.lod_distance_bands[3]:
             return LODLevel.LOD3
         elif distance > self.lod_distance_bands[2]:
@@ -368,6 +381,18 @@ class RuntimeLODManager:
             return LODLevel.LOD1
         else:
             return LODLevel.LOD0
+    
+    def get_chunk_resolution(self, lod_level: LODLevel) -> int:
+        """
+        Get chunk resolution for given LOD level
+        
+        Args:
+            lod_level: LOD level to get resolution for
+            
+        Returns:
+            Grid resolution (N×N) for this LOD level
+        """
+        return self.chunk_res_per_lod.get(lod_level, 32)
 
     def select_active_chunks(self, all_chunks: List[Dict], camera_pos: np.ndarray,
                            view_matrix: np.ndarray, proj_matrix: np.ndarray,
@@ -399,7 +424,8 @@ class RuntimeLODManager:
         
         for chunk in all_chunks:
             chunk_info = chunk.get("chunk_info", {})
-            chunk_id = chunk_info.get("chunk_id", "unknown")
+            # Handle both unified format (chunk_id at top level) and legacy format (nested in chunk_info)
+            chunk_id = chunk.get("chunk_id") or chunk_info.get("chunk_id", "unknown")
             
             # Compute bounding volumes
             bounding_sphere = self.compute_bounding_sphere(chunk)
@@ -442,7 +468,25 @@ class RuntimeLODManager:
         if len(selected_chunks) > self.max_chunks_per_frame:
             selected_chunks = selected_chunks[:self.max_chunks_per_frame]
         
-        # Update performance stats
+        # T19: Calculate triangle statistics for HUD display
+        total_triangles = 0
+        triangle_counts = []
+        
+        for chunk_info in selected_chunks:
+            # Estimate triangles based on LOD resolution
+            chunk_res = self.get_chunk_resolution(chunk_info.lod_level)
+            triangles_per_chunk = (chunk_res - 1) * (chunk_res - 1) * 2  # 2 triangles per quad
+            total_triangles += triangles_per_chunk
+            triangle_counts.append(triangles_per_chunk)
+        
+        # Calculate median triangle count
+        median_triangles = 0
+        if triangle_counts:
+            triangle_counts.sort()
+            n = len(triangle_counts)
+            median_triangles = triangle_counts[n // 2] if n % 2 == 1 else (triangle_counts[n // 2 - 1] + triangle_counts[n // 2]) // 2
+        
+        # Update performance stats with triangle information
         total_time = time.time() - start_time
         self.stats.update({
             'total_chunks': len(all_chunks),
@@ -450,7 +494,10 @@ class RuntimeLODManager:
             'culled_chunks': len(all_chunks) - len(selected_chunks),
             'active_lod_levels': dict(lod_counts),
             'cull_time_ms': cull_time * 1000,
-            'lod_time_ms': total_time * 1000
+            'lod_time_ms': total_time * 1000,
+            'total_triangles': total_triangles,
+            'median_triangle_count': median_triangles,
+            'lod_histogram': dict(lod_counts)
         })
         
         return selected_chunks

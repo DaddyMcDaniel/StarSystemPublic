@@ -1,0 +1,130 @@
+{
+  "type": "SPHERICAL_PLANET_GAME",
+  "nodes": [
+    {
+      "type": "SPHERICAL_WORLD",
+      "terrain": {
+        "type": "T17_HERO_PLANET",
+        "generation_method": "T17_sophisticated_procedural",
+        "biome": "multi_zone_hero_world",
+        "radius": 65.0,
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "base_material": "hero_world_composite",
+        "seed": 31415926,
+        "heightmap": {
+          "noise_octaves": 6,
+          "height_variation": 0.28,
+          "erosion_factor": 0.22,
+          "ridge_sharpness": 0.65,
+          "warping_strength": 0.35,
+          "archipelago_distribution": 0.18
+        },
+        "geological_features": {
+          "ridged_mountains": {
+            "density": 0.25,
+            "height_multiplier": 2.4,
+            "ridge_complexity": 0.8,
+            "distribution": "northern_hemisphere"
+          },
+          "warped_dunes": {
+            "warp_frequency": 0.015,
+            "dune_height": 1.6,
+            "flow_direction": "northeast_winds",
+            "distribution": "mid_latitudes"
+          },
+          "equatorial_archipelago": {
+            "island_count": 12,
+            "island_size_variation": 0.4,
+            "water_level": -0.15,
+            "distribution": "equatorial_ring"
+          },
+          "cave_networks": {
+            "gyroidal_caves": true,
+            "cave_complexity": 1.8,
+            "entrance_density": 0.08,
+            "depth_variation": "full_penetration"
+          }
+        },
+        "surface_generation": {
+          "voxel_resolution": 0.25,
+          "surface_roughness": 0.35,
+          "rock_scatter": 0.45,
+          "organic_variation": true,
+          "micro_features": true
+        },
+        "terrain_layers": {
+          "surface": "hero_composite_material",
+          "mountain_ridges": "crystalline_rock_formation",
+          "dune_material": "warped_sedimentary_flow",
+          "archipelago_base": "volcanic_island_substrate",
+          "cave_interior": "gyroidal_cave_material",
+          "bedrock": "hero_world_bedrock",
+          "core": "hero_planetary_core"
+        },
+        "environmental": {
+          "atmosphere_density": 0.75,
+          "lighting_type": "hero_world_cinematic",
+          "weather_effects": true,
+          "horizon_quality": "hero_curved_realistic",
+          "atmospheric_scattering": "enhanced"
+        },
+        "rendering": {
+          "chunk_system": "T17_optimized_chunks",
+          "level_of_detail": "T17_advanced_LOD",
+          "seamless_chunks": true,
+          "estimated_polygons": 850000,
+          "performance_target": "60fps_mid_tier_gpu"
+        },
+        "notes": "T17 Hero Planet Showcase - sophisticated terrain with ridged mountains, warped dunes, equatorial archipelagos, and gyroidal cave systems"
+      },
+      "features": [
+        {
+          "type": "ATMOSPHERIC_EFFECT",
+          "style": "orbital_rings",
+          "visibility": "high"
+        },
+        {
+          "type": "NAVIGATION_BEACON",
+          "pos": "north_pole",
+          "material": "beacon_major"
+        }
+      ],
+      "building_zones": [
+        {
+          "type": "CRAFT_STATION",
+          "recipes": "basic",
+          "material": "structure_workbench"
+        }
+      ]
+    },
+    {
+      "type": "SPHERICAL_PLAYER",
+      "spawn_pos": "equator_safe",
+      "surface_locked": true,
+      "controls": [
+        "WASD",
+        "mouse_look",
+        "space_jump"
+      ]
+    },
+    {
+      "type": "EXPLORATION_OBJECTIVE",
+      "goal": {
+        "type": "EXPLORE_PLANET",
+        "coverage": 0.8,
+        "time_limit": null
+      }
+    }
+  ],
+  "compression_id": "C4190",
+  "planet_seed": 31415926,
+  "assets": [
+    "rock_boulder_v1",
+    "ground_patch_v1",
+    "alien_grass_sparse_v1"
+  ]
+}
