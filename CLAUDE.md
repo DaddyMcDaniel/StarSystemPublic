@@ -69,16 +69,37 @@ python agents/run_evolution_loop.py
 
 ### Rendering and Visualization
 ```bash
-# OpenGL viewers (preferred)
+# OpenGL viewers (preferred) - T19+ enhanced with LOD and lighting
 python renderer/pcc_game_viewer.py <game_file>       # Interactive viewer with bridge
 python renderer/pcc_fixed_viewer.py <game_file>      # Fixed camera viewer
 python renderer/pcc_simple_viewer.py <game_file>     # Minimal smoke test viewer
+
+# Screenshot capture (T16+)
+python scripts/capture_viewer_screenshots.py         # Automated screenshot capture
 
 # Forge engine demo
 python forge_engine_demo.py
 
 # Direct 3D viewer test
 python test_3d_viewer.py
+```
+
+### Mini-Planet Workflow (T18-T22)
+```bash
+# Primary mini-planet generation command
+./commands/LOP_miniplanet                    # Generate with random seed
+./commands/LOP_miniplanet --seed 42          # Generate with specific seed
+./commands/LOP_miniplanet --seed 42 --view   # Generate and launch viewer
+./commands/LOP_miniplanet --quick --view     # Quick mode for testing
+
+# Unified planet generation system
+python unified_miniplanet.py --seed 12345    # Advanced planet generation
+python create_mini_planet.py                 # Alternative planet creation
+python generate_miniplanet.py                # Direct generation script
+
+# Visual demonstration and testing
+python terrain_visual_demo.py                # Terrain improvements demo
+python demo_terrain_improvements.py          # T20+ terrain features
 ```
 
 ### Testing and Quality
@@ -90,10 +111,14 @@ python test_ai_tools.py
 python test_vm_execution.py
 python test_integration.py
 python test_forge_quick.py
+python test_chunk_streaming.py              # Test T19+ streaming system
 
 # Test evolved games
 python test_best_100gen_game.py
 python test_final_evolved_game.py
+
+# Terrain quality validation (T22)
+python -m agents.agent_d.validation.terrain_quality_validator
 ```
 
 ## Architecture Overview
@@ -106,7 +131,7 @@ python test_final_evolved_game.py
 
 ### Forge Engine Architecture
 - **Modular Design**: Hot-swappable modules (`forge/modules/`)
-  - Rendering: OpenGL-based 3D rendering
+  - Rendering: OpenGL-based 3D rendering with T19+ LOD system
   - Physics: Game physics simulation
   - PCC Runtime: Executes PCC games
   - Audio/Animation: Planned modules
@@ -117,7 +142,11 @@ python test_final_evolved_game.py
 Four-agent cycle creates increasingly sophisticated games:
 
 1. **Agent A (Generator)**: Creates PCC games using patterns and memory (`agents/agent_a_generator.py`)
-2. **Agent D (Renderer)**: Converts PCC to 3D visual scenes (`agents/agent_d_renderer.py`)  
+2. **Agent D (Renderer)**: Converts PCC to 3D visual scenes (`agents/agent_d_renderer.py`)
+   - **T18-T22 Enhanced**: Advanced terrain with lighting, validation, marching cubes
+   - **Lighting System**: Shadow mapping, SSAO, tone mapping (`agents/agent_d/lighting/`)
+   - **Validation**: Terrain quality assessment (`agents/agent_d/validation/`)
+   - **Debug UI**: Marching cubes debug, LOD statistics (`agents/agent_d/debug_ui/`, `agents/agent_d/hud/`)
 3. **Agent B (Tester)**: Plays games and provides quality assessment (`agents/agent_b_game_player.py`)
 4. **Agent C (Supervisor)**: Provides feedback and evolves patterns (`agents/agent_c_supervisor.py`)
 
@@ -143,12 +172,70 @@ PCC Code → C++ VM / Python Runtime → 3D Scene → OpenGL Renderer → Agent 
 - `tests/examples/`: Generated PCC games
 - `rendered_games/`: Visual game outputs
 - `reports/`: Evolution progress reports
+- `generated_planets/`: Mini-planet variations with metadata (`T18+`)
+  - `metadata/`: Planet configuration and generation metadata
+  - `meshes/`: Generated terrain mesh data
+  - `textures/`: Planet surface textures
+  - `previews/`: Generated preview images
+- `planet_configs/`: Hero planet configurations
+- `test_screenshots_t16/`: Automated screenshot captures
 
 ### Configuration
 - `.env`: Environment variables (API keys, paths)
 - `config.json`: System configuration
 - `agent_b_plan/`: Agent B specifications and gating
 - Package management: `package.json` (Playwright), `requirements*.txt` (Python deps)
+- **Direct_Struct_Summary/**: Comprehensive system documentation and architecture summaries
+  - `Main_Struct.md`: Complete technical overview
+  - `core_terrain_system.json`: Terrain pipeline documentation
+  - `rendering_pipeline.json`: OpenGL rendering system
+  - `production_workflow.json`: Development workflows
+
+## Git Workflow
+
+### Committing and Pushing Changes
+```bash
+# Check status and see what files have changed
+git status
+git diff                    # Show unstaged changes
+git diff --staged          # Show staged changes
+
+# Pull latest changes first (important!)
+git pull
+
+# Add files to staging area
+git add -A                 # Add all files (modified and untracked)
+# OR selectively add:
+git add <specific_files>   # Add specific files only
+
+# Create comprehensive commit with proper message
+git commit -m "$(cat <<'EOF'
+feat(T18-T22): description of major changes
+
+Detailed explanation of improvements:
+• Key feature 1: description
+• Key feature 2: description
+• System enhancement: description
+
+The system now supports [major capabilities].
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+
+# Push to repository
+git push
+```
+
+### Commit Message Patterns
+Follow the established pattern seen in recent commits:
+- `feat(T##):` for new features with iteration number
+- `fix:` for bug fixes
+- `refactor:` for code reorganization
+- Include bullet points for major changes
+- Always include Claude Code attribution
 
 ## Development Workflow
 
@@ -169,18 +256,38 @@ PCC Code → C++ VM / Python Runtime → 3D Scene → OpenGL Renderer → Agent 
 3. Register in engine configuration
 4. Hot-swappable at runtime
 
-### Rendering Pipeline
+### Rendering Pipeline (T18-T22 Enhanced)
+- **Advanced Terrain**: Marching cubes, SDF cave systems, seam prevention
+- **LOD Management**: Runtime level-of-detail with adaptive resolution (`agents/agent_d/mesh/runtime_lod.py`)
+- **Lighting System**: PBR materials, shadow mapping, SSAO, tone mapping
+- **Chunk Streaming**: Optimized mesh loading with overlap prevention (`agents/agent_d/mesh/chunk_streamer.py`)
+- **Quality Validation**: Automated terrain assessment and metrics
+- Bridge protocol for Agent B interaction (`renderer/pcc_game_viewer.py`)
 - Prefer OpenGL viewers over pygame (being phased out)
 - Use C++ VM when available, Python runtime as fallback
-- Bridge protocol for Agent B interaction (`renderer/pcc_game_viewer.py`)
 
 ## Key Technologies
 - **Languages**: C++17 (VM), Python 3.8+ (agents/engine)
-- **Graphics**: OpenGL, GLUT for 3D rendering
+- **Graphics**: OpenGL, GLUT for 3D rendering with advanced shaders
+- **Terrain**: Marching cubes, SDF evaluation, quadtree chunking
 - **AI**: Integration with Claude collective intelligence
 - **Build**: CMake for C++ components
-- **Testing**: Built-in C++ tests, Python test scripts
+- **Testing**: Built-in C++ tests, Python test scripts, terrain quality validation
+- **Lighting**: Shadow mapping, SSAO, tone mapping, PBR materials
 - **Optional**: Reinforcement learning (stable-baselines3), Playwright for web automation
+
+## Project Documentation
+
+### Direct_Struct_Summary System
+Comprehensive technical documentation located in `Direct_Struct_Summary/`:
+- **Main_Struct.md**: Complete system overview for external developers
+- **core_terrain_system.json**: Detailed terrain pipeline documentation
+- **rendering_pipeline.json**: OpenGL rendering architecture
+- **agent_systems.json**: Agent collaboration and memory systems
+- **production_workflow.json**: Development and testing workflows
+- **quick_start_guide.json**: Getting started instructions
+
+Refer to these files for in-depth technical details and system architecture.
 
 ## Notes
 - The system prefers the C++ VM (`bin/pcc_vm`) when built, falls back to Python runtime
@@ -188,3 +295,6 @@ PCC Code → C++ VM / Python Runtime → 3D Scene → OpenGL Renderer → Agent 
 - Agent memory persists between evolution cycles in JSON format  
 - Games are stored as compressed AST JSON in `.pcc` files
 - The evolution system can run autonomous loops generating increasingly complex games
+- **T18-T22 Systems**: Advanced terrain generation with lighting, validation, and quality metrics
+- **Mini-Planet Workflow**: Use `./commands/LOP_miniplanet` for primary generation interface
+- **Seeded Generation**: Same seed produces identical, deterministic planets
